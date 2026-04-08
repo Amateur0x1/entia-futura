@@ -1,0 +1,37 @@
+---
+import BilingualSection from '../components/BilingualSection.astro';
+import Layout from '../layouts/Layout.astro';
+import { siteMeta } from '../content/site';
+---
+
+<Layout title={`关于我们 | ${siteMeta.enName}`} description={siteMeta.oneLineEn}>
+  <main>
+    <section class="hero-panel">
+      <p class="eyebrow">About</p>
+      <h1 class="hero-title-zh">关于我们</h1>
+      <p class="hero-title-en">{siteMeta.enName}</p>
+      <p class="hero-subtitle">{siteMeta.enSubtitle}</p>
+    </section>
+    <BilingualSection
+      eyebrow="Who We Are"
+      zhTitle="我们是谁"
+      enTitle="Who We Are"
+      zhBody="未来人研究所是一个独立研究机构，围绕“未来我们将如何存在？”这一核心问题展开工作。我们以高等研究为基础，同时强调研究向现实问题、合作机制与未来项目的持续转化。这意味着，我们不仅重视思想、方法与长期观察，也重视研究如何进入现实，如何与企业、地方、空间、社群及各类实践者形成真实合作，如何在现实中测试新的组织形式、学习机制、空间原型与未来生活方式。"
+      enBody="Entia Futura Institut is an independent institute organized around one core question: “How shall we exist in the future?” Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, and future-oriented projects. We value thought, method, and long-term observation, while also asking how research can enter reality, form real collaborations with enterprises, local initiatives, spaces, communities, and practitioners, and test new forms of organization, learning, spatial prototypes, and future ways of living."
+    />
+    <BilingualSection
+      eyebrow="What We Are Not"
+      zhTitle="我们不是什么"
+      enTitle="What We Are Not"
+      zhBody="我们不是传统学院，不是普通咨询公司，不是内容平台，也不是松散社群。我们希望成为一种新的机构形态：以研究为骨架，以社群为生命，以协作为接口，以实验和项目为现实转化路径。"
+      enBody="We are not a traditional academic institution, nor a conventional consulting firm, nor a content platform, nor a loose social community. We seek to become a new institutional form: research as structure, community as vitality, collaboration as interface, and experimentation and projects as pathways of translation into reality."
+    />
+    <BilingualSection
+      eyebrow="What We Believe"
+      zhTitle="我们的信念"
+      enTitle="What We Believe"
+      zhBody="我们相信，未来的问题不能只在学院中被讨论，也不能只在商业世界中被消费。它们需要一种新的研究机构来承接：既有方法和判断力，也有现实进入能力；既能形成知识成果，也能发起合作、孵化项目并培育共同体。"
+      enBody="We believe that the questions of the future cannot remain confined to academic discourse, nor be reduced to trends in the commercial world. They require a new kind of institute: one with method and judgment, but also with the capacity to enter reality; one that produces knowledge, while also initiating collaborations, incubating projects, and cultivating forms of collective life."
+    />
+  </main>
+</Layout>

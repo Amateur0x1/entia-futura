@@ -1,0 +1,54 @@
+---
+import BilingualIntro from '../components/BilingualIntro.astro';
+import Layout from '../layouts/Layout.astro';
+import { siteMeta } from '../content/site';
+---
+
+<Layout title={`联系我们 | ${siteMeta.enName}`} description="Contact Entia Futura Institut.">
+  <main>
+    <section class="hero-panel">
+      <p class="eyebrow">Contact</p>
+      <h1 class="hero-title-zh">联系我们</h1>
+      <p class="hero-title-en">Contact</p>
+    </section>
+    <section class="contact-card">
+      <div class="section-heading">
+        <h2>联系我们</h2>
+        <p>Contact</p>
+      </div>
+      <BilingualIntro
+        zh="如果你希望围绕某个问题、合作、项目、提案或计划与未来人研究所建立联系，欢迎向我们写信。"
+        en="If you would like to connect with Entia Futura Institut around a question, collaboration, project, proposal, or program, we welcome you to write to us."
+      />
+      <p style="margin-top: 18px;">
+        Email:
+        <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
+      </p>
+      <form class="contact-form" action={`mailto:${siteMeta.email}`} method="post" enctype="text/plain">
+        <label>
+          姓名 / Name
+          <input name="name" type="text" />
+        </label>
+        <label>
+          邮箱 / Email
+          <input name="email" type="email" />
+        </label>
+        <label>
+          机构 / 公司 / Organization / Company
+          <input name="organization" type="text" />
+        </label>
+        <label>
+          联系主题 / Subject
+          <input name="subject" type="text" />
+        </label>
+        <label>
+          你的信息 / Your Message
+          <textarea name="message"></textarea>
+        </label>
+        <div class="cta-row">
+          <button class="button primary" type="submit">发送 / Send</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</Layout>

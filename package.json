@@ -1,0 +1,23 @@
+{
+  "name": "entia-futura",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "cf:dev": "astro build && wrangler dev",
+    "cf:deploy": "astro build && wrangler deploy",
+    "tunnel": "cloudflared tunnel --url http://127.0.0.1:4321",
+    "tunnel:cf": "cloudflared tunnel --url http://127.0.0.1:8787",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.1.8",
+    "astro": "^6.1.5",
+    "wrangler": "^4.81.0"
+  }
+}

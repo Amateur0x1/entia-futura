@@ -1,0 +1,33 @@
+---
+import BilingualCards from '../components/BilingualCards.astro';
+import BilingualIntro from '../components/BilingualIntro.astro';
+import Layout from '../layouts/Layout.astro';
+import { siteMeta, ventureItems } from '../content/site';
+---
+
+<Layout title={`未来项目 | ${siteMeta.enName}`} description="Future Ventures of Entia Futura Institut.">
+  <main>
+    <section class="hero-panel">
+      <p class="eyebrow">Future Ventures</p>
+      <h1 class="hero-title-zh">未来项目</h1>
+      <p class="hero-title-en">Future Ventures</p>
+    </section>
+    <section class="section-card">
+      <div class="section-heading">
+        <h2>未来项目</h2>
+        <p>Future Ventures</p>
+      </div>
+      <BilingualIntro
+        zh="未来人研究所不仅关注研究，也关注研究如何进一步长成项目、机制、原型与新的组织形式。“未来项目”不是传统意义上的创业孵化器，也不是单纯的商业板块，而是研究所内部的一层现实生成机制。"
+        en="Entia Futura Institut is concerned not only with research, but with how research may grow into projects, mechanisms, prototypes, and new organizational forms. Future Ventures is not a conventional startup incubator, nor simply a commercial division, but a generative layer within the institute."
+      />
+    </section>
+    <section class="section-card">
+      <div class="section-heading">
+        <h2>生成方向</h2>
+        <p>Venture Directions</p>
+      </div>
+      <BilingualCards items={ventureItems} />
+    </section>
+  </main>
+</Layout>

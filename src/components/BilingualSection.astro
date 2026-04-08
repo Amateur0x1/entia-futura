@@ -1,0 +1,22 @@
+---
+import BilingualIntro from './BilingualIntro.astro';
+
+interface Props {
+  eyebrow?: string;
+  zhTitle: string;
+  enTitle: string;
+  zhBody: string;
+  enBody: string;
+}
+
+const { eyebrow, zhTitle, enTitle, zhBody, enBody } = Astro.props;
+---
+
+<section class="section-card">
+  <div class="section-heading">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h2>{zhTitle}</h2>
+    <p>{enTitle}</p>
+  </div>
+  <BilingualIntro zh={zhBody} en={enBody} />
+</section>
