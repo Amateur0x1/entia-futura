@@ -19,8 +19,8 @@ const currentPath = Astro.url.pathname;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -140,7 +140,7 @@ const currentPath = Astro.url.pathname;
   .brand img {
     width: 56px;
     height: 56px;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 14px;
     border: 1px solid var(--line);
   }

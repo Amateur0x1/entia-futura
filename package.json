@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.8",
+    "@chenglou/pretext": "^0.0.5",
     "astro": "^6.1.5",
     "wrangler": "^4.81.0"
   }
