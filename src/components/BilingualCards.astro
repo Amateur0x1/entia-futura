@@ -1,4 +1,6 @@
 ---
+import { pickByLocale, type Locale } from '../i18n/config';
+
 interface Item {
   zhTitle: string;
   enTitle: string;
@@ -8,26 +10,35 @@ interface Item {
 
 interface Props {
   items: Item[];
+  locale?: Locale;
 }
 
-const { items } = Astro.props;
+const { items, locale } = Astro.props;
 ---
 
 <div class="cards-grid">
   {items.map((item) => (
     <article class="mini-card">
-      <h3>{item.zhTitle}</h3>
-      <span class="en">{item.enTitle}</span>
-      <div class="dual-grid">
-        <div class="lang-block">
-          <h3>中文</h3>
-          <p>{item.zhBody}</p>
-        </div>
-        <div class="lang-block">
-          <h3>English</h3>
-          <p>{item.enBody}</p>
-        </div>
-      </div>
+      <h3>{pickByLocale(locale ?? 'zh', item.zhTitle, item.enTitle)}</h3>
+      {
+        locale ? (
+          <p>{pickByLocale(locale, item.zhBody, item.enBody)}</p>
+        ) : (
+          <>
+            <span class="en">{item.enTitle}</span>
+            <div class="dual-grid">
+              <div class="lang-block">
+                <h3>中文</h3>
+                <p>{item.zhBody}</p>
+              </div>
+              <div class="lang-block">
+                <h3>English</h3>
+                <p>{item.enBody}</p>
+              </div>
+            </div>
+          </>
+        )
+      }
     </article>
   ))}
 </div>

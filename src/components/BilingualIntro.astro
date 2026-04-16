@@ -1,19 +1,30 @@
 ---
+import { pickByLocale, type Locale } from '../i18n/config';
+
 interface Props {
   zh: string;
   en: string;
+  locale?: Locale;
 }
 
-const { zh, en } = Astro.props;
+const { zh, en, locale } = Astro.props;
 ---
 
-<div class="dual-grid">
-  <div class="lang-block">
-    <h3>中文</h3>
-    <p>{zh}</p>
-  </div>
-  <div class="lang-block">
-    <h3>English</h3>
-    <p>{en}</p>
-  </div>
-</div>
+{
+  locale ? (
+    <div class="lang-block locale-block">
+      <p>{pickByLocale(locale, zh, en)}</p>
+    </div>
+  ) : (
+    <div class="dual-grid">
+      <div class="lang-block">
+        <h3>中文</h3>
+        <p>{zh}</p>
+      </div>
+      <div class="lang-block">
+        <h3>English</h3>
+        <p>{en}</p>
+      </div>
+    </div>
+  )
+}

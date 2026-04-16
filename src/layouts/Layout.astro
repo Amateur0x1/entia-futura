@@ -1,17 +1,23 @@
 ---
+import LocaleSwitcher from '../components/LocaleSwitcher.astro';
 import { navItems, siteMeta } from '../content/site';
+import { getLocaleFromPath, pickByLocale, toLocalePath, type Locale } from '../i18n/config';
 
 interface Props {
   title?: string;
   description?: string;
+  locale?: Locale;
 }
 
 const {
   title = `${siteMeta.zhName} | ${siteMeta.enName}`,
   description = siteMeta.oneLineEn,
+  locale,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
+const activeLocale = locale ?? getLocaleFromPath(currentPath);
+const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : currentPath;
 ---
 
 <!doctype html>
@@ -19,8 +25,11 @@ const currentPath = Astro.url.pathname;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/brand/entia-logo.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/brand/entia-logo.png" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/brand/entia-logo.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -29,13 +38,15 @@ const currentPath = Astro.url.pathname;
     <meta property="og:url" content={`${siteMeta.siteUrl}${currentPath}`} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={`${siteMeta.siteUrl}/brand/entia-logo.png`} />
+    {activeLocale && <link rel="alternate" hrefLang="zh-CN" href={`${siteMeta.siteUrl}${toLocalePath('zh', currentPath)}`} />}
+    {activeLocale && <link rel="alternate" hrefLang="en" href={`${siteMeta.siteUrl}${toLocalePath('en', currentPath)}`} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#eef0e8" />
   </head>
   <body>
     <div class="page-shell">
       <header class="site-header">
-        <a class="brand" href="/">
+        <a class="brand" href={activeLocale ? toLocalePath(activeLocale, '/') : '/'}>
           <img src="/brand/entia-logo.png" alt="Entia Futura logo" />
           <div class="brand-copy">
             <span class="brand-zh">{siteMeta.zhName}</span>
@@ -44,11 +55,23 @@ const currentPath = Astro.url.pathname;
         </a>
         <nav class="nav">
           {navItems.map((item) => (
-            <a class:list={['nav-link', { active: currentPath === item.href }]} href={item.href}>
-              <span>{item.zh}</span>
-              <small>{item.en}</small>
+            <a
+              class:list={['nav-link', { active: localizedPath === (activeLocale ? toLocalePath(activeLocale, item.href) : item.href) }]}
+              href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}
+            >
+              {
+                activeLocale ? (
+                  <span>{pickByLocale(activeLocale, item.zh, item.en)}</span>
+                ) : (
+                  <>
+                    <span>{item.zh}</span>
+                    <small>{item.en}</small>
+                  </>
+                )
+              }
             </a>
           ))}
+          {activeLocale && <LocaleSwitcher locale={activeLocale} currentPath={currentPath} />}
         </nav>
       </header>
       <slot />
@@ -66,7 +89,9 @@ const currentPath = Astro.url.pathname;
         </div>
         <nav class="footer-nav">
           {navItems.slice(1).map((item) => (
-            <a href={item.href}>{item.zh}</a>
+            <a href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}>
+              {activeLocale ? pickByLocale(activeLocale, item.zh, item.en) : item.zh}
+            </a>
           ))}
         </nav>
       </footer>
@@ -76,13 +101,14 @@ const currentPath = Astro.url.pathname;
 
 <style is:global>
   :root {
-    --paper: #eef0e8;
-    --paper-2: #f8f8f3;
-    --ink: #171717;
-    --muted: rgba(23, 23, 23, 0.64);
-    --line: rgba(23, 23, 23, 0.12);
-    --accent: #f3ec59;
-    --panel: rgba(255, 255, 255, 0.72);
+    --paper: #b7c7d2;
+    --paper-2: #c8d4dc;
+    --ink: #161616;
+    --muted: rgba(22, 22, 22, 0.62);
+    --line: rgba(22, 22, 22, 0.18);
+    --accent: #fff45a;
+    --accent-2: #5f35ff;
+    --panel: rgba(255, 245, 90, 0.08);
     font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
     color: var(--ink);
     background: var(--paper);
@@ -96,8 +122,9 @@ const currentPath = Astro.url.pathname;
 
   body {
     background:
-      radial-gradient(circle at top left, rgba(243, 236, 89, 0.28), transparent 24rem),
-      linear-gradient(180deg, var(--paper) 0%, #f4f4ef 55%, #eceee5 100%);
+      radial-gradient(circle at 18% 12%, rgba(255, 244, 90, 0.34), transparent 22rem),
+      radial-gradient(circle at 84% 18%, rgba(95, 53, 255, 0.12), transparent 20rem),
+      linear-gradient(180deg, #b3c4cf 0%, #b8c8d2 48%, #c0cfd8 100%);
   }
 
   * {
@@ -116,19 +143,18 @@ const currentPath = Astro.url.pathname;
   }
 
   .site-header {
-    position: sticky;
-    top: 12px;
+    position: relative;
     z-index: 20;
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 18px;
     align-items: start;
     margin-bottom: 28px;
-    padding: 14px 18px;
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    backdrop-filter: blur(18px);
-    background: rgba(248, 248, 243, 0.78);
+    padding: 10px 0 18px;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    backdrop-filter: none;
+    background: transparent;
   }
 
   .brand {
@@ -141,8 +167,8 @@ const currentPath = Astro.url.pathname;
     width: 56px;
     height: 56px;
     object-fit: contain;
-    border-radius: 14px;
-    border: 1px solid var(--line);
+    border-radius: 0;
+    border: 0;
   }
 
   .brand-copy {
@@ -173,9 +199,8 @@ const currentPath = Astro.url.pathname;
     display: grid;
     gap: 2px;
     min-width: 100px;
-    padding: 10px 12px;
+    padding: 8px 0;
     border: 1px solid transparent;
-    border-radius: 14px;
     color: var(--muted);
     transition: all 160ms ease;
   }
@@ -190,16 +215,42 @@ const currentPath = Astro.url.pathname;
     text-transform: uppercase;
   }
 
+  .locale-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid rgba(22, 22, 22, 0.24);
+    border-radius: 999px;
+    background: rgba(255, 244, 90, 0.22);
+  }
+
+  .locale-link {
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 160ms ease, color 160ms ease;
+  }
+
+  .locale-link.active,
+  .locale-link:hover {
+    background: var(--ink);
+    color: var(--accent);
+  }
+
   .nav-link:hover,
   .nav-link.active {
     color: var(--ink);
-    border-color: var(--line);
-    background: rgba(255, 255, 255, 0.62);
+    border-color: rgba(95, 53, 255, 0.26);
+    background: transparent;
   }
 
   main {
     display: grid;
-    gap: 20px;
+    gap: 48px;
   }
 
   .hero-panel,
@@ -207,15 +258,110 @@ const currentPath = Astro.url.pathname;
   .content-card,
   .list-card,
   .contact-card {
-    border: 1px solid var(--line);
-    border-radius: 28px;
-    background: var(--panel);
-    backdrop-filter: blur(18px);
-    box-shadow: 0 24px 70px rgba(24, 29, 32, 0.06);
+    position: relative;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
   }
 
   .hero-panel {
-    padding: 32px;
+    padding: 18px 0 42px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .landing-hero {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .hero-backdrop {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .landing-hero::before,
+  .landing-hero::after {
+    content: '';
+    position: absolute;
+    inset: auto;
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(10px);
+  }
+
+  .landing-hero::before {
+    top: -2rem;
+    right: 10%;
+    width: min(42vw, 28rem);
+    height: min(42vw, 28rem);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 244, 90, 0.9) 0%, rgba(255, 244, 90, 0.18) 58%, rgba(255, 244, 90, 0) 76%);
+  }
+
+  .landing-hero::after {
+    bottom: 2rem;
+    left: -2rem;
+    width: min(38vw, 24rem);
+    height: min(20vw, 10rem);
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(95, 53, 255, 0.16) 0%, rgba(95, 53, 255, 0) 74%);
+  }
+
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(8px);
+    opacity: 0.8;
+    mix-blend-mode: multiply;
+  }
+
+  .hero-orb-a {
+    top: 0;
+    right: 2%;
+    width: min(26vw, 16rem);
+    height: min(26vw, 16rem);
+    background: radial-gradient(circle, rgba(255, 244, 90, 0.92) 0%, rgba(255, 244, 90, 0.14) 64%, transparent 78%);
+  }
+
+  .hero-orb-b {
+    bottom: 18%;
+    right: 30%;
+    width: min(16vw, 10rem);
+    height: min(16vw, 10rem);
+    background: radial-gradient(circle, rgba(95, 53, 255, 0.34) 0%, rgba(95, 53, 255, 0.02) 68%, transparent 80%);
+  }
+
+  .hero-orb-c {
+    bottom: 8%;
+    left: 10%;
+    width: min(30vw, 18rem);
+    height: min(18vw, 10rem);
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.04) 60%, transparent 76%);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(22, 22, 22, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(22, 22, 22, 0.08) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(circle at center, black 20%, transparent 84%);
+    opacity: 0.28;
+  }
+
+  .hero-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+    gap: 32px;
+    align-items: center;
+    min-height: min(76vh, 52rem);
   }
 
   .eyebrow {
@@ -228,37 +374,55 @@ const currentPath = Astro.url.pathname;
 
   .hero-title-zh {
     margin: 0;
-    font-size: clamp(2.8rem, 7vw, 5.8rem);
+    font-size: clamp(3.4rem, 7.4vw, 7rem);
     font-weight: 500;
     letter-spacing: 0.04em;
-    line-height: 1;
+    line-height: 0.94;
+    max-width: 7ch;
   }
 
   .hero-title-en {
     margin: 12px 0 0;
-    font-size: clamp(1.35rem, 2.5vw, 2.1rem);
-    letter-spacing: 0.18em;
+    font-size: clamp(0.98rem, 1.6vw, 1.2rem);
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: rgba(23, 23, 23, 0.78);
   }
 
   .hero-subtitle {
-    margin: 8px 0 0;
-    font-size: 1.05rem;
+    margin: 24px 0 0;
+    max-width: 16ch;
+    font-size: clamp(1.4rem, 2vw, 2rem);
+    line-height: 1.25;
+    color: var(--ink);
+  }
+
+  .hero-flash {
+    margin: 18px 0 0;
     color: var(--muted);
+    font-size: 0.84rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 
-  .core-question {
-    margin: 28px 0 0;
-    padding-top: 24px;
-    border-top: 1px solid var(--line);
-    display: grid;
-    gap: 8px;
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
   }
 
-  .core-question strong {
-    font-size: clamp(1.4rem, 3vw, 2.2rem);
-    font-weight: 500;
+  .hero-logo-frame {
+    position: relative;
+    width: min(100%, 44rem);
+    aspect-ratio: 1 / 1;
+  }
+
+  .hero-logo-art {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 26px 40px rgba(22, 22, 22, 0.08));
   }
 
   .lede {
@@ -297,15 +461,16 @@ const currentPath = Astro.url.pathname;
   .content-card,
   .list-card,
   .contact-card {
-    padding: 28px;
+    padding: 0;
   }
 
   .section-heading {
     display: grid;
     gap: 8px;
-    margin-bottom: 18px;
-    padding-bottom: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
     border-bottom: 1px solid var(--line);
+    will-change: transform, opacity;
   }
 
   .section-heading h2 {
@@ -322,25 +487,26 @@ const currentPath = Astro.url.pathname;
   .cards-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    gap: 30px 42px;
   }
 
   .mini-card {
-    padding: 22px;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.5);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    will-change: transform, opacity;
   }
 
   .mini-card h3 {
-    margin: 0 0 6px;
-    font-size: 1.3rem;
+    margin: 0 0 10px;
+    font-size: clamp(1.5rem, 2vw, 2.1rem);
     font-weight: 500;
   }
 
   .mini-card .en {
     display: block;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
     color: var(--muted);
     font-size: 0.78rem;
     letter-spacing: 0.14em;
@@ -349,6 +515,11 @@ const currentPath = Astro.url.pathname;
 
   .mini-card p {
     margin: 0;
+  }
+
+  .mini-card + .mini-card {
+    border-top: 1px solid var(--line);
+    padding-top: 4px;
   }
 
   .cta-row {
@@ -366,11 +537,36 @@ const currentPath = Astro.url.pathname;
     border: 1px solid var(--ink);
     border-radius: 999px;
     font-size: 0.95rem;
-    transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+    will-change: transform;
+    transition: transform 160ms ease, background 160ms ease, color 160ms ease, box-shadow 220ms ease;
   }
 
   .button:hover {
     transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(23, 23, 23, 0.1);
+  }
+
+  .landing-hero .button {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .landing-hero .button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.38) 50%, transparent 80%);
+    transform: translateX(-130%);
+    transition: transform 420ms ease;
+  }
+
+  .landing-hero .button:hover::after {
+    transform: translateX(130%);
+  }
+
+  [data-parallax-card] {
+    transform-origin: center top;
+    will-change: transform;
   }
 
   .button.primary {
@@ -379,14 +575,24 @@ const currentPath = Astro.url.pathname;
   }
 
   .button.secondary {
-    background: transparent;
+    background: rgba(255, 244, 90, 0.18);
     color: var(--ink);
   }
 
   .list-columns {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
+    gap: 42px;
+  }
+
+  .list-card {
+    padding-top: 10px;
+    will-change: transform, opacity;
+  }
+
+  .list-card + .list-card {
+    border-left: 1px solid var(--line);
+    padding-left: 32px;
   }
 
   ul.clean {
@@ -419,6 +625,7 @@ const currentPath = Astro.url.pathname;
     display: grid;
     gap: 14px;
     margin-top: 18px;
+    max-width: 760px;
   }
 
   .contact-form input,
@@ -439,6 +646,7 @@ const currentPath = Astro.url.pathname;
   @media (max-width: 1100px) {
     .site-header,
     .dual-grid,
+    .hero-stage,
     .cards-grid,
     .list-columns,
     .site-footer {
@@ -447,6 +655,13 @@ const currentPath = Astro.url.pathname;
 
     .nav {
       justify-content: flex-start;
+    }
+
+    .list-card + .list-card {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+      padding-left: 0;
+      padding-top: 24px;
     }
   }
 
@@ -461,12 +676,33 @@ const currentPath = Astro.url.pathname;
     .content-card,
     .list-card,
     .contact-card {
-      padding: 20px;
-      border-radius: 22px;
+      padding: 0;
+      border-radius: 0;
     }
 
     .brand {
       align-items: flex-start;
+    }
+
+    main {
+      gap: 34px;
+    }
+
+    .hero-panel {
+      padding: 8px 0 24px;
+    }
+
+    .hero-stage {
+      min-height: auto;
+    }
+
+    .hero-title-zh {
+      max-width: none;
+    }
+
+    .cards-grid,
+    .list-columns {
+      gap: 24px;
     }
   }
 </style>

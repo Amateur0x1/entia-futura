@@ -1,0 +1,414 @@
+---
+import BilingualCards from '../../components/BilingualCards.astro';
+import BilingualIntro from '../../components/BilingualIntro.astro';
+import BilingualList from '../../components/BilingualList.astro';
+import BilingualSection from '../../components/BilingualSection.astro';
+import Layout from '../../layouts/Layout.astro';
+import {
+  collaborationFormsEn,
+  collaborationFormsZh,
+  collaborationMethodEn,
+  collaborationMethodZh,
+  collaborationPartnersEn,
+  collaborationPartnersZh,
+  joinValuesEn,
+  joinValuesZh,
+  joinWaysEn,
+  joinWaysZh,
+  joinWhoEn,
+  joinWhoZh,
+  practiceItems,
+  programs,
+  publicationCategoriesEn,
+  publicationCategoriesZh,
+  researchAreas,
+  siteMeta,
+  ventureItems,
+} from '../../content/site';
+import { isLocale, pickByLocale } from '../../i18n/config';
+
+const pageSlugs = [
+  'about',
+  'research',
+  'programs',
+  'research-in-practice',
+  'future-ventures',
+  'collaboration',
+  'people',
+  'publications',
+  'join-us',
+  'contact',
+] as const;
+
+type PageSlug = (typeof pageSlugs)[number];
+
+const { locale, slug } = Astro.params;
+
+if (!isLocale(locale) || !slug || !pageSlugs.includes(slug as PageSlug)) {
+  throw new Error(`Unsupported localized route: ${locale}/${slug}`);
+}
+
+const pageSlug = slug as PageSlug;
+
+const pageMeta: Record<PageSlug, { titleZh: string; titleEn: string; eyebrowZh: string; eyebrowEn: string; descriptionZh: string; descriptionEn: string }> = {
+  about: {
+    titleZh: '关于我们',
+    titleEn: 'About',
+    eyebrowZh: '关于',
+    eyebrowEn: 'About',
+    descriptionZh: '关于未来人研究所。',
+    descriptionEn: 'About Entia Futura Institut.',
+  },
+  research: {
+    titleZh: '研究方向',
+    titleEn: 'Research',
+    eyebrowZh: '研究',
+    eyebrowEn: 'Research',
+    descriptionZh: '未来人研究所的研究方向。',
+    descriptionEn: 'Research areas of Entia Futura Institut.',
+  },
+  programs: {
+    titleZh: '项目机制',
+    titleEn: 'Programs',
+    eyebrowZh: '项目机制',
+    eyebrowEn: 'Programs',
+    descriptionZh: '未来人研究所的项目机制。',
+    descriptionEn: 'Programs of Entia Futura Institut.',
+  },
+  'research-in-practice': {
+    titleZh: '研究转化',
+    titleEn: 'Research in Practice',
+    eyebrowZh: '研究转化',
+    eyebrowEn: 'Research in Practice',
+    descriptionZh: '未来人研究所的研究转化。',
+    descriptionEn: 'Research in Practice at Entia Futura Institut.',
+  },
+  'future-ventures': {
+    titleZh: '未来项目',
+    titleEn: 'Future Ventures',
+    eyebrowZh: '未来项目',
+    eyebrowEn: 'Future Ventures',
+    descriptionZh: '未来人研究所的未来项目。',
+    descriptionEn: 'Future Ventures of Entia Futura Institut.',
+  },
+  collaboration: {
+    titleZh: '合作方式',
+    titleEn: 'Collaboration',
+    eyebrowZh: '合作',
+    eyebrowEn: 'Collaboration',
+    descriptionZh: '与未来人研究所合作。',
+    descriptionEn: 'Collaboration with Entia Futura Institut.',
+  },
+  people: {
+    titleZh: '成员',
+    titleEn: 'People',
+    eyebrowZh: '成员',
+    eyebrowEn: 'People',
+    descriptionZh: '未来人研究所的成员。',
+    descriptionEn: 'People of Entia Futura Institut.',
+  },
+  publications: {
+    titleZh: '研究成果',
+    titleEn: 'Publications',
+    eyebrowZh: '研究成果',
+    eyebrowEn: 'Publications',
+    descriptionZh: '未来人研究所的研究成果。',
+    descriptionEn: 'Publications of Entia Futura Institut.',
+  },
+  'join-us': {
+    titleZh: '加入我们',
+    titleEn: 'Join Us',
+    eyebrowZh: '加入我们',
+    eyebrowEn: 'Join Us',
+    descriptionZh: '加入未来人研究所。',
+    descriptionEn: 'Join Entia Futura Institut.',
+  },
+  contact: {
+    titleZh: '联系我们',
+    titleEn: 'Contact',
+    eyebrowZh: '联系',
+    eyebrowEn: 'Contact',
+    descriptionZh: '联系未来人研究所。',
+    descriptionEn: 'Contact Entia Futura Institut.',
+  },
+};
+
+const meta = pageMeta[pageSlug];
+const pageTitle = pickByLocale(locale, meta.titleZh, meta.titleEn);
+const pageDescription = pickByLocale(locale, meta.descriptionZh, meta.descriptionEn);
+---
+
+<Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale}>
+  <main>
+    <section class="hero-panel">
+      <p class="eyebrow">{pickByLocale(locale, meta.eyebrowZh, meta.eyebrowEn)}</p>
+      <h1 class="hero-title-zh">{pageTitle}</h1>
+      <p class="hero-title-en">{pickByLocale(locale, siteMeta.zhName, siteMeta.enName)}</p>
+      {pageSlug === 'research' && <p class="hero-subtitle">{pickByLocale(locale, siteMeta.coreQuestionZh, siteMeta.coreQuestionEn)}</p>}
+      {pageSlug === 'about' && <p class="hero-subtitle">{pickByLocale(locale, siteMeta.enSubtitle, siteMeta.enSubtitle)}</p>}
+    </section>
+
+    {pageSlug === 'about' && (
+      <>
+        <BilingualSection
+          locale={locale}
+          eyebrow={pickByLocale(locale, '我们是谁', 'Who We Are')}
+          zhTitle="我们是谁"
+          enTitle="Who We Are"
+          zhBody="未来人研究所是一个独立研究机构，围绕“未来我们将如何存在？”这一核心问题展开工作。我们以高等研究为基础，同时强调研究向现实问题、合作机制与未来项目的持续转化。这意味着，我们不仅重视思想、方法与长期观察，也重视研究如何进入现实，如何与企业、地方、空间、社群及各类实践者形成真实合作，如何在现实中测试新的组织形式、学习机制、空间原型与未来生活方式。"
+          enBody="Entia Futura Institut is an independent institute organized around one core question: “How shall we exist in the future?” Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, and future-oriented projects. We value thought, method, and long-term observation, while also asking how research can enter reality, form real collaborations with enterprises, local initiatives, spaces, communities, and practitioners, and test new forms of organization, learning, spatial prototypes, and future ways of living."
+        />
+        <BilingualSection
+          locale={locale}
+          eyebrow={pickByLocale(locale, '我们不是什么', 'What We Are Not')}
+          zhTitle="我们不是什么"
+          enTitle="What We Are Not"
+          zhBody="我们不是传统学院，不是普通咨询公司，不是内容平台，也不是松散社群。我们希望成为一种新的机构形态：以研究为骨架，以社群为生命，以协作为接口，以实验和项目为现实转化路径。"
+          enBody="We are not a traditional academic institution, nor a conventional consulting firm, nor a content platform, nor a loose social community. We seek to become a new institutional form: research as structure, community as vitality, collaboration as interface, and experimentation and projects as pathways of translation into reality."
+        />
+        <BilingualSection
+          locale={locale}
+          eyebrow={pickByLocale(locale, '我们的信念', 'What We Believe')}
+          zhTitle="我们的信念"
+          enTitle="What We Believe"
+          zhBody="我们相信，未来的问题不能只在学院中被讨论，也不能只在商业世界中被消费。它们需要一种新的研究机构来承接：既有方法和判断力，也有现实进入能力；既能形成知识成果，也能发起合作、孵化项目并培育共同体。"
+          enBody="We believe that the questions of the future cannot remain confined to academic discourse, nor be reduced to trends in the commercial world. They require a new kind of institute: one with method and judgment, but also with the capacity to enter reality; one that produces knowledge, while also initiating collaborations, incubating projects, and cultivating forms of collective life."
+        />
+      </>
+    )}
+
+    {pageSlug === 'research' && (
+      <section class="section-card">
+        <div class="section-heading">
+          <h2>{pickByLocale(locale, '研究方向', 'Research Areas')}</h2>
+        </div>
+        <BilingualCards items={researchAreas} locale={locale} />
+      </section>
+    )}
+
+    {pageSlug === 'programs' && (
+      <>
+        <section class="section-card">
+          <div class="section-heading">
+            <p class="eyebrow">{pickByLocale(locale, '导言', 'Intro')}</p>
+            <h2>{pickByLocale(locale, '项目机制', 'Programs')}</h2>
+          </div>
+          <BilingualIntro
+            locale={locale}
+            zh="未来人研究所通过研究、活动、协作、驻留、社群与实验等多种机制展开工作，持续回应一个核心问题：未来我们将如何存在？"
+            en="Entia Futura Institut works through research, public programs, collaboration, residencies, community structures, and experimentation, all organized around one core question: How shall we exist in the future?"
+          />
+        </section>
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '工作机制', 'Program Structures')}</h2>
+          </div>
+          <BilingualCards items={programs} locale={locale} />
+        </section>
+      </>
+    )}
+
+    {pageSlug === 'research-in-practice' && (
+      <>
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '研究转化', 'Research in Practice')}</h2>
+          </div>
+          <BilingualIntro
+            locale={locale}
+            zh="未来人研究所相信，研究不应停留在理论层面，也不应被压缩成单纯的策略包装。我们强调研究转化：让高等研究进入现实问题、组织实践、品牌叙事、空间场景与协作机制之中。"
+            en="Entia Futura Institut believes that research should not remain at the level of theory alone, nor be reduced to strategic packaging. We emphasize research in practice: bringing advanced inquiry into real-world problems, organizational practice, narrative work, spatial settings, and collaborative mechanisms."
+          />
+        </section>
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '工作维度', 'Practice Areas')}</h2>
+          </div>
+          <BilingualCards items={practiceItems} locale={locale} />
+        </section>
+      </>
+    )}
+
+    {pageSlug === 'future-ventures' && (
+      <>
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '未来项目', 'Future Ventures')}</h2>
+          </div>
+          <BilingualIntro
+            locale={locale}
+            zh="未来人研究所不仅关注研究，也关注研究如何进一步长成项目、机制、原型与新的组织形式。“未来项目”不是传统意义上的创业孵化器，也不是单纯的商业板块，而是研究所内部的一层现实生成机制。"
+            en="Entia Futura Institut is concerned not only with research, but with how research may grow into projects, mechanisms, prototypes, and new organizational forms. Future Ventures is not a conventional startup incubator, nor simply a commercial division, but a generative layer within the institute."
+          />
+        </section>
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '生成方向', 'Venture Directions')}</h2>
+          </div>
+          <BilingualCards items={ventureItems} locale={locale} />
+        </section>
+      </>
+    )}
+
+    {pageSlug === 'collaboration' && (
+      <>
+        <BilingualList
+          locale={locale}
+          zhTitle="我们合作的对象"
+          enTitle="Who We Work With"
+          zhItems={collaborationPartnersZh}
+          enItems={collaborationPartnersEn}
+        />
+        <BilingualList
+          locale={locale}
+          zhTitle="合作形式"
+          enTitle="Forms of Collaboration"
+          zhItems={collaborationFormsZh}
+          enItems={collaborationFormsEn}
+        />
+        <BilingualList
+          locale={locale}
+          zhTitle="我们的合作方法"
+          enTitle="How We Work"
+          zhItems={collaborationMethodZh}
+          enItems={collaborationMethodEn}
+        />
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '合作的理解', 'Collaboration')}</h2>
+          </div>
+          <BilingualIntro
+            locale={locale}
+            zh="合作不是研究的妥协，而是研究进入现实的一种方式。"
+            en="Collaboration is not a compromise of research, but one of the ways research enters reality."
+          />
+          <div class="cta-row">
+            <a class="button primary" href={`/${locale}/contact`}>
+              {pickByLocale(locale, '发起合作', 'Start a Collaboration')}
+            </a>
+          </div>
+        </section>
+      </>
+    )}
+
+    {pageSlug === 'people' && (
+      <>
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '成员', 'People')}</h2>
+          </div>
+          <BilingualIntro
+            locale={locale}
+            zh="未来人研究所由研究者、写作者、工程师、创业者、策展人、空间主理人、品牌建设者与青年行动者共同构成。我们不把成员理解为单一职业标签，而把它理解为一种围绕问题形成的工作关系。"
+            en="Entia Futura Institut is composed of researchers, writers, engineers, entrepreneurs, curators, space-makers, brand builders, and young organizers. We do not understand people through a single professional label, but through forms of working relation organized around questions."
+          />
+        </section>
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '成员模板', 'People Template')}</h2>
+          </div>
+          <div class="cards-grid">
+            <article class="mini-card">
+              <h3>{pickByLocale(locale, '姓名', 'Name')}</h3>
+              <p>{pickByLocale(locale, '角色 / 职务', 'Role / Position')}</p>
+              <p>{pickByLocale(locale, '一句简介', 'Short Bio')}</p>
+              <p>{pickByLocale(locale, '关键词', 'Keywords')}</p>
+            </article>
+          </div>
+        </section>
+      </>
+    )}
+
+    {pageSlug === 'publications' && (
+      <>
+        <section class="section-card">
+          <div class="section-heading">
+            <h2>{pickByLocale(locale, '研究成果', 'Publications')}</h2>
+          </div>
+          <BilingualIntro
+            locale={locale}
+            zh="未来人研究所的成果不只是一种形式。它可能表现为研究文章、案例档案、访谈、报告、圆桌记录、出版计划、公共讨论、空间项目、工具原型或未来项目。"
+            en="The institute’s outputs do not take a single form. They may appear as essays, case archives, interviews, reports, roundtable records, publications, public conversations, spatial projects, tool prototypes, or future ventures."
+          />
+        </section>
+        <BilingualList
+          locale={locale}
+          zhTitle="分类建议"
+          enTitle="Suggested Categories"
+          zhItems={publicationCategoriesZh}
+          enItems={publicationCategoriesEn}
+        />
+      </>
+    )}
+
+    {pageSlug === 'join-us' && (
+      <>
+        <BilingualList
+          locale={locale}
+          zhTitle="我们想连接的人"
+          enTitle="Who We Hope to Connect With"
+          zhItems={joinWhoZh}
+          enItems={joinWhoEn}
+        />
+        <BilingualList
+          locale={locale}
+          zhTitle="参与方式"
+          enTitle="Ways to Participate"
+          zhItems={joinWaysZh}
+          enItems={joinWaysEn}
+        />
+        <BilingualList
+          locale={locale}
+          zhTitle="我们重视什么"
+          enTitle="What We Value"
+          zhItems={joinValuesZh}
+          enItems={joinValuesEn}
+        />
+      </>
+    )}
+
+    {pageSlug === 'contact' && (
+      <section class="contact-card">
+        <div class="section-heading">
+          <h2>{pickByLocale(locale, '联系我们', 'Contact')}</h2>
+        </div>
+        <BilingualIntro
+          locale={locale}
+          zh="如果你希望围绕某个问题、合作、项目、提案或计划与未来人研究所建立联系，欢迎向我们写信。"
+          en="If you would like to connect with Entia Futura Institut around a question, collaboration, project, proposal, or program, we welcome you to write to us."
+        />
+        <p style="margin-top: 18px;">
+          Email:
+          <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
+        </p>
+        <form class="contact-form" action={`mailto:${siteMeta.email}`} method="post" enctype="text/plain">
+          <label>
+            {pickByLocale(locale, '姓名', 'Name')}
+            <input name="name" type="text" />
+          </label>
+          <label>
+            {pickByLocale(locale, '邮箱', 'Email')}
+            <input name="email" type="email" />
+          </label>
+          <label>
+            {pickByLocale(locale, '机构 / 公司', 'Organization / Company')}
+            <input name="organization" type="text" />
+          </label>
+          <label>
+            {pickByLocale(locale, '联系主题', 'Subject')}
+            <input name="subject" type="text" />
+          </label>
+          <label>
+            {pickByLocale(locale, '你的信息', 'Your Message')}
+            <textarea name="message"></textarea>
+          </label>
+          <div class="cta-row">
+            <button class="button primary" type="submit">
+              {pickByLocale(locale, '发送', 'Send')}
+            </button>
+          </div>
+        </form>
+      </section>
+    )}
+  </main>
+</Layout>

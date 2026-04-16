@@ -1,18 +1,3 @@
 ---
-import BilingualList from '../components/BilingualList.astro';
-import Layout from '../layouts/Layout.astro';
-import { joinValuesEn, joinValuesZh, joinWaysEn, joinWaysZh, joinWhoEn, joinWhoZh, siteMeta } from '../content/site';
+return Astro.redirect('/zh/join-us');
 ---
-
-<Layout title={`加入我们 | ${siteMeta.enName}`} description="Join Entia Futura Institut.">
-  <main>
-    <section class="hero-panel">
-      <p class="eyebrow">Join Us</p>
-      <h1 class="hero-title-zh">加入我们</h1>
-      <p class="hero-title-en">Join Us</p>
-    </section>
-    <BilingualList zhTitle="我们想连接的人" enTitle="Who We Hope to Connect With" zhItems={joinWhoZh} enItems={joinWhoEn} />
-    <BilingualList zhTitle="参与方式" enTitle="Ways to Participate" zhItems={joinWaysZh} enItems={joinWaysEn} />
-    <BilingualList zhTitle="我们重视什么" enTitle="What We Value" zhItems={joinValuesZh} enItems={joinValuesEn} />
-  </main>
-</Layout>
