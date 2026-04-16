@@ -1,5 +1,4 @@
 ---
-import LocaleSwitcher from '../components/LocaleSwitcher.astro';
 import { navItems, siteMeta } from '../content/site';
 import { getLocaleFromPath, pickByLocale, toLocalePath, type Locale } from '../i18n/config';
 
@@ -7,21 +6,25 @@ interface Props {
   title?: string;
   description?: string;
   locale?: Locale;
+  theme?: 'default' | 'landing-dark';
 }
 
 const {
   title = `${siteMeta.zhName} | ${siteMeta.enName}`,
   description = siteMeta.oneLineEn,
   locale,
+  theme = 'default',
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
 const activeLocale = locale ?? getLocaleFromPath(currentPath);
 const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : currentPath;
+const htmlLang = activeLocale === 'en' ? 'en' : 'zh-CN';
+const primaryNavItems = navItems.filter((item) => item.href !== '/publications').slice(0, 4);
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang={htmlLang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -43,18 +46,17 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#eef0e8" />
   </head>
-  <body>
-    <div class="page-shell">
-      <header class="site-header">
+  <body class:list={{ 'theme-landing-dark': theme === 'landing-dark' }}>
+    <div class:list={['page-shell', { 'page-shell-landing': theme === 'landing-dark' }]}>
+      <header class:list={['site-header', { 'site-header-landing': theme === 'landing-dark' }]}>
         <a class="brand" href={activeLocale ? toLocalePath(activeLocale, '/') : '/'}>
-          <img src="/brand/entia-logo.png" alt="Entia Futura logo" />
           <div class="brand-copy">
             <span class="brand-zh">{siteMeta.zhName}</span>
             <span class="brand-en">{siteMeta.enName}</span>
           </div>
         </a>
         <nav class="nav">
-          {navItems.map((item) => (
+          {primaryNavItems.map((item) => (
             <a
               class:list={['nav-link', { active: localizedPath === (activeLocale ? toLocalePath(activeLocale, item.href) : item.href) }]}
               href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}
@@ -71,15 +73,15 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
               }
             </a>
           ))}
-          {activeLocale && <LocaleSwitcher locale={activeLocale} currentPath={currentPath} />}
         </nav>
       </header>
       <slot />
-      <footer class="site-footer">
+      <footer class:list={['site-footer', { 'site-footer-landing': theme === 'landing-dark' }]}>
         <div class="footer-brand">
           <p>{siteMeta.zhName}</p>
           <p>{siteMeta.enName}</p>
           <p>{siteMeta.enSubtitle}</p>
+          <p>© {new Date().getFullYear()} Entia Futura Institut</p>
         </div>
         <div class="footer-statement">
           <p>{siteMeta.coreQuestionZh}</p>
@@ -94,12 +96,38 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
             </a>
           ))}
         </nav>
+        <div class="footer-meta">
+          <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
+          <a href={activeLocale ? toLocalePath(activeLocale, '/contact') : '/contact'}>
+            {pickByLocale(activeLocale ?? 'zh', '联系方式', 'Contact')}
+          </a>
+          <a href={activeLocale ? toLocalePath(activeLocale, '/privacy') : '/privacy'}>
+            {pickByLocale(activeLocale ?? 'zh', '隐私政策', 'Privacy Policy')}
+          </a>
+          <a href={siteMeta.siteUrl} target="_blank" rel="noreferrer">entiafutura.com</a>
+        </div>
       </footer>
     </div>
   </body>
 </html>
 
 <style is:global>
+  @font-face {
+    font-family: 'EntiaTitleZh';
+    src: url('/fonts/SmileySans-Oblique.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'EntiaTitleEn';
+    src: url('/fonts/PoiretOne-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
     --paper: #b7c7d2;
     --paper-2: #c8d4dc;
@@ -122,9 +150,9 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
 
   body {
     background:
-      radial-gradient(circle at 18% 12%, rgba(255, 244, 90, 0.34), transparent 22rem),
-      radial-gradient(circle at 84% 18%, rgba(95, 53, 255, 0.12), transparent 20rem),
-      linear-gradient(180deg, #b3c4cf 0%, #b8c8d2 48%, #c0cfd8 100%);
+      radial-gradient(circle at 18% 12%, rgba(255, 244, 90, 0.14), transparent 20rem),
+      radial-gradient(circle at 84% 18%, rgba(95, 53, 255, 0.08), transparent 18rem),
+      linear-gradient(180deg, #b7c7d2 0%, #b7c7d2 100%);
   }
 
   * {
@@ -159,16 +187,7 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
 
   .brand {
     display: flex;
-    gap: 14px;
     align-items: center;
-  }
-
-  .brand img {
-    width: 56px;
-    height: 56px;
-    object-fit: contain;
-    border-radius: 0;
-    border: 0;
   }
 
   .brand-copy {
@@ -179,6 +198,8 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
   .brand-zh {
     font-size: 1rem;
     letter-spacing: 0.06em;
+    font-family: 'EntiaTitleZh', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    font-weight: 400;
   }
 
   .brand-en {
@@ -186,6 +207,7 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
     color: var(--muted);
     letter-spacing: 0.16em;
     text-transform: uppercase;
+    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
   }
 
   .nav {
@@ -357,11 +379,21 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
   }
 
   .hero-stage {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
-    gap: 32px;
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 44rem) minmax(0, 1fr);
+    grid-template-rows: minmax(24rem, 1fr) auto;
+    grid-template-areas:
+      ". visual ."
+      ". bottom .";
+    gap: 24px 28px;
     min-height: min(76vh, 52rem);
+  }
+
+  .hero-heading-shell {
+    display: grid;
+    justify-items: center;
+    text-align: center;
   }
 
   .eyebrow {
@@ -375,41 +407,120 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
   .hero-title-zh {
     margin: 0;
     font-size: clamp(3.4rem, 7.4vw, 7rem);
-    font-weight: 500;
+    font-weight: 400;
     letter-spacing: 0.04em;
     line-height: 0.94;
-    max-width: 7ch;
+    max-width: 9ch;
+    font-family: 'EntiaTitleZh', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
   }
 
   .hero-title-en {
-    margin: 12px 0 0;
+    margin: 0 0 12px;
     font-size: clamp(0.98rem, 1.6vw, 1.2rem);
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: rgba(23, 23, 23, 0.78);
+    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
+    text-align: center;
   }
 
   .hero-subtitle {
-    margin: 24px 0 0;
-    max-width: 16ch;
+    margin: 0;
+    max-width: 15ch;
     font-size: clamp(1.4rem, 2vw, 2rem);
     line-height: 1.25;
     color: var(--ink);
   }
 
   .hero-flash {
-    margin: 18px 0 0;
+    margin: 0;
     color: var(--muted);
     font-size: 0.84rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+    text-align: center;
   }
 
   .hero-visual {
+    grid-area: visual;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100%;
+  }
+
+  .hero-core {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(100%, 38rem);
+    aspect-ratio: 1 / 1;
+  }
+
+  .gravity-ring {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .gravity-ring {
+    border: 1px solid rgba(22, 22, 22, 0.12);
+    will-change: transform, opacity;
+  }
+
+  .gravity-ring-a {
+    width: 74%;
+    height: 74%;
+    border-color: rgba(22, 22, 22, 0.16);
+  }
+
+  .gravity-ring-b {
+    width: 88%;
+    height: 88%;
+    border-style: dashed;
+    border-color: rgba(95, 53, 255, 0.22);
+  }
+
+  .gravity-ring-c {
+    width: 106%;
+    height: 84%;
+    border-color: rgba(255, 244, 90, 0.42);
+    transform: translate(-50%, -50%) rotate(-12deg);
+  }
+
+  .gravity-ring-d {
+    width: 112%;
+    height: 112%;
+    border-color: rgba(22, 22, 22, 0.08);
+  }
+
+  .gravity-ring-e {
+    width: 126%;
+    height: 70%;
+    border-color: rgba(95, 53, 255, 0.18);
+    transform: translate(-50%, -50%) rotate(18deg);
+  }
+
+  .hero-side {
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-side-left {
+    grid-area: visual;
+    align-self: end;
+    justify-content: flex-start;
+    text-align: left;
+    z-index: 3;
+    padding: 0 0 2rem 1rem;
+  }
+
+  .hero-bottom {
+    grid-area: bottom;
+    display: flex;
+    justify-content: center;
   }
 
   .hero-logo-frame {
@@ -419,8 +530,10 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
   }
 
   .hero-logo-art {
-    width: 100%;
-    height: 100%;
+    position: relative;
+    z-index: 2;
+    width: min(100%, 36rem);
+    height: auto;
     object-fit: contain;
     filter: drop-shadow(0 26px 40px rgba(22, 22, 22, 0.08));
   }
@@ -477,6 +590,19 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
     margin: 0;
     font-size: clamp(1.7rem, 3vw, 2.8rem);
     font-weight: 500;
+  }
+
+  html[lang^='zh'] .section-heading h2,
+  html[lang^='zh'] .mini-card h3 {
+    font-family: 'EntiaTitleZh', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  html[lang='en'] .section-heading h2,
+  html[lang='en'] .mini-card h3 {
+    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: 0.04em;
   }
 
   .section-heading p {
@@ -602,7 +728,7 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
 
   .site-footer {
     display: grid;
-    grid-template-columns: 1.1fr 1.4fr 1fr;
+    grid-template-columns: 1.1fr 1.4fr 1fr 1fr;
     gap: 18px;
     margin-top: 32px;
     padding: 22px;
@@ -619,6 +745,16 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
   .footer-nav {
     display: grid;
     gap: 4px;
+  }
+
+  .footer-meta {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+  }
+
+  .footer-meta a {
+    word-break: break-word;
   }
 
   .contact-form {
@@ -694,15 +830,93 @@ const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : c
 
     .hero-stage {
       min-height: auto;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        "visual"
+        "left"
+        "bottom";
+      gap: 20px;
     }
 
     .hero-title-zh {
       max-width: none;
     }
 
+    .hero-side-left,
+    .hero-bottom,
+    .hero-heading-shell {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .hero-side-left {
+      padding: 0;
+      align-self: auto;
+    }
+
     .cards-grid,
     .list-columns {
       gap: 24px;
     }
+  }
+
+  body.theme-landing-dark {
+    color: #eef3ff;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(113, 255, 210, 0.08), transparent 24rem),
+      radial-gradient(circle at 82% 14%, rgba(123, 124, 255, 0.16), transparent 22rem),
+      linear-gradient(180deg, #05070d 0%, #070b14 52%, #04060b 100%);
+  }
+
+  body.theme-landing-dark .page-shell-landing {
+    max-width: none;
+    padding-top: 16px;
+    padding-bottom: 24px;
+  }
+
+  body.theme-landing-dark .site-header-landing {
+    grid-template-columns: minmax(16rem, 18rem) 1fr;
+    margin: 0 auto 14px;
+    padding-inline: clamp(0.2rem, 1vw, 1rem);
+    border-bottom-color: rgba(205, 220, 255, 0.12);
+  }
+
+  body.theme-landing-dark .brand-en,
+  body.theme-landing-dark .nav-link,
+  body.theme-landing-dark .site-footer-landing p,
+  body.theme-landing-dark .site-footer-landing a {
+    color: rgba(225, 234, 255, 0.68);
+  }
+
+  body.theme-landing-dark .brand-zh,
+  body.theme-landing-dark .nav-link:hover,
+  body.theme-landing-dark .nav-link.active {
+    color: #f5f8ff;
+  }
+
+  body.theme-landing-dark .nav-link:hover,
+  body.theme-landing-dark .nav-link.active {
+    border-color: rgba(141, 255, 222, 0.24);
+  }
+
+  body.theme-landing-dark .locale-switcher {
+    border-color: rgba(216, 227, 255, 0.16);
+    background: rgba(9, 14, 26, 0.7);
+  }
+
+  body.theme-landing-dark .locale-link {
+    color: rgba(221, 232, 255, 0.72);
+  }
+
+  body.theme-landing-dark .locale-link.active,
+  body.theme-landing-dark .locale-link:hover {
+    background: #dbe5ff;
+    color: #07101e;
+  }
+
+  body.theme-landing-dark .site-footer-landing {
+    margin-inline: auto;
+    border-top-color: rgba(205, 220, 255, 0.12);
   }
 </style>

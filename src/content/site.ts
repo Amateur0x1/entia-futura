@@ -13,7 +13,6 @@ export const siteMeta = {
 };
 
 export const navItems = [
-  { href: '/', zh: '首页', en: 'Home' },
   { href: '/about', zh: '关于我们', en: 'About' },
   { href: '/research', zh: '研究方向', en: 'Research' },
   { href: '/programs', zh: '项目机制', en: 'Programs' },
@@ -22,8 +21,6 @@ export const navItems = [
   { href: '/collaboration', zh: '合作方式', en: 'Collaboration' },
   { href: '/people', zh: '成员', en: 'People' },
   { href: '/publications', zh: '研究成果', en: 'Publications' },
-  { href: '/join-us', zh: '加入我们', en: 'Join Us' },
-  { href: '/contact', zh: '联系我们', en: 'Contact' },
 ];
 
 export const researchAreas = [

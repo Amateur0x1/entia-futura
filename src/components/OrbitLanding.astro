@@ -1,0 +1,488 @@
+---
+import { siteMeta } from '../content/site';
+import { pickByLocale, type Locale } from '../i18n/config';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const questions = pickByLocale(
+  locale,
+  [
+    '未来我们将如何学习，而不只是被工具加速？',
+    '当组织越来越智能，人如何保有判断力与方向感？',
+    '品牌何时不再只是传播对象，而是共同体的接口？',
+    '我们会在怎样的空间里工作、居住、连接与思考？',
+    '当技术进入日常，什么样的生活方式值得被发明？',
+  ],
+  [
+    'How shall we learn, rather than merely be accelerated by tools?',
+    'As organizations grow more intelligent, how do humans keep judgment and orientation?',
+    'When does a brand stop being a message and become an interface for collective life?',
+    'What kinds of spaces will hold our work, dwelling, connection, and thought?',
+    'As technology enters the everyday, what forms of life are still worth inventing?',
+  ],
+);
+---
+
+<section class="orbit-landing" data-orbit-landing>
+  <div class="orbit-landing-frame" data-orbit-frame>
+    <div class="orbit-atmosphere" aria-hidden="true"></div>
+
+    <div class="orbit-stage" data-orbit-stage>
+      <div class="orbit-copy-rail">
+        <div class="orbit-intro">
+          <h1>{pickByLocale(locale, siteMeta.coreQuestionZh, siteMeta.coreQuestionEn)}</h1>
+          <p class="orbit-lede">
+            {pickByLocale(
+              locale,
+              '滚动并不会立刻离开首屏，而是驱动轨道自转。所有问题统一在左侧出现，中心只保留 Logo 与轨道本身。',
+              'Scrolling does not immediately leave the hero. It drives the orbit while every prompt appears on the left, leaving the center only for the logo and ring.',
+            )}
+          </p>
+        </div>
+
+        <div class="orbit-side orbit-side-left" data-orbit-column="left">
+          {questions.map((question, index) => (
+            <article class="orbit-question-card orbit-question-left" data-question-card data-side="left" data-question-index={index}>
+              <span class="orbit-card-index">{String(index + 1).padStart(2, '0')}</span>
+              <p>{question}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div class="orbit-centerpiece">
+        <div class="orbit-depth-glow orbit-depth-glow-a" aria-hidden="true"></div>
+        <div class="orbit-depth-glow orbit-depth-glow-b" aria-hidden="true"></div>
+
+        <div class="orbit-assembly" data-orbit-assembly>
+          <div class="orbit-plane orbit-plane-back" aria-hidden="true">
+            <div class="orbit-ring orbit-ring-back"></div>
+          </div>
+
+          <div class="orbit-logo-layer" data-logo-layer>
+            <div class="orbit-logo-shadow" aria-hidden="true"></div>
+            <img class="orbit-logo-image" src="/brand/entia-logo-transparent.png" alt="Entia Futura logo" />
+          </div>
+
+          <div class="orbit-plane orbit-plane-front" aria-hidden="true">
+            <div class="orbit-ring orbit-ring-front"></div>
+          </div>
+
+          <div class="orbit-markers" aria-hidden="true">
+            <span class="orbit-marker orbit-marker-a"></span>
+            <span class="orbit-marker orbit-marker-b"></span>
+            <span class="orbit-marker orbit-marker-c"></span>
+            <span class="orbit-marker orbit-marker-d"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .orbit-landing {
+    position: relative;
+    min-height: 100svh;
+    margin: 0;
+    padding: 0;
+  }
+
+  .orbit-landing-frame {
+    position: relative;
+    min-height: 100svh;
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .orbit-atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(255, 244, 90, 0.18), rgba(255, 244, 90, 0) 24rem),
+      radial-gradient(circle at 76% 32%, rgba(95, 53, 255, 0.12), rgba(95, 53, 255, 0) 20rem),
+      radial-gradient(circle at 20% 68%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 18rem);
+  }
+
+  .orbit-eyebrow {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .orbit-intro h1 {
+    margin: 0;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    line-height: 0.94;
+    letter-spacing: 0.02em;
+  }
+
+  html[lang^='zh'] .orbit-intro h1 {
+    font-family: 'EntiaTitleZh', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    font-weight: 400;
+  }
+
+  html[lang='en'] .orbit-intro h1 {
+    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .orbit-lede {
+    margin: 0;
+    color: rgba(23, 23, 23, 0.76);
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .orbit-stage {
+    position: relative;
+    min-height: 100svh;
+    padding: clamp(8rem, 15vh, 10rem) 0 clamp(4rem, 10vh, 7rem);
+  }
+
+  .orbit-copy-rail {
+    position: relative;
+    z-index: 6;
+    display: grid;
+    gap: 1.2rem;
+    align-content: center;
+    align-self: center;
+    min-height: min(62vh, 34rem);
+    width: min(26rem, calc(50vw - 18rem));
+    padding-left: clamp(0rem, 1vw, 0.5rem);
+  }
+
+  .orbit-intro {
+    display: grid;
+    gap: 0.8rem;
+    width: min(100%, 26rem);
+    text-align: left;
+  }
+
+  .orbit-side {
+    position: relative;
+    min-height: min(28vh, 14rem);
+  }
+
+  .orbit-question-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: min(100%, 22rem);
+    padding: 1.25rem 1.25rem 1.35rem;
+    border: 1px solid rgba(22, 22, 22, 0.12);
+    border-radius: 1.5rem;
+    background: linear-gradient(180deg, rgba(200, 212, 220, 0.88), rgba(183, 199, 210, 0.78));
+    box-shadow: 0 20px 50px rgba(22, 22, 22, 0.1);
+    opacity: 0;
+    backdrop-filter: blur(18px);
+    will-change: transform, opacity;
+  }
+
+  .orbit-question-left {
+    transform: translate3d(-1.6rem, 0, 0);
+  }
+
+  .orbit-card-index {
+    display: inline-flex;
+    margin-bottom: 0.9rem;
+    color: var(--accent-2);
+    font-size: 0.74rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .orbit-question-card p {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(1.05rem, 1.7vw, 1.4rem);
+    line-height: 1.65;
+  }
+
+  .orbit-centerpiece {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    transform: translate(-50%, -46%);
+    display: grid;
+    place-items: center;
+    min-height: min(74vh, 46rem);
+    width: min(100%, 52rem);
+  }
+
+  .orbit-depth-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(18px);
+    pointer-events: none;
+  }
+
+  .orbit-depth-glow-a {
+    width: min(80%, 30rem);
+    aspect-ratio: 1 / 1;
+    background: radial-gradient(circle, rgba(255, 244, 90, 0.24), rgba(255, 244, 90, 0));
+  }
+
+  .orbit-depth-glow-b {
+    width: min(94%, 36rem);
+    aspect-ratio: 1 / 1;
+    background: radial-gradient(circle, rgba(95, 53, 255, 0.12), rgba(95, 53, 255, 0));
+  }
+
+  .orbit-assembly {
+    --orbit-flow: 0deg;
+    --orbit-marker-rotation: 0deg;
+    position: relative;
+    width: min(100%, 44rem);
+    aspect-ratio: 1 / 1;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .orbit-plane,
+  .orbit-markers {
+    position: absolute;
+    inset: 0;
+  }
+
+  .orbit-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 92%;
+    height: 52%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) rotateX(72deg);
+    transform-style: preserve-3d;
+  }
+
+  .orbit-ring::before,
+  .orbit-ring::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .orbit-ring::before {
+    border: 3px solid rgba(22, 22, 22, 0.26);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.28) inset,
+      0 0 0 10px rgba(255, 244, 90, 0.06) inset,
+      0 0 36px rgba(255, 244, 90, 0.2);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 40%),
+      linear-gradient(90deg, rgba(95, 53, 255, 0.08), rgba(255, 244, 90, 0.08));
+  }
+
+  .orbit-ring::after {
+    inset: 6%;
+    opacity: 0.92;
+    transform: rotate(var(--orbit-flow));
+    transform-origin: 50% 50%;
+    background:
+      conic-gradient(
+        from 0deg,
+        rgba(255, 244, 90, 0.88) 0deg,
+        rgba(255, 244, 90, 0.08) 26deg,
+        rgba(255, 244, 90, 0) 72deg,
+        rgba(95, 53, 255, 0.54) 148deg,
+        rgba(95, 53, 255, 0.04) 178deg,
+        rgba(255, 255, 255, 0) 238deg,
+        rgba(255, 255, 255, 0.76) 304deg,
+        rgba(255, 244, 90, 0.88) 360deg
+      );
+    -webkit-mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 1.15rem),
+      #000 calc(100% - 1.02rem) calc(100% - 0.38rem),
+      transparent calc(100% - 0.2rem)
+    );
+    mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 1.15rem),
+      #000 calc(100% - 1.02rem) calc(100% - 0.38rem),
+      transparent calc(100% - 0.2rem)
+    );
+    filter: blur(0.4px);
+  }
+
+  .orbit-plane-back {
+    z-index: 1;
+    clip-path: inset(0 0 46% 0);
+  }
+
+  .orbit-plane-front {
+    z-index: 4;
+    clip-path: inset(46% 0 0 0);
+  }
+
+  .orbit-plane-front .orbit-ring::before {
+    border-color: rgba(22, 22, 22, 0.34);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.34) inset,
+      0 0 0 14px rgba(255, 244, 90, 0.08) inset,
+      0 18px 34px rgba(22, 22, 22, 0.14),
+      0 0 44px rgba(255, 244, 90, 0.24);
+  }
+
+  .orbit-plane-front .orbit-ring::after {
+    opacity: 1;
+  }
+
+  .orbit-logo-layer {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    z-index: 3;
+    width: clamp(13rem, 28vw, 18rem);
+    aspect-ratio: 1 / 1;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+  }
+
+  .orbit-logo-shadow {
+    position: absolute;
+    left: 16%;
+    right: 16%;
+    bottom: 10%;
+    height: 1.15rem;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(22, 22, 22, 0.28), rgba(22, 22, 22, 0));
+    filter: blur(8px);
+  }
+
+  .orbit-logo-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter:
+      drop-shadow(0 18px 34px rgba(22, 22, 22, 0.16))
+      drop-shadow(0 0 20px rgba(255, 244, 90, 0.16));
+  }
+
+  .orbit-markers {
+    z-index: 2;
+    pointer-events: none;
+    transform: rotate(var(--orbit-marker-rotation));
+  }
+
+  .orbit-marker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0.95rem;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow:
+      0 0 0 4px rgba(255, 244, 90, 0.14),
+      0 0 16px rgba(255, 244, 90, 0.34);
+  }
+
+  .orbit-marker-a {
+    transform: translate(-50%, -50%) translateY(-11.6rem);
+  }
+
+  .orbit-marker-b {
+    transform: translate(-50%, -50%) translate(11.8rem, -1.4rem);
+  }
+
+  .orbit-marker-c {
+    transform: translate(-50%, -50%) translate(0, 11.8rem);
+  }
+
+  .orbit-marker-d {
+    transform: translate(-50%, -50%) translate(-11.8rem, -1.4rem);
+  }
+
+  @media (max-width: 1080px) {
+    .orbit-stage {
+      display: grid;
+      gap: 1.25rem;
+      padding-top: clamp(8.5rem, 18vh, 10rem);
+      padding-bottom: 6rem;
+    }
+
+    .orbit-centerpiece {
+      order: 2;
+      position: relative;
+      left: auto;
+      top: auto;
+      width: 100%;
+      transform: none;
+      min-height: 30rem;
+    }
+
+    .orbit-copy-rail {
+      order: 1;
+      min-height: auto;
+      width: 100%;
+      padding-left: 0;
+      gap: 1rem;
+    }
+
+    .orbit-question-card {
+      width: min(32rem, calc(100vw - 2rem));
+      text-align: left;
+    }
+
+    .orbit-question-left {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .orbit-stage {
+      padding-top: 6rem;
+      padding-bottom: 6.5rem;
+    }
+
+    .orbit-centerpiece {
+      min-height: 24rem;
+    }
+
+    .orbit-assembly {
+      width: min(100%, 25rem);
+    }
+
+    .orbit-logo-layer {
+      width: 11rem;
+    }
+
+    .orbit-ring {
+      width: 94%;
+      height: 54%;
+    }
+
+    .orbit-marker-a {
+      transform: translate(-50%, -50%) translateY(-8rem);
+    }
+
+    .orbit-marker-b {
+      transform: translate(-50%, -50%) translate(8.4rem, -0.8rem);
+    }
+
+    .orbit-marker-c {
+      transform: translate(-50%, -50%) translate(0, 8.2rem);
+    }
+
+    .orbit-marker-d {
+      transform: translate(-50%, -50%) translate(-8.4rem, -0.8rem);
+    }
+
+    .orbit-lede,
+    .orbit-question-card p {
+      font-size: 0.94rem;
+    }
+  }
+</style>

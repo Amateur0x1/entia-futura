@@ -1,18 +1,8 @@
 ---
-import BilingualCards from '../../components/BilingualCards.astro';
-import BilingualIntro from '../../components/BilingualIntro.astro';
-import BilingualList from '../../components/BilingualList.astro';
 import LandingEffects from '../../components/LandingEffects.astro';
-import PretextHeroField from '../../components/PretextHeroField.astro';
+import OrbitLanding from '../../components/OrbitLanding.astro';
 import Layout from '../../layouts/Layout.astro';
-import {
-  collaborationFormsEn,
-  collaborationFormsZh,
-  joinWaysEn,
-  joinWaysZh,
-  researchAreas,
-  siteMeta,
-} from '../../content/site';
+import { siteMeta } from '../../content/site';
 import { isLocale, pickByLocale } from '../../i18n/config';
 
 const { locale } = Astro.params;
@@ -22,112 +12,32 @@ if (!isLocale(locale)) {
 }
 
 const pageTitle = pickByLocale(locale, siteMeta.zhName, siteMeta.enName);
-const pageDescription = pickByLocale(locale, siteMeta.oneLineZh, siteMeta.oneLineEn);
+const pageDescription = pickByLocale(
+  locale,
+  '一个滚动驱动的单页落地页：人形标记沿轨道前进，问题随滚动逐一浮现。',
+  'A scroll-driven landing page where a humanoid mark moves around an orbital ring and questions appear node by node.',
+);
 ---
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale}>
-  <main>
-    <section class="hero-panel landing-hero" data-hero>
-      <div class="hero-backdrop" data-hero-backdrop>
-        <span class="hero-orb hero-orb-a" data-hero-orb></span>
-        <span class="hero-orb hero-orb-b" data-hero-orb></span>
-        <span class="hero-orb hero-orb-c" data-hero-orb></span>
-        <span class="hero-grid" aria-hidden="true"></span>
-      </div>
-      <p class="eyebrow">{pickByLocale(locale, '首页', 'Home')}</p>
-      <div class="hero-stage">
-        <div>
-          <div data-hero-heading>
-            <h1 class="hero-title-zh">{pickByLocale(locale, siteMeta.zhName, siteMeta.enName)}</h1>
-            <p class="hero-title-en">{pickByLocale(locale, siteMeta.enSubtitle, siteMeta.enName)}</p>
-          </div>
-          <p class="hero-subtitle" data-hero-copy>
-            {pickByLocale(locale, siteMeta.coreQuestionZh, siteMeta.coreQuestionEn)}
-          </p>
-          <p class="hero-flash" data-hero-copy>
-            {pickByLocale(locale, '研究 / 项目 / 协作 / 共同体', 'Research / Ventures / Collaboration / Collective Life')}
-          </p>
-          <div class="cta-row">
-            <a class="button primary" href={`/${locale}/about`} data-hero-cta>
-              {pickByLocale(locale, '了解我们', 'About Us')}
-            </a>
-            <a class="button secondary" href={`/${locale}/research`} data-hero-cta>
-              {pickByLocale(locale, '研究方向', 'Research')}
-            </a>
-            <a class="button secondary" href={`/${locale}/collaboration`} data-hero-cta>
-              {pickByLocale(locale, '发起合作', 'Start a Collaboration')}
-            </a>
-          </div>
-        </div>
-        <div class="hero-visual" data-hero-copy>
-          <PretextHeroField locale={locale} />
-        </div>
-      </div>
-    </section>
-
-    <section class="section-card" data-reveal>
-      <div class="section-heading">
-        <p class="eyebrow">{pickByLocale(locale, '关于研究所', 'About Entia Futura Institut')}</p>
-        <h2>{pickByLocale(locale, '关于未来人研究所', 'About Entia Futura Institut')}</h2>
-      </div>
-      <BilingualIntro
-        locale={locale}
-        zh="未来人研究所是一个围绕“未来我们将如何存在？”这一核心问题展开工作的独立研究机构。我们以高等研究为基础，同时强调研究向现实问题、合作机制、未来项目与社会实验的持续转化。我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。"
-        en="Entia Futura Institut is an independent institute organized around the question: “How shall we exist in the future?” Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, future ventures, and social experimentation. We are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life."
-      />
-    </section>
-
-    <section class="section-card" data-reveal>
-      <div class="section-heading">
-        <p class="eyebrow">{pickByLocale(locale, '研究方向', 'Research Areas')}</p>
-        <h2>{pickByLocale(locale, '研究方向', 'Research Areas')}</h2>
-      </div>
-      <BilingualCards items={researchAreas} locale={locale} />
-    </section>
-
-    <section class="section-card" data-reveal>
-      <div class="section-heading">
-        <p class="eyebrow">{pickByLocale(locale, '合作', 'Collaboration')}</p>
-        <h2>{pickByLocale(locale, '合作形式', 'Forms of Collaboration')}</h2>
-      </div>
-      <BilingualList
-        locale={locale}
-        zhTitle="合作形式"
-        enTitle="Forms of Collaboration"
-        zhItems={collaborationFormsZh}
-        enItems={collaborationFormsEn}
-      />
-      <div class="cta-row">
-        <a class="button primary" href={`/${locale}/collaboration`}>
-          {pickByLocale(locale, '查看合作方式', 'View Collaboration')}
-        </a>
-      </div>
-    </section>
-
-    <section class="section-card" data-reveal>
-      <div class="section-heading">
-        <p class="eyebrow">{pickByLocale(locale, '参与', 'Participation')}</p>
-        <h2>{pickByLocale(locale, '参与方式', 'Ways to Participate')}</h2>
-      </div>
-      <BilingualList
-        locale={locale}
-        zhTitle="参与方式"
-        enTitle="Ways to Participate"
-        zhItems={joinWaysZh}
-        enItems={joinWaysEn}
-      />
-      <div class="cta-row">
-        <a class="button secondary" href={`/${locale}/join-us`}>
-          {pickByLocale(locale, '了解更多', 'Learn More')}
-        </a>
-      </div>
-    </section>
-
-    <section class="hero-panel" data-reveal>
-      <p class="lede">
-        {pickByLocale(locale, siteMeta.coreQuestionZh, siteMeta.coreQuestionEn)}
-      </p>
-    </section>
+  <main class="landing-main">
+    <OrbitLanding locale={locale} />
   </main>
   <LandingEffects />
 </Layout>
+
+<style>
+  .landing-main {
+    gap: 0;
+  }
+
+  :global(.site-header) {
+    border-bottom-color: transparent;
+  }
+
+  :global(.site-footer) {
+    margin-top: 0;
+    border-top-color: transparent;
+    background: transparent;
+  }
+</style>
