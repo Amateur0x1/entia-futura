@@ -22,389 +22,571 @@
     });
 
     gsap.ticker.lagSmoothing(0);
+  }
 
-    const orbitRoot = document.querySelector('[data-orbit-landing]');
-    const orbitFrame = orbitRoot?.querySelector('[data-orbit-frame]');
-    const orbitAssembly = orbitRoot?.querySelector('[data-orbit-assembly]');
-    const logoLayer = orbitRoot?.querySelector('[data-logo-layer]');
-    const intro = orbitRoot?.querySelector('.orbit-intro');
-    const glows = orbitRoot?.querySelectorAll('.orbit-depth-glow');
-    const cards = orbitRoot?.querySelectorAll('[data-question-card]');
+  const revealSection = (section, index) => {
+    const element = section;
+    const heading = element.querySelector('.section-heading');
+    const eyebrow = element.querySelector('.eyebrow');
+    const title = element.querySelector('.section-heading h2, .section-heading h1');
+    const subcopy = element.querySelector('.section-heading p:last-of-type');
+    const cards = element.querySelectorAll('.field-card, .interface-card, .question-fragment');
+    const buttons = element.querySelectorAll('.button');
 
-    if (
-      orbitRoot instanceof HTMLElement &&
-      orbitFrame instanceof HTMLElement &&
-      orbitAssembly instanceof HTMLElement &&
-      logoLayer instanceof HTMLElement &&
-      intro instanceof HTMLElement &&
-      cards
-    ) {
-      const questionCards = Array.from(cards);
-      const glowEls = glows ? Array.from(glows) : [];
-      const totalSteps = Math.max(questionCards.length, 1);
-      const segment = 1;
-      const totalDuration = totalSteps * segment + 0.9;
-
-      gsap.set(questionCards, {
+    gsap.fromTo(
+      element,
+      {
         autoAlpha: 0,
-      });
-
-      questionCards.forEach((card) => {
-        const side = card.getAttribute('data-side');
-        gsap.set(card, {
-          yPercent: -50,
-          x: side === 'left' ? -28 : 28,
-          scale: 0.94,
-        });
-      });
-
-      gsap.set(logoLayer, {
-        transformOrigin: '50% 50%',
-      });
-
-      gsap.set(glowEls, {
-        transformOrigin: '50% 50%',
-      });
-
-      const introTimeline = gsap.timeline({
-        defaults: {
-          ease: 'power3.out',
+      },
+      {
+        autoAlpha: 1,
+        duration: 0.35,
+        ease: 'none',
+        delay: index === 0 ? 0.1 : 0,
+        scrollTrigger: {
+          trigger: element,
+          start: 'top 88%',
+          once: true,
         },
-      });
+      },
+    );
 
-      introTimeline
-        .fromTo(
-          intro,
-          {
-            autoAlpha: 0,
-            y: 24,
+    if (heading) {
+      gsap.fromTo(
+        heading,
+        {
+          y: 72,
+          clipPath: 'inset(0 0 100% 0)',
+        },
+        {
+          y: 0,
+          clipPath: 'inset(0 0 0% 0)',
+          duration: 1.15,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 76%',
+            once: true,
           },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.8,
-          },
-        )
-        .fromTo(
-          orbitAssembly,
-          {
-            autoAlpha: 0,
-            scale: 0.95,
-          },
-          {
-            autoAlpha: 1,
-            scale: 1,
-            duration: 1,
-          },
-          '-=0.4',
-        )
-        .fromTo(
-          logoLayer,
-          {
-            autoAlpha: 0,
-            y: 18,
-            scale: 0.9,
-          },
-          {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.95,
-            ease: 'back.out(1.4)',
-          },
-          '-=0.55',
-        )
-        .fromTo(
-          glowEls,
-          {
-            autoAlpha: 0,
-            scale: 0.88,
-          },
-          {
-            autoAlpha: 1,
-            scale: 1,
-            duration: 1.1,
-            stagger: 0.12,
-          },
-          '-=0.8',
-        );
+        },
+      );
+    }
 
-      gsap.to(glowEls[0], {
-        scale: 1.06,
-        opacity: 0.92,
+    if (eyebrow) {
+      gsap.fromTo(
+        eyebrow,
+        {
+          x: -24,
+          autoAlpha: 0,
+        },
+        {
+          x: 0,
+          autoAlpha: 1,
+          duration: 0.78,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 78%',
+            once: true,
+          },
+        },
+      );
+    }
+
+    if (title) {
+      gsap.fromTo(
+        title,
+        {
+          y: 44,
+          autoAlpha: 0,
+        },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.95,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 74%',
+            once: true,
+          },
+        },
+      );
+    }
+
+    if (subcopy) {
+      gsap.fromTo(
+        subcopy,
+        {
+          y: 28,
+          autoAlpha: 0,
+        },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.82,
+          delay: 0.04,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 72%',
+            once: true,
+          },
+        },
+      );
+    }
+
+    if (cards.length > 0) {
+      gsap.fromTo(
+        cards,
+        {
+          autoAlpha: 0,
+          y: 64,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.95,
+          stagger: 0.1,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 68%',
+            once: true,
+          },
+        },
+      );
+    }
+
+    if (buttons.length > 0) {
+      gsap.fromTo(
+        buttons,
+        {
+          autoAlpha: 0,
+          y: 18,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.75,
+          stagger: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 66%',
+            once: true,
+          },
+        },
+      );
+    }
+  };
+
+  const calibrationRoot = document.querySelector('[data-calibration-root]');
+  const calibrationFrame = calibrationRoot?.querySelector('[data-orbit-frame]');
+  const calibrationCopy = calibrationRoot?.querySelector('.calibration-copy');
+  const orbitAssembly = calibrationRoot?.querySelector('[data-orbit-assembly]');
+  const logoLayer = calibrationRoot?.querySelector('[data-logo-layer]');
+  const signalCards = calibrationRoot?.querySelectorAll('[data-signal-note]');
+  const fieldItems = calibrationRoot?.querySelectorAll('[data-field-item]');
+  const promptChips = calibrationRoot?.querySelectorAll('[data-prompt-chip]');
+  const instrumentLabels = calibrationRoot?.querySelectorAll('[data-instrument-label]');
+
+  if (
+    calibrationRoot instanceof HTMLElement &&
+    calibrationFrame instanceof HTMLElement &&
+    calibrationCopy instanceof HTMLElement &&
+    orbitAssembly instanceof HTMLElement &&
+    logoLayer instanceof HTMLElement
+  ) {
+    const notes = signalCards ? Array.from(signalCards) : [];
+    const fields = fieldItems ? Array.from(fieldItems) : [];
+    const chips = promptChips ? Array.from(promptChips) : [];
+    const labels = instrumentLabels ? Array.from(instrumentLabels) : [];
+
+    gsap.set([calibrationCopy, orbitAssembly, logoLayer], {
+      transformOrigin: '50% 50%',
+    });
+
+    const introTimeline = gsap.timeline({
+      defaults: {
+        ease: 'power3.out',
+      },
+    });
+
+    introTimeline
+      .fromTo(
+        calibrationCopy,
+        {
+          autoAlpha: 0,
+          y: 28,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.82,
+        },
+      )
+      .fromTo(
+        orbitAssembly,
+        {
+          autoAlpha: 0,
+          scale: 0.94,
+        },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          duration: 1,
+        },
+        '-=0.48',
+      )
+      .fromTo(
+        logoLayer,
+        {
+          autoAlpha: 0,
+          scale: 0.88,
+          y: 22,
+        },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.95,
+          ease: 'back.out(1.2)',
+        },
+        '-=0.62',
+      )
+      .fromTo(
+        labels,
+        {
+          autoAlpha: 0,
+          x: (index) => (index % 2 === 0 ? -18 : 18),
+        },
+        {
+          autoAlpha: 1,
+          x: 0,
+          duration: 0.7,
+          stagger: 0.08,
+        },
+        '-=0.72',
+      )
+      .fromTo(
+        chips,
+        {
+          autoAlpha: 0,
+          scale: 0.82,
+          y: 10,
+        },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.72,
+          stagger: 0.07,
+        },
+        '-=0.62',
+      )
+      .fromTo(
+        notes,
+        {
+          autoAlpha: 0,
+          y: 34,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.08,
+        },
+        '-=0.56',
+      )
+      .fromTo(
+        fields,
+        {
+          autoAlpha: 0,
+          y: 24,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.04,
+        },
+        '-=0.54',
+      );
+
+    chips.forEach((chip, index) => {
+      gsap.to(chip, {
+        x: index % 2 === 0 ? 10 : -10,
+        y: index < 3 ? -12 : 12,
+        rotation: index % 2 === 0 ? 1.6 : -1.6,
+        duration: 3.1 + index * 0.3,
+        ease: 'sine.inOut',
         repeat: -1,
         yoyo: true,
-        duration: 3.2,
-        ease: 'sine.inOut',
       });
+    });
 
-      gsap.to(glowEls[1], {
-        scale: 0.96,
-        opacity: 0.7,
-        repeat: -1,
-        yoyo: true,
-        duration: 4.1,
-        ease: 'sine.inOut',
-      });
+    gsap.to(orbitAssembly, {
+      y: -8,
+      duration: 4.2,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+    });
 
-      const orbitTimeline = gsap.timeline({
+    gsap.to(logoLayer, {
+      y: -12,
+      scale: 1.02,
+      duration: 3.6,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+    });
+
+    const media = gsap.matchMedia();
+
+    media.add('(min-width: 861px)', () => {
+      const heroTimeline = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
-          trigger: orbitRoot,
+          trigger: calibrationRoot,
           start: 'top top',
-          end: `+=${Math.max(questionCards.length * 880, 4200)}`,
+          end: '+=2400',
           scrub: 1,
-          pin: orbitFrame,
+          pin: calibrationFrame,
           anticipatePin: 1,
         },
       });
 
-      orbitTimeline
+      heroTimeline
         .to(
           orbitAssembly,
           {
-            '--orbit-flow': '320deg',
-            '--orbit-marker-rotation': '320deg',
-            duration: totalDuration,
+            '--orbit-flow': '240deg',
+            '--orbit-marker-rotation': '240deg',
+            duration: 1.2,
           },
           0,
+        )
+        .to(
+          calibrationCopy,
+          {
+            yPercent: -6,
+            autoAlpha: 0.66,
+            duration: 0.7,
+          },
+          0,
+        )
+        .to(
+          notes,
+          {
+            y: -42,
+            autoAlpha: (index) => (index === notes.length - 1 ? 1 : 0.52),
+            duration: 0.7,
+            stagger: 0.03,
+          },
+          0.08,
+        )
+        .to(
+          chips,
+          {
+            x: (index) => [36, -26, 28, -34, 24, -18][index] ?? 0,
+            y: (index) => [-18, 18, -14, 18, -12, 20][index] ?? 0,
+            scale: 0.92,
+            autoAlpha: 0.7,
+            duration: 1.1,
+          },
+          0,
+        )
+        .to(
+          labels,
+          {
+            y: (index) => [-10, 0, 10][index] ?? 0,
+            autoAlpha: 0.88,
+            duration: 0.8,
+            stagger: 0.03,
+          },
+          0.06,
         )
         .to(
           logoLayer,
           {
-            scale: 1,
-            duration: totalDuration,
+            yPercent: -2,
+            scale: 1.04,
+            duration: 1.15,
           },
           0,
-        )
-        .to(
-          intro,
-          {
-            autoAlpha: 0.58,
-            yPercent: -4,
-            duration: totalDuration * 0.4,
-          },
-          0,
-        )
-        ;
-
-      questionCards.forEach((card, index) => {
-        const side = card.getAttribute('data-side');
-        const enterAt = 0.45 + index * segment;
-        const exitAt = enterAt + 0.62;
-        const exitX = side === 'left' ? -40 : 40;
-
-        orbitTimeline
-          .to(
-            card,
-            {
-              autoAlpha: 1,
-              x: 0,
-              scale: 1,
-              duration: 0.24,
-              ease: 'power2.out',
-            },
-            enterAt,
-          )
-          .to(
-            card,
-            {
-              autoAlpha: index === questionCards.length - 1 ? 1 : 0,
-              x: index === questionCards.length - 1 ? 0 : exitX,
-              scale: index === questionCards.length - 1 ? 1 : 0.97,
-              duration: 0.2,
-              ease: 'power2.in',
-            },
-            exitAt,
-          );
-      });
-
-      gsap.utils.toArray('[data-reveal]').forEach((section, index) => {
-        const element = section;
-        const heading = element.querySelector('.section-heading');
-        const eyebrow = element.querySelector('.eyebrow');
-        const title = element.querySelector('.section-heading h2, h1, .hero-title-zh');
-        const subcopy = element.querySelector('.section-heading p, .lede');
-        const cards = element.querySelectorAll('.mini-card, .list-card');
-        const paragraphs = element.querySelectorAll('p, li');
-        const buttons = element.querySelectorAll('.button');
-
-        gsap.fromTo(
-          element,
-          {
-            autoAlpha: 0,
-          },
-          {
-            autoAlpha: 1,
-            duration: 0.35,
-            ease: 'none',
-            delay: index === 0 ? 0.1 : 0,
-            scrollTrigger: {
-              trigger: element,
-              start: 'top 88%',
-              once: true,
-            },
-          },
         );
 
-        if (heading) {
-          gsap.fromTo(
-            heading,
-            {
-              y: 72,
-              clipPath: 'inset(0 0 100% 0)',
-            },
-            {
-              y: 0,
-              clipPath: 'inset(0 0 0% 0)',
-              duration: 1.2,
-              ease: 'power4.out',
-              scrollTrigger: {
-                trigger: element,
-                start: 'top 76%',
-                once: true,
-              },
-            },
-          );
-        }
-
-        if (eyebrow) {
-          gsap.fromTo(
-            eyebrow,
-            {
-              x: -24,
-              autoAlpha: 0,
-            },
-            {
-              x: 0,
-              autoAlpha: 1,
-              duration: 0.8,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: element,
-                start: 'top 78%',
-                once: true,
-              },
-            },
-          );
-        }
-
-        if (title) {
-          gsap.fromTo(
-            title,
-            {
-              y: 48,
-              autoAlpha: 0,
-            },
-            {
-              y: 0,
-              autoAlpha: 1,
-              duration: 1,
-              ease: 'power4.out',
-              scrollTrigger: {
-                trigger: element,
-                start: 'top 74%',
-                once: true,
-              },
-            },
-          );
-        }
-
-        if (subcopy) {
-          gsap.fromTo(
-            subcopy,
-            {
-              y: 34,
-              autoAlpha: 0,
-            },
-            {
-              y: 0,
-              autoAlpha: 1,
-              duration: 0.9,
-              delay: 0.05,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: element,
-                start: 'top 72%',
-                once: true,
-              },
-            },
-          );
-        }
-
-        if (cards.length > 0) {
-          gsap.fromTo(
-            cards,
-            {
-              autoAlpha: 0,
-              y: 80,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 1,
-              stagger: 0.16,
-              ease: 'power4.out',
-              scrollTrigger: {
-                trigger: element,
-                start: 'top 68%',
-                once: true,
-              },
-            },
-          );
-        }
-
-        if (paragraphs.length > 0 && cards.length === 0) {
-          gsap.fromTo(
-            paragraphs,
-            {
-              autoAlpha: 0,
-              y: 28,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.85,
-              stagger: 0.06,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: element,
-                start: 'top 68%',
-                once: true,
-              },
-            },
-          );
-        }
-
-        if (buttons.length > 0) {
-          gsap.fromTo(
-            buttons,
-            {
-              autoAlpha: 0,
-              y: 18,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.8,
-              stagger: 0.08,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: element,
-                start: 'top 66%',
-                once: true,
-              },
-            },
-          );
-        }
-      });
-    }
-  } else {
-    document.querySelectorAll('[data-question-card]').forEach((card, index) => {
-      if (index === 0) {
-        card.style.opacity = '1';
-        card.style.transform = 'translate3d(0, -50%, 0)';
-      }
+      return () => {
+        heroTimeline.kill();
+      };
     });
   }
+
+  const transformSection = document.querySelector('[data-transform-section]');
+  const transformPin = transformSection?.querySelector('[data-transform-pin]');
+  const transformViewport = transformSection?.querySelector('[data-transform-viewport]');
+  const transformTrack = transformSection?.querySelector('[data-transform-track]');
+  const transformPanels = transformSection?.querySelectorAll('[data-transform-panel]');
+  const axisLine = transformSection?.querySelector('.transform-axis-line');
+  const axisNodes = transformSection?.querySelectorAll('.transform-axis-node');
+
+  if (
+    transformSection instanceof HTMLElement &&
+    transformPin instanceof HTMLElement &&
+    transformViewport instanceof HTMLElement &&
+    transformTrack instanceof HTMLElement
+  ) {
+    const panels = transformPanels ? Array.from(transformPanels) : [];
+    const tokensByPanel = panels.map((panel) => Array.from(panel.querySelectorAll('.transform-token')));
+    const nodes = axisNodes ? Array.from(axisNodes) : [];
+
+    gsap.fromTo(
+      transformSection.querySelector('.transformation-header'),
+      {
+        autoAlpha: 0,
+        y: 34,
+      },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.88,
+        ease: 'power4.out',
+        scrollTrigger: {
+          trigger: transformSection,
+          start: 'top 72%',
+          once: true,
+        },
+      },
+    );
+
+    const media = gsap.matchMedia();
+
+    media.add('(min-width: 861px)', () => {
+      const totalShift = Math.max(transformTrack.scrollWidth - transformViewport.clientWidth, 0);
+
+      if (totalShift <= 0) {
+        return () => {};
+      }
+
+      if (axisLine instanceof HTMLElement) {
+        gsap.set(axisLine, {
+          scaleX: 0,
+          transformOrigin: 'left center',
+        });
+      }
+
+      gsap.set(nodes, {
+        scale: 0.76,
+        autoAlpha: 0.56,
+      });
+
+      tokensByPanel.forEach((tokens, index) => {
+        gsap.set(tokens, {
+          autoAlpha: index === 0 ? 1 : 0.36,
+          y: index === 0 ? 0 : 24,
+        });
+      });
+
+      const transformTimeline = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: transformSection,
+          start: 'top top',
+          end: `+=${totalShift + window.innerWidth * 1.2}`,
+          scrub: 1,
+          pin: transformPin,
+          anticipatePin: 1,
+        },
+      });
+
+      transformTimeline.to(
+        transformTrack,
+        {
+          x: -totalShift,
+          duration: 1,
+        },
+        0,
+      );
+
+      if (axisLine instanceof HTMLElement) {
+        transformTimeline.to(
+          axisLine,
+          {
+            scaleX: 1,
+            duration: 1,
+          },
+          0,
+        );
+      }
+
+      nodes.forEach((node, index) => {
+        transformTimeline.to(
+          node,
+          {
+            scale: 1.18,
+            autoAlpha: 1,
+            duration: 0.1,
+          },
+          index * 0.33,
+        );
+      });
+
+      tokensByPanel.forEach((tokens, index) => {
+        const start = index * 0.33;
+        transformTimeline
+          .to(
+            tokens,
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.14,
+              stagger: 0.03,
+            },
+            start,
+          )
+          .to(
+            tokens,
+            {
+              autoAlpha: index === tokensByPanel.length - 1 ? 1 : 0.42,
+              y: index === tokensByPanel.length - 1 ? 0 : -12,
+              duration: 0.14,
+              stagger: 0.02,
+            },
+            Math.min(start + 0.22, 0.88),
+          );
+      });
+
+      panels.forEach((panel, index) => {
+        transformTimeline.fromTo(
+          panel,
+          {
+            y: 26,
+          },
+          {
+            y: 0,
+            duration: 0.18,
+          },
+          index * 0.28,
+        );
+      });
+
+      return () => {
+        transformTimeline.kill();
+      };
+    });
+  }
+
+  gsap.utils.toArray('[data-reveal]').forEach((section, index) => {
+    revealSection(section, index);
+  });
+
+  window.addEventListener(
+    'load',
+    () => {
+      ScrollTrigger.refresh();
+    },
+    { once: true },
+  );
 </script>

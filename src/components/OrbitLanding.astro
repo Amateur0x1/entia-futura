@@ -1,6 +1,18 @@
 ---
-import { siteMeta } from '../content/site';
-import { pickByLocale, type Locale } from '../i18n/config';
+import {
+  collaborationFormsEn,
+  collaborationFormsZh,
+  joinWaysEn,
+  joinWaysZh,
+  practiceItems,
+  programs,
+  publicationCategoriesEn,
+  publicationCategoriesZh,
+  researchAreas,
+  siteMeta,
+  ventureItems,
+} from '../content/site';
+import { pickByLocale, toLocalePath, type Locale } from '../i18n/config';
 
 interface Props {
   locale: Locale;
@@ -25,223 +37,561 @@ const questions = pickByLocale(
     'As technology enters the everyday, what forms of life are still worth inventing?',
   ],
 );
+
+const promptWords = pickByLocale(
+  locale,
+  ['学习', '判断力', '共同体', '空间', '地方', '生活形式'],
+  ['Learning', 'Judgment', 'Collective Life', 'Space', 'Locality', 'Forms of Life'],
+);
+
+const signalCards = pickByLocale(
+  locale,
+  [
+    {
+      eyebrow: 'research archive',
+      title: '问题并不直接进入现实，而先进入长期积累的研究档案。',
+    },
+    {
+      eyebrow: 'translation layer',
+      title: '研究在这里被转成方法、叙事、活动、空间与组织接口。',
+    },
+    {
+      eyebrow: 'initiatives',
+      title: '最后才以出版、驻留、实验、合作与公共计划的形式发生。',
+    },
+  ],
+  [
+    {
+      eyebrow: 'research archive',
+      title: 'Questions do not enter reality directly. They first accumulate in an archive of inquiry.',
+    },
+    {
+      eyebrow: 'translation layer',
+      title: 'Research is translated here into methods, narratives, programs, spaces, and organizational interfaces.',
+    },
+    {
+      eyebrow: 'initiatives',
+      title: 'Only then does it take form as publications, residencies, experiments, collaborations, and public programs.',
+    },
+  ],
+);
+
+const instrumentLabels = pickByLocale(
+  locale,
+  ['00 / 轨道档案', 'field calibration', 'institution active'],
+  ['00 / orbital archive', 'field calibration', 'institution active'],
+);
+
+const fieldLabels = researchAreas.map((area) => pickByLocale(locale, area.zhTitle, area.enTitle));
+
+const archiveItems = [
+  ...programs.slice(0, 3).map((item) => pickByLocale(locale, item.zhTitle, item.enTitle)),
+  ...practiceItems.slice(0, 2).map((item) => pickByLocale(locale, item.zhTitle, item.enTitle)),
+];
+
+const translationItems = [
+  ...practiceItems.slice(0, 3).map((item) => pickByLocale(locale, item.zhTitle, item.enTitle)),
+  pickByLocale(locale, '公共活动', 'Public Programs'),
+  pickByLocale(locale, '空间脚本', 'Spatial Scripts'),
+];
+
+const initiativeItems = [
+  ...ventureItems.slice(0, 3).map((item) => pickByLocale(locale, item.zhTitle, item.enTitle)),
+  pickByLocale(locale, '出版计划', 'Publication Programs'),
+  pickByLocale(locale, '长期合作', 'Long-term Collaboration'),
+];
+
+const interfaceCards = [
+  {
+    eyebrow: pickByLocale(locale, '研究成果', 'Publications'),
+    title: pickByLocale(locale, '研究、评论、档案与出版计划。', 'Research outputs, commentary, archives, and publication plans.'),
+    items: pickByLocale(locale, publicationCategoriesZh.slice(0, 4), publicationCategoriesEn.slice(0, 4)),
+    href: toLocalePath(locale, '/publications'),
+    cta: pickByLocale(locale, '查看成果', 'View publications'),
+  },
+  {
+    eyebrow: pickByLocale(locale, '合作方式', 'Collaboration'),
+    title: pickByLocale(locale, '联合研究、内容共创、地方合作与实验性合作。', 'Joint research, co-created content, place-based work, and experimental collaboration.'),
+    items: pickByLocale(locale, collaborationFormsZh.slice(0, 4), collaborationFormsEn.slice(0, 4)),
+    href: toLocalePath(locale, '/collaboration'),
+    cta: pickByLocale(locale, '发起合作', 'Start collaboration'),
+  },
+  {
+    eyebrow: pickByLocale(locale, '加入方式', 'Participation'),
+    title: pickByLocale(locale, '活动、社群、共创项目、提案与驻留入口。', 'Events, community entry points, co-created projects, proposals, and residencies.'),
+    items: pickByLocale(locale, joinWaysZh.slice(0, 4), joinWaysEn.slice(0, 4)),
+    href: toLocalePath(locale, '/join-us'),
+    cta: pickByLocale(locale, '了解参与', 'Explore participation'),
+  },
+];
 ---
 
-<section class="orbit-landing" data-orbit-landing>
-  <div class="orbit-landing-frame" data-orbit-frame>
-    <div class="orbit-atmosphere" aria-hidden="true"></div>
+<section class="landing-system" data-landing-system>
+  <div class="landing-atmosphere" aria-hidden="true"></div>
 
-    <div class="orbit-stage" data-orbit-stage>
-      <div class="orbit-copy-rail">
-        <div class="orbit-intro">
-          <h1>{pickByLocale(locale, siteMeta.coreQuestionZh, siteMeta.coreQuestionEn)}</h1>
-          <p class="orbit-lede">
-            {pickByLocale(
-              locale,
-              '滚动并不会立刻离开首屏，而是驱动轨道自转。所有问题统一在左侧出现，中心只保留 Logo 与轨道本身。',
-              'Scrolling does not immediately leave the hero. It drives the orbit while every prompt appears on the left, leaving the center only for the logo and ring.',
-            )}
-          </p>
+  <section class="calibration-stage" data-calibration-root>
+    <div class="calibration-frame" data-orbit-frame>
+      <div class="calibration-copy">
+        <p class="eyebrow calibration-index">{pickByLocale(locale, '00 / 机构校准', '00 / Calibration')}</p>
+        <h1>{pickByLocale(locale, siteMeta.coreQuestionZh, siteMeta.coreQuestionEn)}</h1>
+        <p class="calibration-lede">{pickByLocale(locale, siteMeta.oneLineZh, siteMeta.oneLineEn)}</p>
+
+        <div class="cta-row calibration-actions">
+          <a class="button primary" href={toLocalePath(locale, '/research')}>
+            {pickByLocale(locale, '进入研究', 'Enter Research')}
+          </a>
+          <a class="button secondary" href={toLocalePath(locale, '/programs')}>
+            {pickByLocale(locale, '查看机制', 'View Programs')}
+          </a>
+          <a class="button secondary" href={toLocalePath(locale, '/collaboration')}>
+            {pickByLocale(locale, '发起合作', 'Start Collaboration')}
+          </a>
         </div>
 
-        <div class="orbit-side orbit-side-left" data-orbit-column="left">
-          {questions.map((question, index) => (
-            <article class="orbit-question-card orbit-question-left" data-question-card data-side="left" data-question-index={index}>
-              <span class="orbit-card-index">{String(index + 1).padStart(2, '0')}</span>
-              <p>{question}</p>
+        <div class="signal-stack">
+          {signalCards.map((card) => (
+            <article class="signal-card" data-signal-note>
+              <p>{card.eyebrow}</p>
+              <h2>{card.title}</h2>
             </article>
           ))}
         </div>
       </div>
 
-      <div class="orbit-centerpiece">
-        <div class="orbit-depth-glow orbit-depth-glow-a" aria-hidden="true"></div>
-        <div class="orbit-depth-glow orbit-depth-glow-b" aria-hidden="true"></div>
+      <div class="instrument-stage">
+        <div class="instrument-shell">
+          <div class="instrument-depth instrument-depth-a" aria-hidden="true"></div>
+          <div class="instrument-depth instrument-depth-b" aria-hidden="true"></div>
 
-        <div class="orbit-assembly" data-orbit-assembly>
-          <div class="orbit-plane orbit-plane-back" aria-hidden="true">
-            <div class="orbit-ring orbit-ring-back"></div>
-          </div>
+          <div class="instrument-label instrument-label-top" data-instrument-label>{instrumentLabels[0]}</div>
+          <div class="instrument-label instrument-label-right" data-instrument-label>{instrumentLabels[1]}</div>
+          <div class="instrument-label instrument-label-bottom" data-instrument-label>{instrumentLabels[2]}</div>
 
-          <div class="orbit-logo-layer" data-logo-layer>
-            <div class="orbit-logo-shadow" aria-hidden="true"></div>
-            <img class="orbit-logo-image" src="/brand/entia-logo-cutout.png" alt="Entia Futura logo" />
-          </div>
+          {promptWords.map((word, index) => (
+            <span class={`prompt-chip prompt-chip-${index + 1}`} data-prompt-chip>{word}</span>
+          ))}
 
-          <div class="orbit-plane orbit-plane-front" aria-hidden="true">
-            <div class="orbit-ring orbit-ring-front"></div>
-          </div>
+          <div class="orbit-assembly" data-orbit-assembly>
+            <div class="orbit-plane orbit-plane-back" aria-hidden="true">
+              <div class="orbit-ring orbit-ring-back"></div>
+            </div>
 
-          <div class="orbit-markers" aria-hidden="true">
-            <span class="orbit-marker orbit-marker-a"></span>
-            <span class="orbit-marker orbit-marker-b"></span>
-            <span class="orbit-marker orbit-marker-c"></span>
-            <span class="orbit-marker orbit-marker-d"></span>
+            <div class="orbit-logo-layer" data-logo-layer>
+              <div class="orbit-logo-shadow" aria-hidden="true"></div>
+              <img class="orbit-logo-image" src="/brand/entia-logo-cutout.png" alt="Entia Futura logo" />
+            </div>
+
+            <div class="orbit-plane orbit-plane-front" aria-hidden="true">
+              <div class="orbit-ring orbit-ring-front"></div>
+            </div>
+
+            <div class="orbit-markers" aria-hidden="true">
+              <span class="orbit-marker orbit-marker-a"></span>
+              <span class="orbit-marker orbit-marker-b"></span>
+              <span class="orbit-marker orbit-marker-c"></span>
+              <span class="orbit-marker orbit-marker-d"></span>
+            </div>
           </div>
+        </div>
+
+        <div class="field-ledger">
+          <p class="field-ledger-label">{pickByLocale(locale, 'CURRENT FIELDS', 'CURRENT FIELDS')}</p>
+          <ol>
+            {fieldLabels.map((label, index) => (
+              <li data-field-item>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <p>{label}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <section class="index-stage section-card" data-reveal>
+    <div class="section-heading">
+      <p class="eyebrow">{pickByLocale(locale, '01 / 问题被重新编目', '01 / Questions Re-indexed')}</p>
+      <h2>{pickByLocale(locale, '问题不是栏目标题，而是研究入口。', 'Questions are not menu labels, but entrances into inquiry.')}</h2>
+      <p>
+        {pickByLocale(
+          locale,
+          '首页不直接陈列卖点，而是把核心问题重新索引为持续展开的研究领域。',
+          'The homepage does not list selling points. It re-indexes core questions into ongoing fields of inquiry.',
+        )}
+      </p>
+    </div>
+
+    <div class="index-grid">
+      <div class="question-column">
+        {questions.map((question, index) => (
+          <article class="question-fragment">
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <p>{question}</p>
+          </article>
+        ))}
+      </div>
+
+      <div class="field-grid">
+        {researchAreas.map((area, index) => (
+          <article class="field-card">
+            <p>{String(index + 1).padStart(2, '0')}</p>
+            <h3>{pickByLocale(locale, area.zhTitle, area.enTitle)}</h3>
+            <p>{pickByLocale(locale, area.zhBody, area.enBody)}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="transformation-stage" data-transform-section>
+    <div class="transformation-pin" data-transform-pin>
+      <div class="transformation-header">
+        <p class="eyebrow">{pickByLocale(locale, '02 / 从研究到实践', '02 / From Inquiry to Practice')}</p>
+        <h2>{pickByLocale(locale, '纵向滚动驱动一条横向转译链。', 'Vertical scrolling drives a horizontal chain of translation.')}</h2>
+        <p>
+          {pickByLocale(
+            locale,
+            '这不是三栏介绍，而是把研究材料如何被转成现实形式的机构方法做成一条可被观看的动态结构线。',
+            'This is not a three-column explainer. It turns the institute’s method of translating research into reality into a visible moving structure.',
+          )}
+        </p>
+      </div>
+
+      <div class="transformation-shell">
+        <div class="transform-axis" aria-hidden="true">
+          <span class="transform-axis-line"></span>
+          <span class="transform-axis-node"></span>
+          <span class="transform-axis-node"></span>
+          <span class="transform-axis-node"></span>
+        </div>
+
+        <div class="transform-viewport" data-transform-viewport>
+          <div class="transform-track" data-transform-track>
+            <article class="transform-panel transform-panel-archive" data-transform-panel>
+              <div class="transform-panel-meta">
+                <span>01</span>
+                <p>{pickByLocale(locale, 'RESEARCH ARCHIVE', 'RESEARCH ARCHIVE')}</p>
+              </div>
+              <h3>{pickByLocale(locale, '访谈、观察、档案与研究计划在这里沉积。', 'Interviews, observation, archives, and research plans accumulate here.')}</h3>
+              <div class="transform-token-grid">
+                {archiveItems.map((item) => (
+                  <span class="transform-token">{item}</span>
+                ))}
+              </div>
+            </article>
+
+            <article class="transform-panel transform-panel-translation" data-transform-panel>
+              <div class="transform-panel-meta">
+                <span>02</span>
+                <p>{pickByLocale(locale, 'TRANSLATION LAYER', 'TRANSLATION LAYER')}</p>
+              </div>
+              <h3>{pickByLocale(locale, '研究在这里被转译为方法、叙事、活动、空间与组织接口。', 'Research is translated here into methods, narratives, programs, spaces, and organizational interfaces.')}</h3>
+              <div class="transform-token-grid">
+                {translationItems.map((item) => (
+                  <span class="transform-token">{item}</span>
+                ))}
+              </div>
+            </article>
+
+            <article class="transform-panel transform-panel-initiatives" data-transform-panel>
+              <div class="transform-panel-meta">
+                <span>03</span>
+                <p>{pickByLocale(locale, 'INITIATIVES', 'INITIATIVES')}</p>
+              </div>
+              <h3>{pickByLocale(locale, '最后才成为出版、驻留、实验、协作与面向现实的未来项目。', 'Only then does it take form as publications, residencies, experiments, collaborations, and future-facing initiatives.')}</h3>
+              <div class="transform-token-grid">
+                {initiativeItems.map((item) => (
+                  <span class="transform-token">{item}</span>
+                ))}
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <p class="transform-caption">
+        {pickByLocale(
+          locale,
+          '纵向滚动在这一段不再向下翻页，而是推动研究材料、转译机制与现实形式在同一条轴线上横向流动。',
+          'In this passage, vertical scroll no longer flips downward. It pushes research material, translation mechanisms, and real-world forms across the same horizontal axis.',
+        )}
+      </p>
+    </div>
+  </section>
+
+  <section class="interfaces-stage section-card" data-reveal>
+    <div class="section-heading">
+      <p class="eyebrow">{pickByLocale(locale, '03 / 现实接口', '03 / Interfaces')}</p>
+      <h2>{pickByLocale(locale, '当抽象研究回到现实，就变成这些入口。', 'When abstract research returns to reality, it becomes these interfaces.')}</h2>
+      <p>
+        {pickByLocale(
+          locale,
+          '在机构气质之后，用户仍然需要清楚的去路。出版、合作与参与方式应该是可立即进入的接口。',
+          'After the institutional atmosphere is established, users still need clear routes. Publications, collaboration, and participation must remain immediate interfaces.',
+        )}
+      </p>
+    </div>
+
+    <div class="interfaces-grid">
+      {interfaceCards.map((card) => (
+        <article class="interface-card">
+          <p class="interface-card-eyebrow">{card.eyebrow}</p>
+          <h3>{card.title}</h3>
+          <ul>
+            {card.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+          <a class="button secondary" href={card.href}>{card.cta}</a>
+        </article>
+      ))}
+    </div>
+  </section>
 </section>
 
 <style>
-  .orbit-landing {
+  .landing-system {
     position: relative;
-    min-height: 100svh;
-    margin: 0;
-    padding: 0;
+    display: grid;
+    gap: 2rem;
   }
 
-  .orbit-landing-frame {
-    position: relative;
-    min-height: 100svh;
-    overflow: clip;
-    isolation: isolate;
-  }
-
-  .orbit-atmosphere {
+  .landing-atmosphere {
     position: absolute;
-    inset: 0;
-    z-index: -2;
+    inset: -6rem 0 auto;
+    height: 52rem;
+    pointer-events: none;
     background:
-      radial-gradient(circle at 50% 42%, rgba(255, 244, 90, 0.18), rgba(255, 244, 90, 0) 24rem),
-      radial-gradient(circle at 76% 32%, rgba(95, 53, 255, 0.12), rgba(95, 53, 255, 0) 20rem),
-      radial-gradient(circle at 20% 68%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 18rem);
+      radial-gradient(circle at 16% 24%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 18rem),
+      radial-gradient(circle at 52% 20%, rgba(255, 244, 90, 0.22), rgba(255, 244, 90, 0) 24rem),
+      radial-gradient(circle at 84% 28%, rgba(95, 53, 255, 0.12), rgba(95, 53, 255, 0) 22rem);
+    filter: blur(2px);
   }
 
-  .orbit-eyebrow {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.76rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+  .calibration-stage {
+    position: relative;
+    min-height: 100svh;
   }
 
-  .orbit-intro h1 {
+  .calibration-frame {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(18rem, 1.05fr) minmax(22rem, 1.25fr);
+    gap: clamp(2rem, 4vw, 5rem);
+    align-items: center;
+    min-height: calc(100svh - 5rem);
+    padding: clamp(2rem, 4vh, 3rem) 0 clamp(2rem, 4vh, 3rem);
+  }
+
+  .calibration-copy {
+    display: grid;
+    gap: 1.4rem;
+    align-content: center;
+    max-width: 34rem;
+  }
+
+  .calibration-index {
+    margin-bottom: 0;
+  }
+
+  .calibration-copy h1 {
     margin: 0;
-    font-size: clamp(2.8rem, 7vw, 6rem);
-    line-height: 0.94;
+    font-size: clamp(3.1rem, 7.4vw, 6.8rem);
+    line-height: 0.92;
     letter-spacing: 0.02em;
   }
 
-  html[lang^='zh'] .orbit-intro h1 {
+  html[lang^='zh'] .calibration-copy h1 {
     font-family: 'EntiaTitleZh', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
     font-weight: 400;
   }
 
-  html[lang='en'] .orbit-intro h1 {
+  html[lang='en'] .calibration-copy h1 {
     font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
 
-  .orbit-lede {
+  .calibration-lede {
     margin: 0;
-    color: rgba(23, 23, 23, 0.76);
-    font-size: 1rem;
-    line-height: 1.8;
+    max-width: 30rem;
+    color: rgba(23, 23, 23, 0.78);
+    font-size: 1.04rem;
+    line-height: 1.85;
   }
 
-  .orbit-stage {
-    position: relative;
-    min-height: 100svh;
-    padding: clamp(8rem, 15vh, 10rem) 0 clamp(4rem, 10vh, 7rem);
+  .calibration-actions {
+    margin-top: 0.4rem;
   }
 
-  .orbit-copy-rail {
-    position: relative;
-    z-index: 6;
+  .signal-stack {
     display: grid;
-    gap: 1.2rem;
-    align-content: center;
-    align-self: center;
-    min-height: min(62vh, 34rem);
-    width: min(26rem, calc(50vw - 18rem));
-    padding-left: clamp(0rem, 1vw, 0.5rem);
+    gap: 0.9rem;
+    margin-top: 1rem;
   }
 
-  .orbit-intro {
-    display: grid;
-    gap: 0.8rem;
-    width: min(100%, 26rem);
-    text-align: left;
-  }
-
-  .orbit-side {
-    position: relative;
-    min-height: min(28vh, 14rem);
-  }
-
-  .orbit-question-card {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: min(100%, 22rem);
-    padding: 1.25rem 1.25rem 1.35rem;
+  .signal-card {
+    padding: 1rem 1.1rem 1.1rem;
     border: 1px solid rgba(22, 22, 22, 0.12);
-    border-radius: 1.5rem;
-    background: linear-gradient(180deg, rgba(200, 212, 220, 0.88), rgba(183, 199, 210, 0.78));
-    box-shadow: 0 20px 50px rgba(22, 22, 22, 0.1);
-    opacity: 0;
-    backdrop-filter: blur(18px);
-    will-change: transform, opacity;
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, rgba(200, 212, 220, 0.84), rgba(183, 199, 210, 0.56));
+    box-shadow: 0 20px 42px rgba(22, 22, 22, 0.08);
+    backdrop-filter: blur(16px);
   }
 
-  .orbit-question-left {
-    transform: translate3d(-1.6rem, 0, 0);
-  }
-
-  .orbit-card-index {
-    display: inline-flex;
-    margin-bottom: 0.9rem;
+  .signal-card p {
+    margin: 0 0 0.55rem;
     color: var(--accent-2);
-    font-size: 0.74rem;
-    letter-spacing: 0.22em;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
   }
 
-  .orbit-question-card p {
+  .signal-card h2 {
     margin: 0;
-    color: var(--ink);
-    font-size: clamp(1.05rem, 1.7vw, 1.4rem);
-    line-height: 1.65;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.68;
   }
 
-  .orbit-centerpiece {
-    position: absolute;
-    left: 50%;
-    top: 46%;
-    transform: translate(-50%, -46%);
+  .instrument-stage {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: center;
+  }
+
+  .instrument-shell {
+    position: relative;
+    width: min(100%, 44rem);
+    aspect-ratio: 1 / 1;
     display: grid;
     place-items: center;
-    min-height: min(74vh, 46rem);
-    width: min(100%, 52rem);
   }
 
-  .orbit-depth-glow {
+  .instrument-depth {
     position: absolute;
     border-radius: 50%;
-    filter: blur(18px);
+    filter: blur(16px);
     pointer-events: none;
   }
 
-  .orbit-depth-glow-a {
-    width: min(80%, 30rem);
+  .instrument-depth-a {
+    width: 72%;
     aspect-ratio: 1 / 1;
-    background: radial-gradient(circle, rgba(255, 244, 90, 0.24), rgba(255, 244, 90, 0));
+    background: radial-gradient(circle, rgba(255, 244, 90, 0.22), rgba(255, 244, 90, 0));
   }
 
-  .orbit-depth-glow-b {
-    width: min(94%, 36rem);
+  .instrument-depth-b {
+    width: 92%;
     aspect-ratio: 1 / 1;
     background: radial-gradient(circle, rgba(95, 53, 255, 0.12), rgba(95, 53, 255, 0));
+  }
+
+  .instrument-label {
+    position: absolute;
+    color: rgba(22, 22, 22, 0.72);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .instrument-label::before {
+    content: '';
+    position: absolute;
+    background: rgba(22, 22, 22, 0.18);
+  }
+
+  .instrument-label-top {
+    top: 9%;
+    left: 18%;
+  }
+
+  .instrument-label-top::before {
+    left: calc(100% + 0.75rem);
+    top: 50%;
+    width: 4rem;
+    height: 1px;
+  }
+
+  .instrument-label-right {
+    top: 48%;
+    right: 0;
+    transform: translateY(-50%);
+  }
+
+  .instrument-label-right::before {
+    right: calc(100% + 0.75rem);
+    top: 50%;
+    width: 4.5rem;
+    height: 1px;
+  }
+
+  .instrument-label-bottom {
+    bottom: 14%;
+    left: 16%;
+  }
+
+  .instrument-label-bottom::before {
+    left: calc(100% + 0.75rem);
+    top: 50%;
+    width: 3.8rem;
+    height: 1px;
+  }
+
+  .prompt-chip {
+    position: absolute;
+    z-index: 7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid rgba(22, 22, 22, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 16px 36px rgba(22, 22, 22, 0.08);
+    backdrop-filter: blur(14px);
+    color: var(--ink);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+  }
+
+  .prompt-chip-1 {
+    top: 10%;
+    left: 8%;
+  }
+
+  .prompt-chip-2 {
+    top: 18%;
+    right: 4%;
+  }
+
+  .prompt-chip-3 {
+    top: 44%;
+    left: 0;
+  }
+
+  .prompt-chip-4 {
+    top: 42%;
+    right: 0;
+  }
+
+  .prompt-chip-5 {
+    bottom: 16%;
+    left: 10%;
+  }
+
+  .prompt-chip-6 {
+    bottom: 8%;
+    right: 14%;
   }
 
   .orbit-assembly {
     --orbit-flow: 0deg;
     --orbit-marker-rotation: 0deg;
     position: relative;
-    width: min(100%, 44rem);
+    width: min(100%, 40rem);
     aspect-ratio: 1 / 1;
     transform-style: preserve-3d;
     will-change: transform;
@@ -292,27 +642,26 @@ const questions = pickByLocale(
       conic-gradient(
         from 0deg,
         rgba(255, 244, 90, 0.88) 0deg,
-        rgba(255, 244, 90, 0.08) 26deg,
-        rgba(255, 244, 90, 0) 72deg,
-        rgba(95, 53, 255, 0.54) 148deg,
-        rgba(95, 53, 255, 0.04) 178deg,
-        rgba(255, 255, 255, 0) 238deg,
+        rgba(255, 244, 90, 0.08) 24deg,
+        rgba(255, 244, 90, 0) 68deg,
+        rgba(95, 53, 255, 0.44) 146deg,
+        rgba(95, 53, 255, 0.02) 180deg,
+        rgba(255, 255, 255, 0) 236deg,
         rgba(255, 255, 255, 0.76) 304deg,
         rgba(255, 244, 90, 0.88) 360deg
       );
     -webkit-mask: radial-gradient(
       farthest-side,
-      transparent calc(100% - 1.15rem),
-      #000 calc(100% - 1.02rem) calc(100% - 0.38rem),
-      transparent calc(100% - 0.2rem)
+      transparent calc(100% - 1.1rem),
+      #000 calc(100% - 1rem) calc(100% - 0.36rem),
+      transparent calc(100% - 0.16rem)
     );
     mask: radial-gradient(
       farthest-side,
-      transparent calc(100% - 1.15rem),
-      #000 calc(100% - 1.02rem) calc(100% - 0.38rem),
-      transparent calc(100% - 0.2rem)
+      transparent calc(100% - 1.1rem),
+      #000 calc(100% - 1rem) calc(100% - 0.36rem),
+      transparent calc(100% - 0.16rem)
     );
-    filter: blur(0.4px);
   }
 
   .orbit-plane-back {
@@ -334,15 +683,11 @@ const questions = pickByLocale(
       0 0 44px rgba(255, 244, 90, 0.24);
   }
 
-  .orbit-plane-front .orbit-ring::after {
-    opacity: 1;
-  }
-
   .orbit-logo-layer {
     position: absolute;
     inset: 50% auto auto 50%;
     z-index: 3;
-    width: clamp(13rem, 28vw, 18rem);
+    width: clamp(12rem, 28vw, 18rem);
     aspect-ratio: 1 / 1;
     transform: translate(-50%, -50%);
     will-change: transform;
@@ -390,73 +735,498 @@ const questions = pickByLocale(
   }
 
   .orbit-marker-a {
-    transform: translate(-50%, -50%) translateY(-11.6rem);
+    transform: translate(-50%, -50%) translateY(-11rem);
   }
 
   .orbit-marker-b {
-    transform: translate(-50%, -50%) translate(11.8rem, -1.4rem);
+    transform: translate(-50%, -50%) translate(11.2rem, -1.25rem);
   }
 
   .orbit-marker-c {
-    transform: translate(-50%, -50%) translate(0, 11.8rem);
+    transform: translate(-50%, -50%) translate(0, 11.2rem);
   }
 
   .orbit-marker-d {
-    transform: translate(-50%, -50%) translate(-11.8rem, -1.4rem);
+    transform: translate(-50%, -50%) translate(-11.2rem, -1.25rem);
   }
 
-  @media (max-width: 1080px) {
-    .orbit-stage {
-      display: grid;
-      gap: 1.25rem;
-      padding-top: clamp(8.5rem, 18vh, 10rem);
-      padding-bottom: 6rem;
+  .field-ledger {
+    width: min(100%, 38rem);
+    padding: 1.15rem 1.2rem 1rem;
+    border-top: 1px solid rgba(22, 22, 22, 0.16);
+  }
+
+  .field-ledger-label {
+    margin: 0 0 0.8rem;
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  .field-ledger ol {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .field-ledger li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.7rem;
+    align-items: start;
+    padding-top: 0.4rem;
+    border-top: 1px solid rgba(22, 22, 22, 0.08);
+  }
+
+  .field-ledger li span {
+    color: var(--accent-2);
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .field-ledger li p {
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .index-stage,
+  .interfaces-stage {
+    padding: 1rem 0 0;
+    border-top: 1px solid rgba(22, 22, 22, 0.14);
+  }
+
+  .index-stage {
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .index-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: 1.4rem 2rem;
+    align-items: start;
+  }
+
+  .question-column {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .question-fragment {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(22, 22, 22, 0.12);
+  }
+
+  .question-fragment span {
+    color: var(--accent-2);
+    font-size: 0.76rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .question-fragment p {
+    margin: 0;
+    font-size: clamp(1rem, 1.7vw, 1.24rem);
+    line-height: 1.72;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .field-card {
+    min-height: 15rem;
+    padding: 1.1rem 1.15rem 1.2rem;
+    border: 1px solid rgba(22, 22, 22, 0.12);
+    border-radius: 1.35rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(183, 199, 210, 0.28));
+    box-shadow: 0 20px 44px rgba(22, 22, 22, 0.06);
+  }
+
+  .field-card p:first-child {
+    margin: 0 0 0.8rem;
+    color: var(--accent-2);
+    font-size: 0.76rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .field-card h3 {
+    margin: 0 0 0.65rem;
+    font-size: 1.12rem;
+    font-weight: 400;
+    line-height: 1.45;
+  }
+
+  .field-card p:last-child {
+    margin: 0;
+    color: rgba(22, 22, 22, 0.78);
+    line-height: 1.7;
+  }
+
+  .transformation-stage {
+    position: relative;
+    min-height: 100svh;
+    padding-top: 0.8rem;
+  }
+
+  .transformation-pin {
+    display: grid;
+    gap: 1.6rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(22, 22, 22, 0.14);
+  }
+
+  .transformation-header {
+    max-width: 48rem;
+  }
+
+  .transformation-header h2 {
+    margin: 0 0 0.7rem;
+    font-size: clamp(2rem, 4.4vw, 3.4rem);
+    line-height: 1.04;
+    font-weight: 400;
+  }
+
+  .transformation-header p:last-child {
+    margin: 0;
+    max-width: 42rem;
+    color: rgba(22, 22, 22, 0.78);
+    line-height: 1.8;
+  }
+
+  .transformation-shell {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .transform-axis {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    grid-template-columns: 1fr repeat(3, auto) 1fr;
+    align-items: center;
+    gap: 1rem;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .transform-axis-line {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    height: 1px;
+    background:
+      linear-gradient(90deg, rgba(22, 22, 22, 0.08), rgba(22, 22, 22, 0.2), rgba(22, 22, 22, 0.08));
+  }
+
+  .transform-axis-node {
+    grid-row: 1;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: rgba(255, 244, 90, 0.92);
+    box-shadow: 0 0 0 4px rgba(255, 244, 90, 0.12);
+  }
+
+  .transform-axis-node:nth-of-type(2) {
+    justify-self: center;
+  }
+
+  .transform-axis-node:nth-of-type(3) {
+    justify-self: center;
+  }
+
+  .transform-axis-node:nth-of-type(4) {
+    justify-self: center;
+  }
+
+  .transform-viewport {
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  .transform-track {
+    display: flex;
+    gap: 1.25rem;
+    width: max-content;
+    padding: 1.1rem 0 1.2rem;
+  }
+
+  .transform-panel {
+    position: relative;
+    display: grid;
+    align-content: space-between;
+    gap: 1.3rem;
+    width: min(78vw, 56rem);
+    min-height: 30rem;
+    padding: 1.4rem;
+    border: 1px solid rgba(22, 22, 22, 0.12);
+    border-radius: 1.7rem;
+    background: linear-gradient(180deg, rgba(200, 212, 220, 0.76), rgba(183, 199, 210, 0.46));
+    box-shadow: 0 24px 50px rgba(22, 22, 22, 0.08);
+    overflow: hidden;
+  }
+
+  .transform-panel::before {
+    content: '';
+    position: absolute;
+    inset: auto -10% -25% auto;
+    width: 16rem;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 244, 90, 0.16), rgba(255, 244, 90, 0));
+    filter: blur(6px);
+    pointer-events: none;
+  }
+
+  .transform-panel-translation::before {
+    background: radial-gradient(circle, rgba(95, 53, 255, 0.16), rgba(95, 53, 255, 0));
+  }
+
+  .transform-panel-meta {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .transform-panel-meta span {
+    color: var(--accent-2);
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .transform-panel-meta p {
+    margin: 0;
+    color: rgba(22, 22, 22, 0.72);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .transform-panel h3 {
+    margin: 0;
+    max-width: 34rem;
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  .transform-token-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .transform-token {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.68rem 0.9rem;
+    border: 1px solid rgba(22, 22, 22, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    color: var(--ink);
+    font-size: 0.92rem;
+    line-height: 1.2;
+  }
+
+  .transform-caption {
+    margin: 0;
+    max-width: 56rem;
+    color: rgba(22, 22, 22, 0.78);
+    line-height: 1.8;
+  }
+
+  .interfaces-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .interface-card {
+    display: grid;
+    gap: 1rem;
+    padding: 1.2rem;
+    border: 1px solid rgba(22, 22, 22, 0.12);
+    border-radius: 1.35rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(183, 199, 210, 0.3));
+    box-shadow: 0 18px 42px rgba(22, 22, 22, 0.06);
+  }
+
+  .interface-card-eyebrow {
+    margin: 0;
+    color: var(--accent-2);
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .interface-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.58;
+    font-weight: 400;
+  }
+
+  .interface-card ul {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding-left: 1.1rem;
+    color: rgba(22, 22, 22, 0.8);
+  }
+
+  .interface-card li {
+    line-height: 1.5;
+  }
+
+  @media (max-width: 1100px) {
+    .calibration-frame,
+    .index-grid,
+    .interfaces-grid {
+      grid-template-columns: 1fr;
     }
 
-    .orbit-centerpiece {
-      order: 2;
-      position: relative;
-      left: auto;
-      top: auto;
+    .instrument-stage {
+      justify-items: stretch;
+    }
+
+    .instrument-shell,
+    .field-ledger {
       width: 100%;
-      transform: none;
-      min-height: 30rem;
     }
 
-    .orbit-copy-rail {
-      order: 1;
+    .transform-panel {
+      width: min(86vw, 44rem);
+    }
+  }
+
+  @media (max-width: 860px) {
+    .landing-system {
+      gap: 1.5rem;
+    }
+
+    .calibration-stage {
       min-height: auto;
+    }
+
+    .calibration-frame {
+      min-height: auto;
+      padding-top: 1rem;
+    }
+
+    .instrument-shell {
+      aspect-ratio: auto;
+      min-height: 26rem;
+    }
+
+    .instrument-label-right {
+      right: 2%;
+    }
+
+    .field-ledger ol,
+    .field-grid,
+    .interfaces-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .transform-axis {
+      display: none;
+    }
+
+    .transform-viewport {
+      overflow: visible;
+    }
+
+    .transform-track {
+      display: grid;
       width: 100%;
-      padding-left: 0;
-      gap: 1rem;
+      padding: 0.2rem 0 0;
     }
 
-    .orbit-question-card {
-      width: min(32rem, calc(100vw - 2rem));
-      text-align: left;
-    }
-
-    .orbit-question-left {
-      transform: translate3d(0, 0, 0);
+    .transform-panel {
+      width: 100%;
+      min-height: auto;
     }
   }
 
-  @media (max-width: 720px) {
-    .orbit-stage {
-      padding-top: 6rem;
-      padding-bottom: 6.5rem;
+  @media (max-width: 640px) {
+    .calibration-copy h1 {
+      font-size: clamp(2.4rem, 14vw, 4.4rem);
     }
 
-    .orbit-centerpiece {
-      min-height: 24rem;
+    .calibration-lede,
+    .question-fragment p,
+    .field-card p:last-child,
+    .transform-caption {
+      font-size: 0.96rem;
+    }
+
+    .signal-stack {
+      gap: 0.7rem;
+    }
+
+    .signal-card,
+    .field-card,
+    .transform-panel,
+    .interface-card {
+      border-radius: 1.15rem;
+    }
+
+    .prompt-chip {
+      font-size: 0.74rem;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .prompt-chip-1 {
+      top: 8%;
+      left: 4%;
+    }
+
+    .prompt-chip-2 {
+      top: 16%;
+      right: 0;
+    }
+
+    .prompt-chip-3 {
+      left: 2%;
+    }
+
+    .prompt-chip-4 {
+      right: 2%;
+    }
+
+    .prompt-chip-5 {
+      left: 4%;
+      bottom: 18%;
+    }
+
+    .prompt-chip-6 {
+      right: 6%;
+      bottom: 8%;
     }
 
     .orbit-assembly {
-      width: min(100%, 25rem);
+      width: min(100%, 24rem);
     }
 
     .orbit-logo-layer {
-      width: 11rem;
+      width: 10rem;
     }
 
     .orbit-ring {
@@ -465,24 +1235,19 @@ const questions = pickByLocale(
     }
 
     .orbit-marker-a {
-      transform: translate(-50%, -50%) translateY(-8rem);
+      transform: translate(-50%, -50%) translateY(-7.8rem);
     }
 
     .orbit-marker-b {
-      transform: translate(-50%, -50%) translate(8.4rem, -0.8rem);
+      transform: translate(-50%, -50%) translate(8.1rem, -0.85rem);
     }
 
     .orbit-marker-c {
-      transform: translate(-50%, -50%) translate(0, 8.2rem);
+      transform: translate(-50%, -50%) translate(0, 8.1rem);
     }
 
     .orbit-marker-d {
-      transform: translate(-50%, -50%) translate(-8.4rem, -0.8rem);
-    }
-
-    .orbit-lede,
-    .orbit-question-card p {
-      font-size: 0.94rem;
+      transform: translate(-50%, -50%) translate(-8.1rem, -0.85rem);
     }
   }
 </style>
