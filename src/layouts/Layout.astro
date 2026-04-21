@@ -28,11 +28,11 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/brand/entia-logo.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/brand/entia-logo.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/brand/entia-logo-cutout.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/brand/entia-logo-cutout.png" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/brand/entia-logo.png" />
+    <link rel="apple-touch-icon" href="/brand/entia-logo-cutout.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -40,7 +40,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     <meta property="og:description" content={description} />
     <meta property="og:url" content={`${siteMeta.siteUrl}${currentPath}`} />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content={`${siteMeta.siteUrl}/brand/entia-logo.png`} />
+    <meta property="og:image" content={`${siteMeta.siteUrl}/brand/entia-logo-cutout.png`} />
     {activeLocale && <link rel="alternate" hrefLang="zh-CN" href={`${siteMeta.siteUrl}${toLocalePath('zh', currentPath)}`} />}
     {activeLocale && <link rel="alternate" hrefLang="en" href={`${siteMeta.siteUrl}${toLocalePath('en', currentPath)}`} />}
     <meta name="twitter:card" content="summary_large_image" />

@@ -1,0 +1,60 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { siteMeta } from '../../content/site';
+import { isLocale, pickByLocale } from '../../i18n/config';
+
+const { locale } = Astro.params;
+
+if (!isLocale(locale)) {
+  throw new Error(`Unsupported locale: ${locale}`);
+}
+
+const title = pickByLocale(locale, '隐私政策', 'Privacy Policy');
+const description = pickByLocale(
+  locale,
+  '未来人研究所网站的基础隐私说明。',
+  'Basic privacy information for the Entia Futura Institut website.',
+);
+---
+
+<Layout title={`${title} | ${siteMeta.enName}`} description={description} locale={locale}>
+  <main>
+    <section class="section-card">
+      <div class="section-heading">
+        <p class="eyebrow">{pickByLocale(locale, '信息与隐私', 'Information & Privacy')}</p>
+        <h1>{title}</h1>
+      </div>
+
+      <div class="privacy-copy">
+        <p>
+          {pickByLocale(
+            locale,
+            '我们仅收集维持网站运行与联络所必需的最少信息，例如浏览器请求日志与您主动发送给我们的邮件内容。我们不会出售您的个人信息，也不会将信息用于与研究所沟通无关的用途。',
+            'We collect only the minimum information needed to operate the website and communicate with you, such as browser request logs and the contents of emails you send to us voluntarily. We do not sell personal information or use it for purposes unrelated to communication with the institute.',
+          )}
+        </p>
+        <p>
+          {pickByLocale(
+            locale,
+            '如果您通过邮件与我们联系，相关信息仅用于回复、合作沟通或后续必要联络。若您希望查询、更新或删除与您相关的联系信息，请发送邮件至',
+            'If you contact us by email, the information is used only for reply, collaboration, or other necessary follow-up communication. If you would like to inquire about, update, or delete contact information related to you, please email',
+          )}
+          <a href={`mailto:${siteMeta.email}`}> {siteMeta.email}</a>
+          。
+        </p>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .privacy-copy {
+    display: grid;
+    gap: 1rem;
+    max-width: 52rem;
+  }
+
+  .privacy-copy p {
+    margin: 0;
+  }
+</style>
