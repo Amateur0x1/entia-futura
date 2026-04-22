@@ -117,7 +117,40 @@ const interfaceCards = [
 
   <section class="calibration-stage" data-calibration-root>
     <div class="calibration-frame" data-orbit-frame>
+      <div class="calibration-visual">
+        <div class="hero-video-shell" data-hero-video-shell>
+          <div class="hero-video-loading" data-hero-video-loading>
+            <span>{pickByLocale(locale, '载入入口中', 'Loading threshold')}</span>
+          </div>
+          <video
+            class="hero-video hero-video-scroll"
+            data-scroll-video
+            src="/videos/portal-scroll.mp4"
+            muted
+            playsinline
+            preload="auto"
+          ></video>
+          <video
+            class="hero-video hero-video-loop"
+            data-loop-video
+            src="/videos/portal-loop.webm"
+            autoplay
+            loop
+            muted
+            playsinline
+            preload="auto"
+          ></video>
+          <div class="hero-video-overlay" aria-hidden="true"></div>
+          <div class="hero-video-vignette" aria-hidden="true"></div>
+          <div class="hero-video-label" aria-hidden="true">
+            <span>portal calibration</span>
+            <strong>ENTIA FUTURA / THRESHOLD-01</strong>
+          </div>
+        </div>
+      </div>
+
       <div class="calibration-copy">
+        <p class="calibration-kicker">Entia Futura / Threshold Sequence</p>
         <h1>{pickByLocale(locale, siteMeta.coreQuestionZh, siteMeta.coreQuestionEn)}</h1>
         <p class="calibration-lede">{pickByLocale(locale, siteMeta.oneLineZh, siteMeta.oneLineEn)}</p>
 
@@ -140,28 +173,6 @@ const interfaceCards = [
               <h2>{card.title}</h2>
             </article>
           ))}
-        </div>
-      </div>
-
-      <div class="instrument-stage">
-        <div class="instrument-shell">
-          <div class="instrument-depth instrument-depth-a" aria-hidden="true"></div>
-          <div class="instrument-depth instrument-depth-b" aria-hidden="true"></div>
-
-          <div class="orbit-assembly" data-orbit-assembly>
-            <div class="orbit-plane orbit-plane-back" aria-hidden="true">
-              <div class="orbit-ring orbit-ring-back"></div>
-            </div>
-
-            <div class="orbit-logo-layer" data-logo-layer>
-              <div class="orbit-logo-shadow" aria-hidden="true"></div>
-              <img class="orbit-logo-image" src="/brand/entia-logo-cutout.png" alt="Entia Futura logo" />
-            </div>
-
-            <div class="orbit-plane orbit-plane-front" aria-hidden="true">
-              <div class="orbit-ring orbit-ring-front"></div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -330,23 +341,138 @@ const interfaceCards = [
   .calibration-stage {
     position: relative;
     min-height: 100svh;
+    margin-inline: calc(50% - 50vw);
+    width: 100vw;
   }
 
   .calibration-frame {
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(18rem, 1.05fr) minmax(22rem, 1.25fr);
-    gap: clamp(2rem, 4vw, 5rem);
-    align-items: center;
     min-height: calc(100svh - 5rem);
-    padding: clamp(2rem, 4vh, 3rem) 0 clamp(2rem, 4vh, 3rem);
+    padding: 0;
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .calibration-visual {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero-video-shell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: clip;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.1), transparent 20rem),
+      linear-gradient(180deg, #02060d 0%, #040813 50%, #02050c 100%);
+    isolation: isolate;
+  }
+
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-video-scroll {
+    filter: saturate(0.92) contrast(1.06) brightness(0.88);
+  }
+
+  .hero-video-loop {
+    opacity: 0;
+    filter: saturate(0.94) contrast(1.04) brightness(0.92);
+  }
+
+  .hero-video-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 48%, rgba(240, 248, 255, 0.12), transparent 14rem),
+      linear-gradient(180deg, rgba(2, 5, 12, 0.08), rgba(2, 5, 12, 0.36) 68%, rgba(1, 2, 6, 0.72));
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .hero-video-vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 56%, rgba(8, 12, 18, 0), rgba(3, 6, 12, 0.38) 58%, rgba(1, 2, 7, 0.88) 100%);
+    pointer-events: none;
+  }
+
+  .hero-video-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(180deg, rgba(2, 4, 10, 0.98), rgba(2, 4, 10, 0.8));
+    color: rgba(228, 238, 255, 0.82);
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
+    transition: opacity 320ms ease;
+  }
+
+  .hero-video-loading.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero-video-label {
+    position: absolute;
+    right: clamp(1rem, 2vw, 1.8rem);
+    bottom: clamp(1rem, 2vw, 1.7rem);
+    z-index: 2;
+    display: grid;
+    gap: 0.32rem;
+    padding: 0.82rem 0.95rem;
+    border: 1px solid rgba(202, 220, 255, 0.18);
+    border-radius: 1rem;
+    background: rgba(8, 13, 24, 0.42);
+    color: rgba(228, 238, 255, 0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .hero-video-label span {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .hero-video-label strong {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    font-weight: 400;
+    text-transform: uppercase;
   }
 
   .calibration-copy {
+    position: relative;
+    z-index: 2;
     display: grid;
     gap: 1.4rem;
-    align-content: center;
-    max-width: 34rem;
+    align-content: end;
+    min-height: calc(100svh - 5rem);
+    max-width: min(38rem, calc(100vw - 3rem));
+    padding:
+      clamp(6.5rem, 14vh, 10rem)
+      clamp(1.4rem, 4vw, 4rem)
+      clamp(2rem, 6vh, 4rem);
+  }
+
+  .calibration-kicker {
+    margin: 0;
+    color: rgba(213, 228, 255, 0.72);
+    font-size: 0.76rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
   }
 
   .calibration-copy h1 {
@@ -354,6 +480,7 @@ const interfaceCards = [
     font-size: clamp(3.1rem, 7.4vw, 6.8rem);
     line-height: 0.92;
     letter-spacing: 0.02em;
+    text-shadow: 0 0 24px rgba(5, 10, 20, 0.18);
   }
 
   html[lang^='zh'] .calibration-copy h1 {
@@ -370,7 +497,7 @@ const interfaceCards = [
   .calibration-lede {
     margin: 0;
     max-width: 30rem;
-    color: rgba(23, 23, 23, 0.78);
+    color: rgba(228, 238, 255, 0.82);
     font-size: 1.04rem;
     line-height: 1.85;
   }
@@ -387,16 +514,16 @@ const interfaceCards = [
 
   .signal-card {
     padding: 1rem 1.1rem 1.1rem;
-    border: 1px solid rgba(22, 22, 22, 0.12);
+    border: 1px solid rgba(202, 220, 255, 0.14);
     border-radius: 1.25rem;
-    background: linear-gradient(180deg, rgba(200, 212, 220, 0.84), rgba(183, 199, 210, 0.56));
-    box-shadow: 0 20px 42px rgba(22, 22, 22, 0.08);
+    background: linear-gradient(180deg, rgba(10, 16, 28, 0.72), rgba(8, 13, 24, 0.46));
+    box-shadow: 0 20px 42px rgba(2, 4, 11, 0.22);
     backdrop-filter: blur(16px);
   }
 
   .signal-card p {
     margin: 0 0 0.55rem;
-    color: var(--accent-2);
+    color: rgba(153, 207, 255, 0.88);
     font-size: 0.7rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -407,196 +534,7 @@ const interfaceCards = [
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.68;
-  }
-
-  .instrument-stage {
-    display: grid;
-    gap: 1.5rem;
-    justify-items: center;
-  }
-
-  .instrument-shell {
-    position: relative;
-    width: min(100%, 44rem);
-    aspect-ratio: 1 / 1;
-    display: grid;
-    place-items: center;
-  }
-
-  .instrument-depth {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(16px);
-    pointer-events: none;
-  }
-
-  .instrument-depth-a {
-    width: 72%;
-    aspect-ratio: 1 / 1;
-    background: radial-gradient(circle, rgba(255, 244, 90, 0.22), rgba(255, 244, 90, 0));
-  }
-
-  .instrument-depth-b {
-    width: 92%;
-    aspect-ratio: 1 / 1;
-    background: radial-gradient(circle, rgba(95, 53, 255, 0.12), rgba(95, 53, 255, 0));
-  }
-
-  .orbit-assembly {
-    --orbit-flow: 0deg;
-    position: relative;
-    width: min(100%, 46rem);
-    aspect-ratio: 1 / 1;
-    transform-style: preserve-3d;
-    will-change: transform;
-  }
-
-  .orbit-plane {
-    position: absolute;
-    inset: 0;
-  }
-
-  .orbit-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 92%;
-    height: 52%;
-    border-radius: 50%;
-    transform: translate(-50%, -50%) rotateX(72deg);
-    transform-style: preserve-3d;
-  }
-
-  .orbit-ring::before,
-  .orbit-ring::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-  }
-
-  .orbit-ring::before {
-    inset: 7%;
-    border: 2px solid rgba(22, 22, 22, 0.24);
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.28) inset,
-      0 0 0 8px rgba(255, 244, 90, 0.05) inset,
-      0 0 28px rgba(255, 244, 90, 0.14);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 40%),
-      linear-gradient(90deg, rgba(95, 53, 255, 0.08), rgba(255, 244, 90, 0.08));
-    -webkit-mask: radial-gradient(
-      farthest-side,
-      transparent calc(100% - 1.1rem),
-      #000 calc(100% - 1rem) calc(100% - 0.36rem),
-      transparent calc(100% - 0.16rem)
-    );
-    mask: radial-gradient(
-      farthest-side,
-      transparent calc(100% - 1.1rem),
-      #000 calc(100% - 1rem) calc(100% - 0.36rem),
-      transparent calc(100% - 0.16rem)
-    );
-  }
-
-  .orbit-ring::after {
-    inset: 7%;
-    opacity: 0.96;
-    background:
-      conic-gradient(
-        from -92deg,
-        rgba(255, 255, 255, 0.18) 0deg,
-        rgba(255, 255, 255, 0.12) 74deg,
-        rgba(255, 244, 90, 0.12) 146deg,
-        rgba(255, 255, 255, 0.16) 228deg,
-        rgba(255, 255, 255, 0.22) 304deg,
-        rgba(255, 255, 255, 0.18) 360deg
-      ),
-      conic-gradient(
-        from calc(var(--orbit-flow) - 92deg),
-        rgba(255, 255, 255, 0) 0deg,
-        rgba(255, 255, 255, 0) 286deg,
-        rgba(255, 255, 255, 0.14) 304deg,
-        rgba(255, 255, 255, 0.82) 320deg,
-        rgba(255, 244, 90, 0.98) 334deg,
-        rgba(255, 244, 90, 0.46) 348deg,
-        rgba(255, 255, 255, 0.06) 356deg,
-        rgba(255, 255, 255, 0) 360deg
-      );
-    -webkit-mask: radial-gradient(
-      farthest-side,
-      transparent calc(100% - 1.1rem),
-      #000 calc(100% - 1rem) calc(100% - 0.36rem),
-      transparent calc(100% - 0.16rem)
-    );
-    mask: radial-gradient(
-      farthest-side,
-      transparent calc(100% - 1.1rem),
-      #000 calc(100% - 1rem) calc(100% - 0.36rem),
-      transparent calc(100% - 0.16rem)
-    );
-    filter: blur(0.4px);
-  }
-
-  .orbit-plane-back {
-    z-index: 1;
-    clip-path: inset(0 0 46% 0);
-  }
-
-  .orbit-plane-front {
-    z-index: 4;
-    clip-path: inset(46% 0 0 0);
-  }
-
-  .orbit-plane-front .orbit-ring::before {
-    border-color: rgba(22, 22, 22, 0.34);
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.34) inset,
-      0 0 0 12px rgba(255, 244, 90, 0.06) inset,
-      0 16px 28px rgba(22, 22, 22, 0.12),
-      0 0 34px rgba(255, 244, 90, 0.18);
-  }
-
-  .orbit-plane-back .orbit-ring::after {
-    opacity: 0.42;
-    filter: blur(0.8px);
-  }
-
-  .orbit-plane-front .orbit-ring::after {
-    opacity: 1;
-    filter: blur(0.3px);
-  }
-
-  .orbit-logo-layer {
-    position: absolute;
-    inset: 50% auto auto 50%;
-    z-index: 3;
-    width: clamp(13.5rem, 30vw, 20rem);
-    aspect-ratio: 1 / 1;
-    transform: translate(-50%, -50%);
-    will-change: transform;
-  }
-
-  .orbit-logo-shadow {
-    position: absolute;
-    left: 16%;
-    right: 16%;
-    bottom: 10%;
-    height: 1.15rem;
-    border-radius: 999px;
-    background: radial-gradient(circle, rgba(22, 22, 22, 0.28), rgba(22, 22, 22, 0));
-    filter: blur(8px);
-  }
-
-  .orbit-logo-image {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    filter:
-      drop-shadow(0 18px 34px rgba(22, 22, 22, 0.16))
-      drop-shadow(0 0 20px rgba(255, 244, 90, 0.16));
+    color: rgba(242, 247, 255, 0.94);
   }
 
   .index-stage,
@@ -900,18 +838,9 @@ const interfaceCards = [
   }
 
   @media (max-width: 1100px) {
-    .calibration-frame,
     .index-grid,
     .interfaces-grid {
       grid-template-columns: 1fr;
-    }
-
-    .instrument-stage {
-      justify-items: stretch;
-    }
-
-    .instrument-shell {
-      width: 100%;
     }
 
     .transform-panel {
@@ -924,18 +853,14 @@ const interfaceCards = [
       gap: 1.5rem;
     }
 
-    .calibration-stage {
-      min-height: auto;
-    }
-
     .calibration-frame {
-      min-height: auto;
-      padding-top: 1rem;
+      min-height: 100svh;
     }
 
-    .instrument-shell {
-      aspect-ratio: auto;
-      min-height: 26rem;
+    .hero-video-label {
+      right: 0.9rem;
+      bottom: 0.9rem;
+      padding: 0.72rem 0.78rem;
     }
 
     .field-grid,
@@ -968,6 +893,14 @@ const interfaceCards = [
       font-size: clamp(2.4rem, 14vw, 4.4rem);
     }
 
+    .calibration-copy {
+      min-height: 100svh;
+      padding:
+        max(6rem, env(safe-area-inset-top))
+        1rem
+        max(1.5rem, env(safe-area-inset-bottom));
+    }
+
     .calibration-lede,
     .question-fragment p,
     .field-card p:last-child,
@@ -985,19 +918,5 @@ const interfaceCards = [
     .interface-card {
       border-radius: 1.15rem;
     }
-
-    .orbit-assembly {
-      width: min(100%, 27rem);
-    }
-
-    .orbit-logo-layer {
-      width: 11.5rem;
-    }
-
-    .orbit-ring {
-      width: 94%;
-      height: 54%;
-    }
-
   }
 </style>

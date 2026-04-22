@@ -184,20 +184,47 @@
   const calibrationRoot = document.querySelector('[data-calibration-root]');
   const calibrationFrame = calibrationRoot?.querySelector('[data-orbit-frame]');
   const calibrationCopy = calibrationRoot?.querySelector('.calibration-copy');
-  const orbitAssembly = calibrationRoot?.querySelector('[data-orbit-assembly]');
-  const logoLayer = calibrationRoot?.querySelector('[data-logo-layer]');
+  const heroVideoShell = calibrationRoot?.querySelector('[data-hero-video-shell]');
+  const scrollVideo = calibrationRoot?.querySelector('[data-scroll-video]');
+  const loopVideo = calibrationRoot?.querySelector('[data-loop-video]');
+  const heroVideoLoading = calibrationRoot?.querySelector('[data-hero-video-loading]');
+  const portalShell = calibrationRoot?.querySelector('[data-future-portal-shell]');
   const signalCards = calibrationRoot?.querySelectorAll('[data-signal-note]');
+  const primaryVisual =
+    portalShell instanceof HTMLElement
+      ? portalShell
+      : heroVideoShell instanceof HTMLElement
+        ? heroVideoShell
+        : null;
+
+  const hideHeroVideoLoading = () => {
+    if (!(heroVideoLoading instanceof HTMLElement)) {
+      return;
+    }
+
+    heroVideoLoading.classList.add('is-hidden');
+  };
+
+  const startLoopVideo = () => {
+    if (!(loopVideo instanceof HTMLVideoElement)) {
+      return;
+    }
+
+    const playAttempt = loopVideo.play();
+    if (playAttempt && typeof playAttempt.catch === 'function') {
+      playAttempt.catch(() => {});
+    }
+  };
 
   if (
     calibrationRoot instanceof HTMLElement &&
     calibrationFrame instanceof HTMLElement &&
     calibrationCopy instanceof HTMLElement &&
-    orbitAssembly instanceof HTMLElement &&
-    logoLayer instanceof HTMLElement
+    primaryVisual instanceof HTMLElement
   ) {
     const notes = signalCards ? Array.from(signalCards) : [];
 
-    gsap.set([calibrationCopy, orbitAssembly, logoLayer], {
+    gsap.set([calibrationCopy, primaryVisual], {
       transformOrigin: '50% 50%',
     });
 
@@ -221,33 +248,19 @@
         },
       )
       .fromTo(
-        orbitAssembly,
+        primaryVisual,
         {
           autoAlpha: 0,
-          scale: 0.94,
-        },
-        {
-          autoAlpha: 1,
-          scale: 1,
-          duration: 1,
-        },
-        '-=0.48',
-      )
-      .fromTo(
-        logoLayer,
-        {
-          autoAlpha: 0,
-          scale: 0.88,
-          y: 22,
+          scale: 0.96,
+          y: 28,
         },
         {
           autoAlpha: 1,
           scale: 1,
           y: 0,
-          duration: 0.95,
-          ease: 'back.out(1.2)',
+          duration: 1.05,
         },
-        '-=0.62',
+        '-=0.48',
       )
       .fromTo(
         notes,
@@ -264,62 +277,176 @@
         '-=0.56',
       );
 
+    let calibrationScrollInitialized = false;
+
+    const setupCalibrationScroll = () => {
+      if (calibrationScrollInitialized) {
+        return;
+      }
+
+      calibrationScrollInitialized = true;
+
+      const media = gsap.matchMedia();
+
+      media.add('(min-width: 721px)', () => {
+        const pageShell = document.querySelector('.page-shell');
+        const siteHeader = document.querySelector('.site-header');
+        const shellPaddingTop = pageShell instanceof HTMLElement ? parseFloat(window.getComputedStyle(pageShell).paddingTop) || 0 : 0;
+        const headerHeight = siteHeader instanceof HTMLElement ? siteHeader.getBoundingClientRect().height : 0;
+        const headerMarginBottom = siteHeader instanceof HTMLElement ? parseFloat(window.getComputedStyle(siteHeader).marginBottom) || 0 : 0;
+        const headerOffset = Math.max(shellPaddingTop + headerHeight + headerMarginBottom, 0);
+
+        const heroTimeline = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            trigger: calibrationRoot,
+            start: `top top+=${Math.round(headerOffset)}`,
+            end: '+=2400',
+            scrub: 1,
+            pin: calibrationFrame,
+            anticipatePin: 1,
+          },
+        });
+
+        heroTimeline
+          .to(
+            primaryVisual,
+            {
+              yPercent: -2,
+              scale: 1.03,
+              duration: 1.2,
+            },
+            0,
+          )
+          .to(
+            calibrationCopy,
+            {
+              yPercent: -6,
+              autoAlpha: 0.66,
+              duration: 0.7,
+            },
+            0,
+          )
+          .to(
+            notes,
+            {
+              y: -42,
+              autoAlpha: (index) => (index === notes.length - 1 ? 1 : 0.52),
+              duration: 0.7,
+              stagger: 0.03,
+            },
+            0.08,
+          );
+
+        if (
+          heroVideoShell instanceof HTMLElement &&
+          scrollVideo instanceof HTMLVideoElement &&
+          loopVideo instanceof HTMLVideoElement
+        ) {
+          const targetDuration = Math.max(scrollVideo.duration - 0.04, 0);
+
+          if (targetDuration > 0) {
+            gsap.set(loopVideo, { autoAlpha: 0 });
+
+            heroTimeline
+              .to(
+                scrollVideo,
+                {
+                  currentTime: targetDuration,
+                  duration: 1,
+                },
+                0,
+              )
+              .to(
+                loopVideo,
+                {
+                  autoAlpha: 1,
+                  duration: 0.22,
+                },
+                0.78,
+              )
+              .to(
+                scrollVideo,
+                {
+                  autoAlpha: 0.16,
+                  duration: 0.16,
+                },
+                0.84,
+              );
+          }
+        }
+
+        return () => {
+          heroTimeline.kill();
+        };
+      });
+    };
+
+    if (heroVideoShell instanceof HTMLElement && scrollVideo instanceof HTMLVideoElement && scrollVideo.readyState < 1) {
+      scrollVideo.addEventListener('loadedmetadata', setupCalibrationScroll, { once: true });
+    } else {
+      setupCalibrationScroll();
+    }
+  }
+
+  if (
+    heroVideoShell instanceof HTMLElement &&
+    scrollVideo instanceof HTMLVideoElement &&
+    loopVideo instanceof HTMLVideoElement
+  ) {
     const media = gsap.matchMedia();
 
-    media.add('(min-width: 721px)', () => {
-      const pageShell = document.querySelector('.page-shell');
-      const siteHeader = document.querySelector('.site-header');
-      const shellPaddingTop = pageShell instanceof HTMLElement ? parseFloat(window.getComputedStyle(pageShell).paddingTop) || 0 : 0;
-      const headerHeight = siteHeader instanceof HTMLElement ? siteHeader.getBoundingClientRect().height : 0;
-      const headerMarginBottom = siteHeader instanceof HTMLElement ? parseFloat(window.getComputedStyle(siteHeader).marginBottom) || 0 : 0;
-      const headerOffset = Math.max(shellPaddingTop + headerHeight + headerMarginBottom, 0);
+    const syncScrollFrame = () => {
+      if ('requestVideoFrameCallback' in scrollVideo) {
+        const callback = () => {
+          scrollVideo.requestVideoFrameCallback(callback);
+        };
 
-      const heroTimeline = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: calibrationRoot,
-          start: `top top+=${Math.round(headerOffset)}`,
-          end: '+=2400',
-          scrub: 1,
-          pin: calibrationFrame,
-          anticipatePin: 1,
-        },
+        scrollVideo.requestVideoFrameCallback(callback);
+      }
+    };
+
+    const initializeHeroVideos = () => {
+      startLoopVideo();
+      syncScrollFrame();
+
+      if (prefersReducedMotion) {
+        hideHeroVideoLoading();
+        gsap.set(loopVideo, { autoAlpha: 1 });
+        gsap.set(scrollVideo, {
+          autoAlpha: 0.18,
+          currentTime: Math.max(scrollVideo.duration - 0.04, 0),
+        });
+        return;
+      }
+
+      media.add('(max-width: 720px)', () => {
+        hideHeroVideoLoading();
+        gsap.set(loopVideo, { autoAlpha: 1 });
+        gsap.set(scrollVideo, { autoAlpha: 0.18 });
+
+        return () => {};
       });
+    };
 
-      heroTimeline
-        .to(
-          orbitAssembly,
-          {
-            '--orbit-flow': '240deg',
-            duration: 1.2,
-          },
-          0,
-        )
-        .to(
-          calibrationCopy,
-          {
-            yPercent: -6,
-            autoAlpha: 0.66,
-            duration: 0.7,
-          },
-          0,
-        )
-        .to(
-          notes,
-          {
-            y: -42,
-            autoAlpha: (index) => (index === notes.length - 1 ? 1 : 0.52),
-            duration: 0.7,
-            stagger: 0.03,
-          },
-          0.08,
-        )
-        ;
+    if (scrollVideo.readyState >= 1) {
+      initializeHeroVideos();
+    } else {
+      scrollVideo.addEventListener('loadedmetadata', initializeHeroVideos, { once: true });
+    }
 
-      return () => {
-        heroTimeline.kill();
-      };
-    });
+    if (scrollVideo.readyState >= 3) {
+      hideHeroVideoLoading();
+    } else {
+      scrollVideo.addEventListener('canplaythrough', hideHeroVideoLoading, { once: true });
+      scrollVideo.addEventListener('loadeddata', hideHeroVideoLoading, { once: true });
+    }
+
+    if (loopVideo.readyState >= 2) {
+      startLoopVideo();
+    } else {
+      loopVideo.addEventListener('canplay', startLoopVideo, { once: true });
+    }
   }
 
   const transformSection = document.querySelector('[data-transform-section]');
