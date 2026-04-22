@@ -38,12 +38,6 @@ const questions = pickByLocale(
   ],
 );
 
-const promptWords = pickByLocale(
-  locale,
-  ['学习', '判断力', '共同体', '空间', '地方', '生活形式'],
-  ['Learning', 'Judgment', 'Collective Life', 'Space', 'Locality', 'Forms of Life'],
-);
-
 const signalCards = pickByLocale(
   locale,
   [
@@ -75,14 +69,6 @@ const signalCards = pickByLocale(
     },
   ],
 );
-
-const instrumentLabels = pickByLocale(
-  locale,
-  ['00 / 轨道档案', 'field calibration', 'institution active'],
-  ['00 / orbital archive', 'field calibration', 'institution active'],
-);
-
-const fieldLabels = researchAreas.map((area) => pickByLocale(locale, area.zhTitle, area.enTitle));
 
 const archiveItems = [
   ...programs.slice(0, 3).map((item) => pickByLocale(locale, item.zhTitle, item.enTitle)),
@@ -132,7 +118,6 @@ const interfaceCards = [
   <section class="calibration-stage" data-calibration-root>
     <div class="calibration-frame" data-orbit-frame>
       <div class="calibration-copy">
-        <p class="eyebrow calibration-index">{pickByLocale(locale, '00 / 机构校准', '00 / Calibration')}</p>
         <h1>{pickByLocale(locale, siteMeta.coreQuestionZh, siteMeta.coreQuestionEn)}</h1>
         <p class="calibration-lede">{pickByLocale(locale, siteMeta.oneLineZh, siteMeta.oneLineEn)}</p>
 
@@ -163,14 +148,6 @@ const interfaceCards = [
           <div class="instrument-depth instrument-depth-a" aria-hidden="true"></div>
           <div class="instrument-depth instrument-depth-b" aria-hidden="true"></div>
 
-          <div class="instrument-label instrument-label-top" data-instrument-label>{instrumentLabels[0]}</div>
-          <div class="instrument-label instrument-label-right" data-instrument-label>{instrumentLabels[1]}</div>
-          <div class="instrument-label instrument-label-bottom" data-instrument-label>{instrumentLabels[2]}</div>
-
-          {promptWords.map((word, index) => (
-            <span class={`prompt-chip prompt-chip-${index + 1}`} data-prompt-chip>{word}</span>
-          ))}
-
           <div class="orbit-assembly" data-orbit-assembly>
             <div class="orbit-plane orbit-plane-back" aria-hidden="true">
               <div class="orbit-ring orbit-ring-back"></div>
@@ -184,26 +161,7 @@ const interfaceCards = [
             <div class="orbit-plane orbit-plane-front" aria-hidden="true">
               <div class="orbit-ring orbit-ring-front"></div>
             </div>
-
-            <div class="orbit-markers" aria-hidden="true">
-              <span class="orbit-marker orbit-marker-a"></span>
-              <span class="orbit-marker orbit-marker-b"></span>
-              <span class="orbit-marker orbit-marker-c"></span>
-              <span class="orbit-marker orbit-marker-d"></span>
-            </div>
           </div>
-        </div>
-
-        <div class="field-ledger">
-          <p class="field-ledger-label">{pickByLocale(locale, 'CURRENT FIELDS', 'CURRENT FIELDS')}</p>
-          <ol>
-            {fieldLabels.map((label, index) => (
-              <li data-field-item>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <p>{label}</p>
-              </li>
-            ))}
-          </ol>
         </div>
       </div>
     </div>
@@ -391,10 +349,6 @@ const interfaceCards = [
     max-width: 34rem;
   }
 
-  .calibration-index {
-    margin-bottom: 0;
-  }
-
   .calibration-copy h1 {
     margin: 0;
     font-size: clamp(3.1rem, 7.4vw, 6.8rem);
@@ -488,117 +442,16 @@ const interfaceCards = [
     background: radial-gradient(circle, rgba(95, 53, 255, 0.12), rgba(95, 53, 255, 0));
   }
 
-  .instrument-label {
-    position: absolute;
-    color: rgba(22, 22, 22, 0.72);
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .instrument-label::before {
-    content: '';
-    position: absolute;
-    background: rgba(22, 22, 22, 0.18);
-  }
-
-  .instrument-label-top {
-    top: 9%;
-    left: 18%;
-  }
-
-  .instrument-label-top::before {
-    left: calc(100% + 0.75rem);
-    top: 50%;
-    width: 4rem;
-    height: 1px;
-  }
-
-  .instrument-label-right {
-    top: 48%;
-    right: 0;
-    transform: translateY(-50%);
-  }
-
-  .instrument-label-right::before {
-    right: calc(100% + 0.75rem);
-    top: 50%;
-    width: 4.5rem;
-    height: 1px;
-  }
-
-  .instrument-label-bottom {
-    bottom: 14%;
-    left: 16%;
-  }
-
-  .instrument-label-bottom::before {
-    left: calc(100% + 0.75rem);
-    top: 50%;
-    width: 3.8rem;
-    height: 1px;
-  }
-
-  .prompt-chip {
-    position: absolute;
-    z-index: 7;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.6rem 0.9rem;
-    border: 1px solid rgba(22, 22, 22, 0.12);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.18);
-    box-shadow: 0 16px 36px rgba(22, 22, 22, 0.08);
-    backdrop-filter: blur(14px);
-    color: var(--ink);
-    font-size: 0.82rem;
-    letter-spacing: 0.04em;
-  }
-
-  .prompt-chip-1 {
-    top: 10%;
-    left: 8%;
-  }
-
-  .prompt-chip-2 {
-    top: 18%;
-    right: 4%;
-  }
-
-  .prompt-chip-3 {
-    top: 44%;
-    left: 0;
-  }
-
-  .prompt-chip-4 {
-    top: 42%;
-    right: 0;
-  }
-
-  .prompt-chip-5 {
-    bottom: 16%;
-    left: 10%;
-  }
-
-  .prompt-chip-6 {
-    bottom: 8%;
-    right: 14%;
-  }
-
   .orbit-assembly {
     --orbit-flow: 0deg;
-    --orbit-marker-rotation: 0deg;
     position: relative;
-    width: min(100%, 40rem);
+    width: min(100%, 46rem);
     aspect-ratio: 1 / 1;
     transform-style: preserve-3d;
     will-change: transform;
   }
 
-  .orbit-plane,
-  .orbit-markers {
+  .orbit-plane {
     position: absolute;
     inset: 0;
   }
@@ -623,32 +476,52 @@ const interfaceCards = [
   }
 
   .orbit-ring::before {
-    border: 3px solid rgba(22, 22, 22, 0.26);
+    inset: 7%;
+    border: 2px solid rgba(22, 22, 22, 0.24);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.28) inset,
-      0 0 0 10px rgba(255, 244, 90, 0.06) inset,
-      0 0 36px rgba(255, 244, 90, 0.2);
+      0 0 0 8px rgba(255, 244, 90, 0.05) inset,
+      0 0 28px rgba(255, 244, 90, 0.14);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 40%),
       linear-gradient(90deg, rgba(95, 53, 255, 0.08), rgba(255, 244, 90, 0.08));
+    -webkit-mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 1.1rem),
+      #000 calc(100% - 1rem) calc(100% - 0.36rem),
+      transparent calc(100% - 0.16rem)
+    );
+    mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 1.1rem),
+      #000 calc(100% - 1rem) calc(100% - 0.36rem),
+      transparent calc(100% - 0.16rem)
+    );
   }
 
   .orbit-ring::after {
-    inset: 6%;
-    opacity: 0.92;
-    transform: rotate(var(--orbit-flow));
-    transform-origin: 50% 50%;
+    inset: 7%;
+    opacity: 0.96;
     background:
       conic-gradient(
-        from 0deg,
-        rgba(255, 244, 90, 0.88) 0deg,
-        rgba(255, 244, 90, 0.08) 24deg,
-        rgba(255, 244, 90, 0) 68deg,
-        rgba(95, 53, 255, 0.44) 146deg,
-        rgba(95, 53, 255, 0.02) 180deg,
-        rgba(255, 255, 255, 0) 236deg,
-        rgba(255, 255, 255, 0.76) 304deg,
-        rgba(255, 244, 90, 0.88) 360deg
+        from -92deg,
+        rgba(255, 255, 255, 0.18) 0deg,
+        rgba(255, 255, 255, 0.12) 74deg,
+        rgba(255, 244, 90, 0.12) 146deg,
+        rgba(255, 255, 255, 0.16) 228deg,
+        rgba(255, 255, 255, 0.22) 304deg,
+        rgba(255, 255, 255, 0.18) 360deg
+      ),
+      conic-gradient(
+        from calc(var(--orbit-flow) - 92deg),
+        rgba(255, 255, 255, 0) 0deg,
+        rgba(255, 255, 255, 0) 286deg,
+        rgba(255, 255, 255, 0.14) 304deg,
+        rgba(255, 255, 255, 0.82) 320deg,
+        rgba(255, 244, 90, 0.98) 334deg,
+        rgba(255, 244, 90, 0.46) 348deg,
+        rgba(255, 255, 255, 0.06) 356deg,
+        rgba(255, 255, 255, 0) 360deg
       );
     -webkit-mask: radial-gradient(
       farthest-side,
@@ -662,6 +535,7 @@ const interfaceCards = [
       #000 calc(100% - 1rem) calc(100% - 0.36rem),
       transparent calc(100% - 0.16rem)
     );
+    filter: blur(0.4px);
   }
 
   .orbit-plane-back {
@@ -678,16 +552,26 @@ const interfaceCards = [
     border-color: rgba(22, 22, 22, 0.34);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.34) inset,
-      0 0 0 14px rgba(255, 244, 90, 0.08) inset,
-      0 18px 34px rgba(22, 22, 22, 0.14),
-      0 0 44px rgba(255, 244, 90, 0.24);
+      0 0 0 12px rgba(255, 244, 90, 0.06) inset,
+      0 16px 28px rgba(22, 22, 22, 0.12),
+      0 0 34px rgba(255, 244, 90, 0.18);
+  }
+
+  .orbit-plane-back .orbit-ring::after {
+    opacity: 0.42;
+    filter: blur(0.8px);
+  }
+
+  .orbit-plane-front .orbit-ring::after {
+    opacity: 1;
+    filter: blur(0.3px);
   }
 
   .orbit-logo-layer {
     position: absolute;
     inset: 50% auto auto 50%;
     z-index: 3;
-    width: clamp(12rem, 28vw, 18rem);
+    width: clamp(13.5rem, 30vw, 20rem);
     aspect-ratio: 1 / 1;
     transform: translate(-50%, -50%);
     will-change: transform;
@@ -713,86 +597,6 @@ const interfaceCards = [
     filter:
       drop-shadow(0 18px 34px rgba(22, 22, 22, 0.16))
       drop-shadow(0 0 20px rgba(255, 244, 90, 0.16));
-  }
-
-  .orbit-markers {
-    z-index: 2;
-    pointer-events: none;
-    transform: rotate(var(--orbit-marker-rotation));
-  }
-
-  .orbit-marker {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 0.95rem;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow:
-      0 0 0 4px rgba(255, 244, 90, 0.14),
-      0 0 16px rgba(255, 244, 90, 0.34);
-  }
-
-  .orbit-marker-a {
-    transform: translate(-50%, -50%) translateY(-11rem);
-  }
-
-  .orbit-marker-b {
-    transform: translate(-50%, -50%) translate(11.2rem, -1.25rem);
-  }
-
-  .orbit-marker-c {
-    transform: translate(-50%, -50%) translate(0, 11.2rem);
-  }
-
-  .orbit-marker-d {
-    transform: translate(-50%, -50%) translate(-11.2rem, -1.25rem);
-  }
-
-  .field-ledger {
-    width: min(100%, 38rem);
-    padding: 1.15rem 1.2rem 1rem;
-    border-top: 1px solid rgba(22, 22, 22, 0.16);
-  }
-
-  .field-ledger-label {
-    margin: 0 0 0.8rem;
-    color: var(--muted);
-    font-size: 0.7rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-  }
-
-  .field-ledger ol {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem 1rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .field-ledger li {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.7rem;
-    align-items: start;
-    padding-top: 0.4rem;
-    border-top: 1px solid rgba(22, 22, 22, 0.08);
-  }
-
-  .field-ledger li span {
-    color: var(--accent-2);
-    font-size: 0.76rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .field-ledger li p {
-    margin: 0;
-    font-size: 0.94rem;
-    line-height: 1.55;
   }
 
   .index-stage,
@@ -1106,8 +910,7 @@ const interfaceCards = [
       justify-items: stretch;
     }
 
-    .instrument-shell,
-    .field-ledger {
+    .instrument-shell {
       width: 100%;
     }
 
@@ -1116,7 +919,7 @@ const interfaceCards = [
     }
   }
 
-  @media (max-width: 860px) {
+  @media (max-width: 720px) {
     .landing-system {
       gap: 1.5rem;
     }
@@ -1135,11 +938,6 @@ const interfaceCards = [
       min-height: 26rem;
     }
 
-    .instrument-label-right {
-      right: 2%;
-    }
-
-    .field-ledger ol,
     .field-grid,
     .interfaces-grid {
       grid-template-columns: 1fr;
@@ -1188,45 +986,12 @@ const interfaceCards = [
       border-radius: 1.15rem;
     }
 
-    .prompt-chip {
-      font-size: 0.74rem;
-      padding: 0.5rem 0.75rem;
-    }
-
-    .prompt-chip-1 {
-      top: 8%;
-      left: 4%;
-    }
-
-    .prompt-chip-2 {
-      top: 16%;
-      right: 0;
-    }
-
-    .prompt-chip-3 {
-      left: 2%;
-    }
-
-    .prompt-chip-4 {
-      right: 2%;
-    }
-
-    .prompt-chip-5 {
-      left: 4%;
-      bottom: 18%;
-    }
-
-    .prompt-chip-6 {
-      right: 6%;
-      bottom: 8%;
-    }
-
     .orbit-assembly {
-      width: min(100%, 24rem);
+      width: min(100%, 27rem);
     }
 
     .orbit-logo-layer {
-      width: 10rem;
+      width: 11.5rem;
     }
 
     .orbit-ring {
@@ -1234,20 +999,5 @@ const interfaceCards = [
       height: 54%;
     }
 
-    .orbit-marker-a {
-      transform: translate(-50%, -50%) translateY(-7.8rem);
-    }
-
-    .orbit-marker-b {
-      transform: translate(-50%, -50%) translate(8.1rem, -0.85rem);
-    }
-
-    .orbit-marker-c {
-      transform: translate(-50%, -50%) translate(0, 8.1rem);
-    }
-
-    .orbit-marker-d {
-      transform: translate(-50%, -50%) translate(-8.1rem, -0.85rem);
-    }
   }
 </style>
