@@ -9,9 +9,25 @@ const { locale = 'zh' } = Astro.props;
 ---
 
 <section class="landing-system">
-  <a class="floating-brand-button" href={toLocalePath(locale, '/')}>
-    <span>Entia Futura</span>
-    <small style="letter-spacing: 1em;">未来人研究所</small>
+  <div class="floating-brand-cluster" data-brand-cluster>
+    <a
+      class="floating-brand-button floating-sheen-button floating-nameplate-button"
+      data-brand-cluster-button
+      href={toLocalePath(locale, '/')}
+    >
+      <span>Entia Futura</span>
+      <small>未来人研究所</small>
+    </a>
+    <a
+      class="floating-brand-button floating-sheen-button floating-more-button"
+      data-brand-cluster-button
+      href={toLocalePath(locale, '/about')}
+    >
+      <span>more</span>
+    </a>
+  </div>
+  <a class="floating-brand-button floating-sheen-button floating-contact-button" href={toLocalePath(locale, '/contact')}>
+    <span>Contact</span>
   </a>
 
   <section class="calibration-stage" data-calibration-root>
@@ -43,32 +59,214 @@ const { locale = 'zh' } = Astro.props;
   </section>
 </section>
 
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sheenButtons = Array.from(document.querySelectorAll('.floating-sheen-button')).filter(
+    (button) => button instanceof HTMLElement,
+  );
+  const resetSheen = (button) => {
+    button.classList.remove('is-sheen-entering', 'is-sheen-leaving');
+  };
+  const restartSheen = (button, className) => {
+    resetSheen(button);
+    void button.offsetWidth;
+    button.classList.add(className);
+  };
+
+  sheenButtons.forEach((button) => {
+    button.addEventListener('animationend', (event) => {
+      if (!(event.target instanceof HTMLElement)) {
+        return;
+      }
+
+      if (event.animationName === 'floating-nameplate-sheen-enter') {
+        button.classList.remove('is-sheen-entering');
+      }
+
+      if (event.animationName === 'floating-nameplate-sheen-leave') {
+        button.classList.remove('is-sheen-leaving');
+      }
+    });
+  });
+
+  if (!prefersReducedMotion) {
+    const brandCluster = document.querySelector('[data-brand-cluster]');
+    const clusterButtons =
+      brandCluster instanceof HTMLElement
+        ? Array.from(brandCluster.querySelectorAll('[data-brand-cluster-button]')).filter(
+            (button) => button instanceof HTMLElement,
+          )
+        : [];
+    const standaloneButtons = sheenButtons.filter((button) => !button.hasAttribute('data-brand-cluster-button'));
+    const clusterDelay = 960;
+    let clusterTimers = [];
+
+    const clearClusterTimers = () => {
+      clusterTimers.forEach((timer) => window.clearTimeout(timer));
+      clusterTimers = [];
+    };
+
+    const playClusterSheen = (className) => {
+      clearClusterTimers();
+
+      clusterButtons.forEach((button, index) => {
+        const startSheen = () => restartSheen(button, className);
+        const delay = index * clusterDelay;
+
+        if (delay === 0) {
+          startSheen();
+          return;
+        }
+
+        const timer = window.setTimeout(startSheen, delay);
+        clusterTimers.push(timer);
+      });
+    };
+
+    standaloneButtons.forEach((button) => {
+      button.addEventListener('pointerenter', () => {
+        restartSheen(button, 'is-sheen-entering');
+      });
+
+      button.addEventListener('pointerleave', () => {
+        restartSheen(button, 'is-sheen-leaving');
+      });
+
+      button.addEventListener('focus', () => {
+        restartSheen(button, 'is-sheen-entering');
+      });
+
+      button.addEventListener('blur', () => {
+        restartSheen(button, 'is-sheen-leaving');
+      });
+    });
+
+    if (brandCluster instanceof HTMLElement && clusterButtons.length > 0) {
+      const setClusterActive = (active) => {
+        brandCluster.classList.toggle('is-cluster-active', active);
+      };
+
+      brandCluster.addEventListener('pointerenter', () => {
+        setClusterActive(true);
+        playClusterSheen('is-sheen-entering');
+      });
+
+      brandCluster.addEventListener('pointerleave', () => {
+        setClusterActive(false);
+        playClusterSheen('is-sheen-leaving');
+      });
+
+      brandCluster.addEventListener('focusin', () => {
+        if (!brandCluster.classList.contains('is-cluster-active')) {
+          setClusterActive(true);
+          playClusterSheen('is-sheen-entering');
+        }
+      });
+
+      brandCluster.addEventListener('focusout', (event) => {
+        const nextTarget = event.relatedTarget;
+
+        if (nextTarget instanceof Node && brandCluster.contains(nextTarget)) {
+          return;
+        }
+
+        setClusterActive(false);
+        playClusterSheen('is-sheen-leaving');
+      });
+    }
+  }
+</script>
+
 <style>
   .landing-system {
     position: relative;
   }
 
-  .floating-brand-button {
+  .floating-brand-cluster {
     position: fixed;
     top: max(1rem, calc(env(safe-area-inset-top) + 0.5rem));
     left: max(1rem, calc(env(safe-area-inset-left) + 0.5rem));
     z-index: 12;
+    display: inline-flex;
+    align-items: stretch;
+    gap: -10px;
+    --brand-button-fg: var(--color-text-primary);
+    --brand-button-highlight-opacity: 0;
+    will-change: transform;
+    animation: floating-brand-drift 14s ease-in-out infinite;
+  }
+
+  .floating-brand-button {
+    position: relative;
     display: inline-grid;
     align-items: center;
     justify-content: center;
     width: fit-content;
-    max-width: calc(100vw - 2rem);
+    max-width: 100%;
     gap: 0.2rem;
     justify-items: center;
     text-align: center;
     min-height: 50px;
     padding: 0.56rem 0.9rem 0.62rem;
     border: 0;
-    border-radius: 12px;
+    border-radius: 18px;
     background: transparent;
-    color: var(--color-text-primary);
+    color: var(--brand-button-fg);
     text-decoration: none;
     -webkit-font-smoothing: antialiased;
+    transition: color 180ms ease;
+  }
+
+  .floating-sheen-button {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .floating-sheen-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-action-secondary-bg) 82%, var(--color-brand-mint) 18%),
+      color-mix(in srgb, var(--color-action-secondary-bg) 92%, black 8%)
+    );
+    opacity: var(--brand-button-highlight-opacity);
+    pointer-events: none;
+    transition: opacity 180ms ease;
+    z-index: 0;
+  }
+
+  .floating-sheen-button::after {
+    content: '';
+    position: absolute;
+    inset: -35%;
+    background: linear-gradient(135deg, transparent 38%, rgba(255, 255, 255, 0.34) 50%, transparent 62%);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(-28%, -28%, 0);
+    will-change: transform, opacity;
+    z-index: 2;
+  }
+
+  .floating-contact-button {
+    position: fixed;
+    top: max(1rem, calc(env(safe-area-inset-top) + 0.5rem));
+    left: auto;
+    right: max(1rem, calc(env(safe-area-inset-right) + 0.5rem));
+    z-index: 12;
+    --brand-button-fg: var(--color-text-primary);
+    --brand-button-highlight-opacity: 0;
+    will-change: transform;
+    animation: floating-brand-drift 14s ease-in-out infinite;
+  }
+
+  .floating-brand-button > span,
+  .floating-brand-button > small {
+    position: relative;
+    z-index: 1;
   }
 
   .floating-brand-button span {
@@ -84,19 +282,125 @@ const { locale = 'zh' } = Astro.props;
 
   .floating-brand-button small {
     display: block;
-    color: color-mix(in srgb, var(--color-text-primary) 54%, transparent);
+    color: color-mix(in srgb, currentColor 54%, transparent);
     font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     letter-spacing: 0.08em;
     line-height: 1;
     font-weight: 400;
     white-space: nowrap;
+    letter-spacing: 0.8em;
   }
 
-  .floating-brand-button:hover {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.06)),
-      linear-gradient(135deg, color-mix(in srgb, var(--color-brand-ice) 8%, transparent), transparent 62%);
+  .floating-more-button {
+    min-width: 82px;
+    padding-inline: 1rem;
+  }
+
+  .floating-more-button span {
+    font-size: 1rem;
+    letter-spacing: 0.18em;
+    text-transform: none;
+  }
+
+  .floating-brand-cluster:hover,
+  .floating-brand-cluster:focus-within,
+  .floating-brand-cluster.is-cluster-active,
+  .floating-contact-button:hover,
+  .floating-contact-button:focus-visible {
+    --brand-button-fg: var(--color-action-secondary-fg);
+    --brand-button-highlight-opacity: 1;
+  }
+
+  .floating-sheen-button.is-sheen-entering::after {
+    animation: floating-nameplate-sheen-enter 900ms ease forwards;
+  }
+
+  .floating-sheen-button.is-sheen-leaving::after {
+    animation: floating-nameplate-sheen-leave 900ms ease forwards;
+  }
+
+  @keyframes floating-brand-drift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+
+    33% {
+      transform: translate3d(2px, -2px, 0);
+    }
+
+    66% {
+      transform: translate3d(-1px, 2px, 0);
+    }
+
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes floating-nameplate-sheen-enter {
+    0% {
+      opacity: 0;
+      transform: translate3d(-28%, -28%, 0);
+    }
+
+    14% {
+      opacity: 1;
+    }
+
+    38% {
+      opacity: 0.82;
+    }
+
+    62% {
+      opacity: 0.56;
+      transform: translate3d(12%, 12%, 0);
+    }
+
+    82% {
+      opacity: 0.28;
+    }
+
+    100% {
+      opacity: 0;
+      transform: translate3d(28%, 28%, 0);
+    }
+  }
+
+  @keyframes floating-nameplate-sheen-leave {
+    0% {
+      opacity: 0;
+      transform: translate3d(28%, 28%, 0);
+    }
+
+    16% {
+      opacity: 0.72;
+    }
+
+    42% {
+      opacity: 0.58;
+    }
+
+    68% {
+      opacity: 0.32;
+      transform: translate3d(-10%, -10%, 0);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translate3d(-28%, -28%, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .floating-brand-cluster,
+    .floating-contact-button {
+      animation: none;
+    }
+
+    .floating-sheen-button::after {
+      display: none;
+    }
   }
 
   .calibration-stage {
@@ -167,13 +471,17 @@ const { locale = 'zh' } = Astro.props;
   }
 
   @media (max-width: 720px) {
-    .floating-brand-button {
+    .floating-brand-cluster {
       top: max(0.8rem, calc(env(safe-area-inset-top) + 0.35rem));
       left: max(0.8rem, calc(env(safe-area-inset-left) + 0.35rem));
+      gap: 0;
+    }
+
+    .floating-brand-button {
       max-width: calc(100vw - 1.6rem);
       min-height: 46px;
       padding: 0.5rem 0.8rem 0.54rem;
-      border-radius: 12px;
+      border-radius: 16px;
     }
 
     .floating-brand-button span {
@@ -182,6 +490,22 @@ const { locale = 'zh' } = Astro.props;
 
     .floating-brand-button small {
       font-size: 0.54rem;
+    }
+
+    .floating-more-button {
+      min-width: 64px;
+      padding-inline: 0.72rem;
+    }
+
+    .floating-more-button span {
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+    }
+
+    .floating-contact-button {
+      top: max(0.8rem, calc(env(safe-area-inset-top) + 0.35rem));
+      left: auto;
+      right: max(0.8rem, calc(env(safe-area-inset-right) + 0.35rem));
     }
   }
 </style>
