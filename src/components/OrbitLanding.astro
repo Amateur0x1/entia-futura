@@ -1,4 +1,19 @@
+---
+import { toLocalePath, type Locale } from '../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'zh' } = Astro.props;
+---
+
 <section class="landing-system">
+  <a class="floating-brand-button" href={toLocalePath(locale, '/')}>
+    <span>Entia Futura</span>
+    <small style="letter-spacing: 1em;">未来人研究所</small>
+  </a>
+
   <section class="calibration-stage" data-calibration-root>
     <div class="calibration-frame" data-orbit-frame>
       <div class="hero-video-shell" data-hero-video-shell>
@@ -31,6 +46,57 @@
 <style>
   .landing-system {
     position: relative;
+  }
+
+  .floating-brand-button {
+    position: fixed;
+    top: max(1rem, calc(env(safe-area-inset-top) + 0.5rem));
+    left: max(1rem, calc(env(safe-area-inset-left) + 0.5rem));
+    z-index: 12;
+    display: inline-grid;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    max-width: calc(100vw - 2rem);
+    gap: 0.2rem;
+    justify-items: center;
+    text-align: center;
+    min-height: 50px;
+    padding: 0.56rem 0.9rem 0.62rem;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .floating-brand-button span {
+    display: block;
+    font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+  }
+
+  .floating-brand-button small {
+    display: block;
+    color: color-mix(in srgb, var(--color-text-primary) 54%, transparent);
+    font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .floating-brand-button:hover {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.06)),
+      linear-gradient(135deg, color-mix(in srgb, var(--color-brand-ice) 8%, transparent), transparent 62%);
   }
 
   .calibration-stage {
@@ -98,5 +164,24 @@
   .hero-video-loading.is-hidden {
     opacity: 0;
     pointer-events: none;
+  }
+
+  @media (max-width: 720px) {
+    .floating-brand-button {
+      top: max(0.8rem, calc(env(safe-area-inset-top) + 0.35rem));
+      left: max(0.8rem, calc(env(safe-area-inset-left) + 0.35rem));
+      max-width: calc(100vw - 1.6rem);
+      min-height: 46px;
+      padding: 0.5rem 0.8rem 0.54rem;
+      border-radius: 12px;
+    }
+
+    .floating-brand-button span {
+      font-size: 0.94rem;
+    }
+
+    .floating-brand-button small {
+      font-size: 0.54rem;
+    }
   }
 </style>

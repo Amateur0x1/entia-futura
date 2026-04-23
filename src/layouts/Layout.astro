@@ -113,16 +113,8 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
 
 <style is:global>
   @font-face {
-    font-family: 'EntiaTitleZh';
-    src: url('/fonts/SmileySans-Oblique.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'EntiaTitleEn';
-    src: url('/fonts/PoiretOne-Regular.ttf') format('truetype');
+    font-family: 'POIRETONE-REGULAR';
+    src: url('/fonts/POIRETONE-REGULAR.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -284,7 +276,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   .brand-zh {
     font-size: 1rem;
     letter-spacing: 0.06em;
-    font-family: 'EntiaTitleZh', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
     font-weight: 400;
   }
 
@@ -293,7 +285,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     color: var(--color-text-muted);
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
+    font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
   }
 
   .nav {
@@ -495,7 +487,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     letter-spacing: 0.04em;
     line-height: 0.94;
     max-width: 9ch;
-    font-family: 'EntiaTitleZh', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
   }
 
   .hero-title-en {
@@ -504,7 +496,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--color-text-tertiary);
-    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
+    font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
     text-align: center;
   }
 
@@ -678,14 +670,14 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
 
   html[lang^='zh'] .section-heading h2,
   html[lang^='zh'] .mini-card h3 {
-    font-family: 'EntiaTitleZh', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
     font-weight: 400;
     letter-spacing: 0.02em;
   }
 
   html[lang='en'] .section-heading h2,
   html[lang='en'] .mini-card h3 {
-    font-family: 'EntiaTitleEn', "Helvetica Neue", Arial, sans-serif;
+    font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
     letter-spacing: 0.04em;
   }
 
@@ -744,7 +736,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     align-items: center;
     justify-content: center;
     padding: 12px 18px;
-    border: 1px solid var(--color-action-secondary-border);
+    border: 0;
     border-radius: 999px;
     font-size: 0.95rem;
     will-change: transform;
@@ -785,7 +777,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   }
 
   .button.secondary {
-    background: var(--color-action-secondary-bg);
+    background: color-mix(in srgb, var(--color-brand-mint) 18%, transparent);
     color: var(--color-action-secondary-fg);
   }
 
