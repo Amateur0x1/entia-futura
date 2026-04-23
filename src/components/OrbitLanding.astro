@@ -22,9 +22,11 @@ const { locale = 'zh' } = Astro.props;
     </a>
     <a
       class="floating-brand-button floating-more-button"
+      data-brand-more-button
       data-brand-cluster-button
       href={toLocalePath(locale, '/about')}
     >
+      <i class="floating-more-fill" data-more-fill aria-hidden="true"></i>
       <span>more</span>
     </a>
   </div>
@@ -102,6 +104,14 @@ const { locale = 'zh' } = Astro.props;
       brandCluster instanceof HTMLElement
         ? brandCluster.querySelector('[data-brand-logo-button]')
         : null;
+    const moreButton =
+      brandCluster instanceof HTMLElement
+        ? brandCluster.querySelector('[data-brand-more-button]')
+        : null;
+    const moreFill =
+      moreButton instanceof HTMLElement
+        ? moreButton.querySelector('[data-more-fill]')
+        : null;
     const logoTextNodes = logoButton instanceof HTMLElement ? getAnimatedTextNodes(logoButton) : [];
     const standaloneButtons = sheenButtons.filter((button) => !button.hasAttribute('data-brand-cluster-button'));
     /*
@@ -173,6 +183,68 @@ const { locale = 'zh' } = Astro.props;
       playTextRotate(logoTextNodes);
     };
 
+    const getMoreFillMetrics = (button, originX, originY) => {
+      const { width, height } = button.getBoundingClientRect();
+      const maxX = Math.max(originX, width - originX);
+      const maxY = Math.max(originY, height - originY);
+      const radius = Math.hypot(maxX, maxY);
+
+      return {
+        diameter: radius * 2,
+        x: originX - radius,
+        y: originY - radius,
+      };
+    };
+    const moreFillStartScale = 0.016;
+
+    const setMoreFilled = (filled) => {
+      if (moreButton instanceof HTMLElement) {
+        moreButton.classList.toggle('is-more-filled', filled);
+      }
+    };
+
+    const expandMoreFill = (originX, originY) => {
+      if (!(moreButton instanceof HTMLElement) || !(moreFill instanceof HTMLElement)) {
+        return;
+      }
+
+      const { diameter, x, y } = getMoreFillMetrics(moreButton, originX, originY);
+
+      gsap.killTweensOf(moreFill);
+      gsap.set(moreFill, {
+        width: diameter,
+        height: diameter,
+        x,
+        y,
+        scale: moreFillStartScale,
+        opacity: 1,
+      });
+      setMoreFilled(true);
+
+      gsap.to(moreFill, {
+        scale: 1,
+        duration: 0.6,
+        ease: 'power2.out',
+      });
+    };
+
+    const collapseMoreFill = () => {
+      if (!(moreButton instanceof HTMLElement) || !(moreFill instanceof HTMLElement)) {
+        return;
+      }
+
+      gsap.killTweensOf(moreFill);
+      gsap.to(moreFill, {
+        scale: moreFillStartScale,
+        opacity: 0,
+        duration: 0.28,
+        ease: 'power2.in',
+        onComplete: () => {
+          setMoreFilled(false);
+        },
+      });
+    };
+
     standaloneButtons.forEach((button) => {
       button.addEventListener('pointerenter', () => {
         restartSheen(button, 'is-sheen-entering');
@@ -209,7 +281,6 @@ const { locale = 'zh' } = Astro.props;
         if (!brandCluster.classList.contains('is-cluster-active')) {
           setClusterActive(true);
           // playClusterSheen('is-sheen-entering');
-          playClusterTextEffect();
         }
       });
 
@@ -228,6 +299,26 @@ const { locale = 'zh' } = Astro.props;
     if (logoButton instanceof HTMLElement) {
       logoButton.addEventListener('pointerenter', triggerLogoTextMotion);
       logoButton.addEventListener('focus', triggerLogoTextMotion);
+    }
+
+    if (moreButton instanceof HTMLElement) {
+      moreButton.addEventListener('pointerenter', (event) => {
+        const rect = moreButton.getBoundingClientRect();
+        expandMoreFill(event.clientX - rect.left, event.clientY - rect.top);
+      });
+
+      moreButton.addEventListener('pointerleave', () => {
+        collapseMoreFill();
+      });
+
+      moreButton.addEventListener('focus', () => {
+        const rect = moreButton.getBoundingClientRect();
+        expandMoreFill(rect.width / 2, rect.height / 2);
+      });
+
+      moreButton.addEventListener('blur', () => {
+        collapseMoreFill();
+      });
     }
   }
 </script>
@@ -370,19 +461,41 @@ const { locale = 'zh' } = Astro.props;
     min-height: 38px;
     padding-block: 0.36rem;
     padding-inline: 1rem;
+    overflow: hidden;
+    isolation: isolate;
     box-shadow: inset 0 0 0 1px var(--color-border-default);
     transition: color 180ms ease, box-shadow 180ms ease;
   }
 
+  .floating-more-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    border-radius: 999px;
+    background: var(--color-brand-violet);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0) scale(0.016);
+    transform-origin: 50% 50%;
+    will-change: transform, opacity;
+    z-index: 0;
+  }
+
   .floating-more-button span {
+    position: relative;
+    z-index: 1;
     letter-spacing: 0.18em;
     line-height: 1;
     text-transform: none;
     transform: translateY(-2px);
   }
 
+  .floating-more-button.is-more-filled,
   .floating-more-button:hover,
   .floating-more-button:focus-visible {
+    color: var(--color-action-secondary-fg);
     box-shadow: inset 0 0 0 1px var(--color-border-strong);
   }
 
