@@ -183,7 +183,6 @@
 
   const calibrationRoot = document.querySelector('[data-calibration-root]');
   const calibrationFrame = calibrationRoot?.querySelector('[data-orbit-frame]');
-  const calibrationCopy = calibrationRoot?.querySelector('.calibration-copy');
   const heroVideoShell = calibrationRoot?.querySelector('[data-hero-video-shell]');
   const scrollVideo = calibrationRoot?.querySelector('[data-scroll-video]');
   const loopVideo = calibrationRoot?.querySelector('[data-loop-video]');
@@ -219,12 +218,11 @@
   if (
     calibrationRoot instanceof HTMLElement &&
     calibrationFrame instanceof HTMLElement &&
-    calibrationCopy instanceof HTMLElement &&
     primaryVisual instanceof HTMLElement
   ) {
     const notes = signalCards ? Array.from(signalCards) : [];
 
-    gsap.set([calibrationCopy, primaryVisual], {
+    gsap.set(primaryVisual, {
       transformOrigin: '50% 50%',
     });
 
@@ -235,18 +233,6 @@
     });
 
     introTimeline
-      .fromTo(
-        calibrationCopy,
-        {
-          autoAlpha: 0,
-          y: 28,
-        },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.82,
-        },
-      )
       .fromTo(
         primaryVisual,
         {
@@ -260,7 +246,6 @@
           y: 0,
           duration: 1.05,
         },
-        '-=0.48',
       )
       .fromTo(
         notes,
@@ -274,7 +259,7 @@
           duration: 0.8,
           stagger: 0.08,
         },
-        '-=0.56',
+        '-=0.42',
       );
 
     let calibrationScrollInitialized = false;
@@ -288,20 +273,28 @@
 
       const media = gsap.matchMedia();
 
-      media.add('(min-width: 721px)', () => {
+      media.add('(min-width: 0px)', () => {
         const pageShell = document.querySelector('.page-shell');
         const siteHeader = document.querySelector('.site-header');
         const shellPaddingTop = pageShell instanceof HTMLElement ? parseFloat(window.getComputedStyle(pageShell).paddingTop) || 0 : 0;
-        const headerHeight = siteHeader instanceof HTMLElement ? siteHeader.getBoundingClientRect().height : 0;
-        const headerMarginBottom = siteHeader instanceof HTMLElement ? parseFloat(window.getComputedStyle(siteHeader).marginBottom) || 0 : 0;
+        const headerStyles = siteHeader instanceof HTMLElement ? window.getComputedStyle(siteHeader) : null;
+        const headerIsVisible =
+          siteHeader instanceof HTMLElement &&
+          headerStyles !== null &&
+          headerStyles.display !== 'none' &&
+          headerStyles.visibility !== 'hidden';
+        const headerHeight = headerIsVisible ? siteHeader.getBoundingClientRect().height : 0;
+        const headerMarginBottom = headerIsVisible ? parseFloat(headerStyles.marginBottom) || 0 : 0;
         const headerOffset = Math.max(shellPaddingTop + headerHeight + headerMarginBottom, 0);
+        const playbackStretch = 3;
+        const scrollDistance = (window.innerWidth <= 720 ? 1400 : 2400) * playbackStretch;
 
         const heroTimeline = gsap.timeline({
           defaults: { ease: 'none' },
           scrollTrigger: {
             trigger: calibrationRoot,
             start: `top top+=${Math.round(headerOffset)}`,
-            end: '+=2400',
+            end: `+=${scrollDistance}`,
             scrub: 1,
             pin: calibrationFrame,
             anticipatePin: 1,
@@ -315,15 +308,6 @@
               yPercent: -2,
               scale: 1.03,
               duration: 1.2,
-            },
-            0,
-          )
-          .to(
-            calibrationCopy,
-            {
-              yPercent: -6,
-              autoAlpha: 0.66,
-              duration: 0.7,
             },
             0,
           )
@@ -407,26 +391,21 @@
     };
 
     const initializeHeroVideos = () => {
+      gsap.set(loopVideo, { autoAlpha: 0 });
+      gsap.set(scrollVideo, {
+        autoAlpha: 1,
+        currentTime: 0,
+      });
+
       startLoopVideo();
       syncScrollFrame();
 
       if (prefersReducedMotion) {
         hideHeroVideoLoading();
-        gsap.set(loopVideo, { autoAlpha: 1 });
-        gsap.set(scrollVideo, {
-          autoAlpha: 0.18,
-          currentTime: Math.max(scrollVideo.duration - 0.04, 0),
-        });
         return;
       }
 
-      media.add('(max-width: 720px)', () => {
-        hideHeroVideoLoading();
-        gsap.set(loopVideo, { autoAlpha: 1 });
-        gsap.set(scrollVideo, { autoAlpha: 0.18 });
-
-        return () => {};
-      });
+      hideHeroVideoLoading();
     };
 
     if (scrollVideo.readyState >= 1) {

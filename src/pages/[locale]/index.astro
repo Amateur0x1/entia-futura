@@ -31,13 +31,15 @@ const pageDescription = pickByLocale(
     gap: 0;
   }
 
+  :global(body.theme-landing-dark .page-shell-landing) {
+    padding: 0;
+  }
+
   :global(.site-header) {
-    border-bottom-color: transparent;
+    display: none;
   }
 
   :global(.site-footer) {
-    margin-top: 0;
-    border-top-color: transparent;
-    background: transparent;
+    display: none;
   }
 </style>
