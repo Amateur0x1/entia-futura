@@ -1,0 +1,373 @@
+.landing-system {
+  position: relative;
+}
+
+.landing-system::after {
+  content: '';
+  position: fixed;
+  inset: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  border: 1px solid var(--color-border-inverse-strong);
+  pointer-events: none;
+  z-index: 59;
+}
+
+.floating-brand-cluster {
+  position: fixed;
+  top: max(1rem, calc(env(safe-area-inset-top) + 0.5rem));
+  left: max(1rem, calc(env(safe-area-inset-left) + 0.5rem));
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  --brand-button-fg: var(--color-text-primary);
+  --brand-button-highlight-opacity: 0;
+  will-change: transform;
+  animation: floating-brand-drift 14s ease-in-out infinite;
+}
+
+.floating-base-button {
+  position: relative;
+  display: inline-grid;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  gap: 0.2rem;
+  justify-items: center;
+  text-align: center;
+  min-height: 50px;
+  padding: 0.56rem 0.9rem 0.62rem;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--brand-button-fg);
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  transition: color 180ms ease;
+  perspective: 960px;
+  transform-style: preserve-3d;
+}
+
+.floating-button.floating-contact-button {
+  position: fixed;
+  top: max(1.3rem, calc(env(safe-area-inset-top) + 1rem));
+  left: auto;
+  right: calc(max(1rem, calc(env(safe-area-inset-right) + 0.5rem)) + 16px);
+  z-index: 60;
+  will-change: transform;
+  animation: floating-brand-drift 14s ease-in-out infinite;
+  background: color-mix(in srgb, var(--color-border-inverse-strong) 12%, transparent);
+  box-shadow:
+    inset 0 0 0 2px var(--color-border-inverse-strong),
+    0 0 10px color-mix(in srgb, var(--color-border-inverse-strong) 72%, transparent);
+}
+
+.floating-contact-button .floating-more-fill {
+  background: var(--color-border-inverse-strong);
+}
+
+.floating-know-more-button {
+  position: fixed;
+  left: 50%;
+  bottom: max(1.8rem, calc(env(safe-area-inset-bottom) + 1.2rem));
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.62rem 1rem 0.6rem;
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 62%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-primary) 24%, transparent);
+  transform: translateX(-50%);
+  font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 180ms ease, box-shadow 180ms ease, color 180ms ease;
+}
+
+.floating-know-more-button span {
+  font-size: 0.84rem;
+}
+
+.floating-know-more-button svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+  transform: translateY(1px);
+}
+
+.floating-know-more-button:hover,
+.floating-know-more-button:focus-visible {
+  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--color-primary) 34%, transparent);
+  color: color-mix(in srgb, var(--color-primary) 86%, white 14%);
+}
+
+.floating-base-button > span,
+.floating-base-button > small {
+  position: relative;
+  z-index: 1;
+}
+
+[data-brand-animated-text] {
+  color: var(--brand-button-fg);
+  transform-origin: 50% 60%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, text-shadow;
+}
+
+.floating-base-button span {
+  display: block;
+  font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+}
+
+.floating-base-button small {
+  display: block;
+  color: color-mix(in srgb, var(--brand-button-fg) 54%, transparent);
+  font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  font-weight: 400;
+  white-space: nowrap;
+  letter-spacing: 0.8em;
+}
+
+small[data-brand-animated-text] {
+  color: color-mix(in srgb, var(--brand-button-fg) 54%, transparent);
+}
+
+.floating-button {
+  border-radius: 12px;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 82px;
+  min-height: 38px;
+  padding-block: 0.36rem;
+  padding-inline: 1rem;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    inset 0 0 0 2px var(--color-border-accent-soft),
+    0 0 10px color-mix(in srgb, var(--color-secondary) 18%, transparent);
+  transition: color 180ms ease, box-shadow 180ms ease;
+}
+
+.floating-more-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  border-radius: 999px;
+  background: var(--color-secondary);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0) scale(0.016);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  z-index: 0;
+}
+
+.floating-button span {
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: none;
+  transform: translateY(-2px);
+}
+
+.floating-button.is-more-filled,
+.floating-button:hover,
+.floating-button:focus-visible {
+  color: var(--color-secondary-foreground);
+  box-shadow:
+    inset 0 0 0 2px var(--color-border-accent-medium),
+    0 0 16px color-mix(in srgb, var(--color-secondary) 30%, transparent);
+}
+
+.floating-contact-button.is-more-filled,
+.floating-contact-button:hover,
+.floating-contact-button:focus-visible {
+  box-shadow:
+    inset 0 0 0 2px var(--color-border-inverse-strong),
+    0 0 16px color-mix(in srgb, var(--color-border-inverse-strong) 82%, transparent);
+}
+
+.floating-brand-cluster:hover,
+.floating-brand-cluster:focus-within,
+.floating-brand-cluster.is-cluster-active {
+  --brand-button-fg: var(--color-text-primary);
+  --brand-button-highlight-opacity: 0;
+}
+
+@keyframes floating-brand-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  33% {
+    transform: translate3d(2px, -2px, 0);
+  }
+
+  66% {
+    transform: translate3d(-1px, 2px, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-brand-cluster,
+  .floating-contact-button {
+    animation: none;
+  }
+}
+
+.calibration-stage {
+  position: relative;
+  min-height: 340svh;
+  margin-inline: calc(50% - 50vw);
+  width: 100vw;
+}
+
+.calibration-frame {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 100svh;
+  overflow: clip;
+  isolation: isolate;
+}
+
+.hero-video-shell {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  overflow: clip;
+  background: var(--gradient-hero-stage);
+  isolation: isolate;
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-video-scroll {
+  filter: var(--filter-hero-scroll);
+}
+
+.hero-video-loop {
+  opacity: 0;
+  filter: var(--filter-hero-loop);
+}
+
+.hero-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-hero-overlay);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.hero-video-vignette {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-hero-vignette);
+  pointer-events: none;
+}
+
+.hero-video-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--gradient-loading-screen);
+  transition: opacity 320ms ease;
+}
+
+.hero-video-loading.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+  .calibration-stage {
+    min-height: 300svh;
+  }
+
+  .landing-system::after {
+    inset: max(9px, env(safe-area-inset-top)) max(9px, env(safe-area-inset-right))
+      max(9px, env(safe-area-inset-bottom)) max(9px, env(safe-area-inset-left));
+  }
+
+  .floating-brand-cluster {
+    top: max(0.8rem, calc(env(safe-area-inset-top) + 0.35rem));
+    left: max(0.8rem, calc(env(safe-area-inset-left) + 0.35rem));
+    gap: 0;
+  }
+
+  .floating-base-button {
+    max-width: calc(100vw - 1.6rem);
+    min-height: 46px;
+    padding: 0.5rem 0.8rem 0.54rem;
+    border-radius: 16px;
+  }
+
+  .floating-base-button span {
+    font-size: 0.94rem;
+  }
+
+  .floating-base-button small {
+    font-size: 0.54rem;
+  }
+
+  .floating-button {
+    min-width: 64px;
+    min-height: 34px;
+    padding-block: 0.3rem;
+    padding-inline: 0.72rem;
+    border-radius: 10px;
+  }
+
+  .floating-button span {
+    letter-spacing: 0.14em;
+    transform: translateY(-0.5px);
+  }
+
+  .floating-contact-button {
+    top: max(1rem, calc(env(safe-area-inset-top) + 0.5rem));
+    left: auto;
+    right: calc(max(0.8rem, calc(env(safe-area-inset-right) + 0.35rem)) + 16px);
+  }
+
+  .floating-know-more-button {
+    bottom: max(1.2rem, calc(env(safe-area-inset-bottom) + 0.7rem));
+    padding: 0.54rem 0.84rem 0.52rem;
+    gap: 0.42rem;
+  }
+
+  .floating-know-more-button span {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+  }
+}

@@ -1,6 +1,6 @@
 ---
-import LandingEffects from '../../components/LandingEffects.astro';
-import LandingHero from '../../components/LandingHero.astro';
+import HomeEffects from '../../sections/home/HomeEffects.astro';
+import HomeHeroScreen from '../../sections/home/HomeHeroScreen.astro';
 import Layout from '../../layouts/Layout.astro';
 import { siteMeta } from '../../content/site';
 import { isLocale, pickByLocale } from '../../i18n/config';
@@ -28,7 +28,7 @@ const instituteIntro = pickByLocale(
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
   <main class="landing-main">
-    <LandingHero locale={locale} />
+    <HomeHeroScreen locale={locale} />
     <section class={`landing-next-panel ${locale === 'en' ? 'landing-next-panel--en' : ''}`} data-next-panel>
       <div class="landing-next-panel__inner" data-next-panel-inner>
         <article class="landing-next-panel__block landing-next-panel__block--top-right">
@@ -83,7 +83,7 @@ const instituteIntro = pickByLocale(
     <path class="shape-overlays__path" fill="url(#landing-shape-gradient-2)"></path>
     <path class="shape-overlays__path" fill="url(#landing-shape-gradient-3)"></path>
   </svg>
-  <LandingEffects />
+  <HomeEffects />
 </Layout>
 
 <style>

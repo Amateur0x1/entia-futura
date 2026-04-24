@@ -1,0 +1,66 @@
+---
+import type { Locale } from '../../i18n/config';
+
+interface Props {
+  locale: Locale;
+  coreQuestionLabel: string;
+  coreQuestion: string;
+  instituteIntro: string;
+}
+
+const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
+---
+
+<section class={`landing-next-panel ${locale === 'en' ? 'landing-next-panel--en' : ''}`} data-next-panel>
+  <div class="landing-next-panel__inner" data-next-panel-inner>
+    <article class="landing-next-panel__block landing-next-panel__block--top-right">
+      <p class="landing-next-panel__label">{coreQuestionLabel}</p>
+      <h2 class="landing-next-panel__title" data-next-panel-heading>{coreQuestion}</h2>
+      <div class="landing-next-panel__divider" data-next-panel-divider aria-hidden="true"></div>
+      <div class="landing-next-panel__body" data-next-panel-body>
+        {instituteIntro.split('\n').map((paragraph) => (
+          <p class="landing-next-panel__paragraph">{paragraph}</p>
+        ))}
+      </div>
+    </article>
+  </div>
+</section>
+<section class={`landing-next-preview ${locale === 'en' ? 'landing-next-preview--en' : ''}`} data-next-preview aria-hidden="true">
+  <div class="landing-next-panel__inner landing-next-preview__inner" data-next-preview-inner>
+    <article class="landing-next-panel__block landing-next-panel__block--top-right">
+      <p class="landing-next-panel__label">{coreQuestionLabel}</p>
+      <h2 class="landing-next-panel__title" data-next-panel-heading>{coreQuestion}</h2>
+      <div class="landing-next-panel__divider" data-next-panel-divider aria-hidden="true"></div>
+      <div class="landing-next-panel__body" data-next-panel-body>
+        {instituteIntro.split('\n').map((paragraph) => (
+          <p class="landing-next-panel__paragraph">{paragraph}</p>
+        ))}
+      </div>
+    </article>
+  </div>
+</section>
+<svg
+  class="shape-overlays landing-shape-overlays"
+  data-shape-overlay
+  viewBox="0 0 100 100"
+  preserveAspectRatio="none"
+  aria-hidden="true"
+>
+  <defs>
+    <linearGradient id="landing-shape-gradient-1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF" />
+      <stop offset="100%" stop-color="#7B5CFF" />
+    </linearGradient>
+    <linearGradient id="landing-shape-gradient-2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7B5CFF" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="landing-shape-gradient-3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#05070B" />
+      <stop offset="100%" stop-color="#05070B" />
+    </linearGradient>
+  </defs>
+  <path class="shape-overlays__path" fill="url(#landing-shape-gradient-1)"></path>
+  <path class="shape-overlays__path" fill="url(#landing-shape-gradient-2)"></path>
+  <path class="shape-overlays__path" fill="url(#landing-shape-gradient-3)"></path>
+</svg>
