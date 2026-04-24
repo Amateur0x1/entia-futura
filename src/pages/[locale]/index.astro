@@ -17,18 +17,135 @@ const pageDescription = pickByLocale(
   '一个以轨道档案为视觉母题的研究所首页：问题被重新编目，研究通过横向转译链进入现实。',
   'An institute homepage built around an orbital archive: questions are re-indexed and research enters reality through a horizontal chain of translation.',
 );
+const nextPanelEyebrow = pickByLocale(locale, '下一屏', 'Next Screen');
+const nextPanelTitle = pickByLocale(locale, '当影像闭合，研究开始显影。', 'When the image closes, research comes into view.');
+const nextPanelBody = pickByLocale(
+  locale,
+  '这一屏先作为过渡场，承接首页视频结束后的形态变化。下一步可以在这里接入正式的栏目、叙事或内容编排。',
+  'This panel acts as the receiving field after the landing video finishes. It can later become the real second screen for content, navigation, or narrative structure.',
+);
 ---
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
   <main class="landing-main">
     <OrbitLanding locale={locale} />
+    <section class="landing-next-panel" data-next-panel>
+      <div class="landing-next-panel__inner" data-next-panel-inner>
+        <p class="landing-next-panel__eyebrow">{nextPanelEyebrow}</p>
+        <h2 class="landing-next-panel__title">{nextPanelTitle}</h2>
+        <p class="landing-next-panel__body">{nextPanelBody}</p>
+      </div>
+    </section>
   </main>
+  <section class="landing-next-preview" data-next-preview aria-hidden="true">
+    <div class="landing-next-panel__inner landing-next-preview__inner" data-next-preview-inner>
+      <p class="landing-next-panel__eyebrow">{nextPanelEyebrow}</p>
+      <h2 class="landing-next-panel__title">{nextPanelTitle}</h2>
+      <p class="landing-next-panel__body">{nextPanelBody}</p>
+    </div>
+  </section>
+  <svg
+    class="shape-overlays landing-shape-overlays"
+    data-shape-overlay
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <defs>
+      <linearGradient id="landing-shape-gradient-1" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#d9e3e7" />
+        <stop offset="100%" stop-color="#4d4a60" />
+      </linearGradient>
+      <linearGradient id="landing-shape-gradient-2" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#b9cad0" />
+        <stop offset="100%" stop-color="#4d4a60" />
+      </linearGradient>
+    </defs>
+    <path class="shape-overlays__path" fill="url(#landing-shape-gradient-2)"></path>
+    <path class="shape-overlays__path" fill="url(#landing-shape-gradient-1)"></path>
+  </svg>
   <LandingEffects />
 </Layout>
 
 <style>
   .landing-main {
     gap: 0;
+  }
+
+  .landing-next-panel {
+    position: relative;
+    min-height: 100svh;
+    padding: clamp(5rem, 12vw, 9rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
+    background:
+      radial-gradient(circle at 18% 24%, rgba(185, 202, 208, 0.16), transparent 22rem),
+      radial-gradient(circle at 84% 18%, rgba(9, 9, 7, 0.36), transparent 18rem),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-action-secondary-bg) 86%, black 14%),
+        color-mix(in srgb, var(--color-action-secondary-bg) 92%, black 8%)
+      );
+    color: var(--color-action-secondary-fg);
+  }
+
+  .landing-next-preview {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    display: grid;
+    align-items: end;
+    padding: clamp(5rem, 12vw, 9rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
+    background: transparent;
+    color: var(--color-action-secondary-fg);
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .landing-next-preview__inner {
+    width: 100%;
+  }
+
+  .landing-next-panel__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 1.1rem;
+    max-width: 720px;
+  }
+
+  .landing-next-panel__eyebrow {
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-action-secondary-fg) 68%, transparent);
+  }
+
+  .landing-next-panel__title {
+    margin: 0;
+    max-width: 14ch;
+    font-size: clamp(2.4rem, 6vw, 5.4rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+  }
+
+  .landing-next-panel__body {
+    margin: 0;
+    max-width: 34rem;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--color-action-secondary-fg) 84%, transparent);
+  }
+
+  .landing-shape-overlays {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    visibility: hidden;
   }
 
   :global(body.theme-landing-dark .page-shell-landing) {
@@ -41,5 +158,25 @@ const pageDescription = pickByLocale(
 
   :global(.site-footer) {
     display: none;
+  }
+
+  @media (max-width: 720px) {
+    .landing-next-panel {
+      padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
+      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
+        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
+      padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
+    }
+
+    .landing-next-preview {
+      padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
+      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
+        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
+      padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
+    }
+
+    .landing-next-panel__title {
+      max-width: 11ch;
+    }
   }
 </style>

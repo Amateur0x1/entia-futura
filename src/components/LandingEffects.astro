@@ -189,12 +189,60 @@
   const heroVideoLoading = calibrationRoot?.querySelector('[data-hero-video-loading]');
   const portalShell = calibrationRoot?.querySelector('[data-future-portal-shell]');
   const signalCards = calibrationRoot?.querySelectorAll('[data-signal-note]');
+  const nextPanel = document.querySelector('[data-next-panel]');
+  const nextPanelInner = nextPanel?.querySelector('[data-next-panel-inner]');
+  const nextPreview = document.querySelector('[data-next-preview]');
+  const nextPreviewInner = nextPreview?.querySelector('[data-next-preview-inner]');
+  const shapeOverlay = document.querySelector('[data-shape-overlay]');
+  const shapeOverlayPaths = shapeOverlay?.querySelectorAll('.shape-overlays__path');
   const primaryVisual =
     portalShell instanceof HTMLElement
       ? portalShell
       : heroVideoShell instanceof HTMLElement
         ? heroVideoShell
         : null;
+  const numShapePoints = 10;
+  const shapePaths =
+    shapeOverlayPaths ? Array.from(shapeOverlayPaths).filter((path) => path instanceof SVGPathElement) : [];
+  const shapeState = { progress: 0 };
+  const shapeEase = gsap.parseEase('power2.inOut');
+  const coverDelayPerPath = 0.05;
+  const coverDelayPointsMax = 0.12;
+  const coverPointSpan = 0.24;
+  const coverDelays = shapePaths.map((_, pathIndex) =>
+    Array.from({ length: numShapePoints }, () => pathIndex * coverDelayPerPath + Math.random() * coverDelayPointsMax),
+  );
+
+  const buildCoverPath = (points) => {
+    let d = `M 0 0 V ${points[0]} C`;
+
+    for (let pointIndex = 0; pointIndex < numShapePoints - 1; pointIndex++) {
+      const position = ((pointIndex + 1) / (numShapePoints - 1)) * 100;
+      const controlPoint = position - (100 / (numShapePoints - 1)) / 2;
+      d += ` ${controlPoint} ${points[pointIndex]} ${controlPoint} ${points[pointIndex + 1]} ${position} ${points[pointIndex + 1]}`;
+    }
+
+    d += ' V 100 H 0';
+    return d;
+  };
+
+  const getPointValue = (progress, delay, span) => {
+    const normalized = gsap.utils.clamp(0, 1, (progress - delay) / span);
+    return 100 - shapeEase(normalized) * 100;
+  };
+
+  const renderShapeOverlay = () => {
+    if (shapePaths.length === 0) {
+      return;
+    }
+
+    shapePaths.forEach((path, index) => {
+      const points = coverDelays[index].map((delay) => getPointValue(shapeState.progress, delay, coverPointSpan));
+      path.setAttribute('d', buildCoverPath(points));
+    });
+  };
+
+  renderShapeOverlay();
 
   const hideHeroVideoLoading = () => {
     if (!(heroVideoLoading instanceof HTMLElement)) {
@@ -225,6 +273,25 @@
     gsap.set(primaryVisual, {
       transformOrigin: '50% 50%',
     });
+
+    if (!prefersReducedMotion && nextPreviewInner instanceof HTMLElement) {
+      gsap.set(nextPreviewInner, {
+        autoAlpha: 0,
+        y: 48,
+      });
+    }
+
+    if (nextPreview instanceof HTMLElement) {
+      gsap.set(nextPreview, {
+        autoAlpha: 0,
+      });
+    }
+
+    if (shapeOverlay instanceof SVGSVGElement) {
+      gsap.set(shapeOverlay, {
+        autoAlpha: 0,
+      });
+    }
 
     const introTimeline = gsap.timeline({
       defaults: {
@@ -356,6 +423,64 @@
                 0.84,
               );
           }
+        }
+
+        if (
+          !prefersReducedMotion &&
+          nextPreview instanceof HTMLElement &&
+          nextPreviewInner instanceof HTMLElement &&
+          shapeOverlay instanceof SVGSVGElement
+        ) {
+          const shapeOverlayStart = 0.84;
+          const shapeOverlayDuration = 0.64;
+          const previewSwapStart = shapeOverlayStart + shapeOverlayDuration * 0.74;
+          const previewRevealStart = shapeOverlayStart + shapeOverlayDuration * 0.82;
+
+          heroTimeline
+            .set(
+              shapeOverlay,
+              {
+                autoAlpha: 1,
+              },
+              shapeOverlayStart,
+            )
+            .set(
+              nextPreview,
+              {
+                autoAlpha: 1,
+              },
+              previewSwapStart,
+            )
+            .to(
+              shapeState,
+              {
+                progress: 1,
+                duration: shapeOverlayDuration,
+                ease: 'none',
+                onUpdate: renderShapeOverlay,
+              },
+              shapeOverlayStart,
+            )
+            .to(
+              notes,
+              {
+                autoAlpha: 0,
+                y: -58,
+                duration: 0.22,
+                stagger: 0.02,
+              },
+              shapeOverlayStart + 0.06,
+            )
+            .to(
+              nextPreviewInner,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.18,
+                ease: 'power3.out',
+              },
+              previewRevealStart,
+            );
         }
 
         return () => {
