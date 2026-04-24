@@ -676,12 +676,15 @@ const { locale = 'zh' } = Astro.props;
 
   .calibration-stage {
     position: relative;
-    min-height: 100svh;
+    min-height: 340svh;
     margin-inline: calc(50% - 50vw);
     width: 100vw;
   }
 
   .calibration-frame {
+    position: sticky;
+    top: 0;
+    height: 100svh;
     min-height: 100svh;
     overflow: clip;
     isolation: isolate;
@@ -742,6 +745,10 @@ const { locale = 'zh' } = Astro.props;
   }
 
   @media (max-width: 720px) {
+    .calibration-stage {
+      min-height: 300svh;
+    }
+
     .floating-brand-cluster {
       top: max(0.8rem, calc(env(safe-area-inset-top) + 0.35rem));
       left: max(0.8rem, calc(env(safe-area-inset-left) + 0.35rem));

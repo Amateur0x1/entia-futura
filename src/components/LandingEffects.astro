@@ -208,7 +208,7 @@
   const shapeEase = gsap.parseEase('power2.inOut');
   const coverDelayPerPath = 0.05;
   const coverDelayPointsMax = 0.12;
-  const coverPointSpan = 0.24;
+  const coverPointSpan = 0.4;
   const coverDelays = shapePaths.map((_, pathIndex) =>
     Array.from({ length: numShapePoints }, () => pathIndex * coverDelayPerPath + Math.random() * coverDelayPointsMax),
   );
@@ -352,17 +352,25 @@
         const headerMarginBottom = headerIsVisible ? parseFloat(headerStyles.marginBottom) || 0 : 0;
         const headerOffset = Math.max(shellPaddingTop + headerHeight + headerMarginBottom, 0);
         const playbackStretch = 3;
-        const scrollDistance = (window.innerWidth <= 720 ? 1400 : 2400) * playbackStretch;
+        const fallbackDistance = (window.innerWidth <= 720 ? 1400 : 2400) * playbackStretch;
+        const videoPlaybackStart = 0;
+        const videoPlaybackDuration = 1.38;
+        const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
+        const transitionStartAtVideoEnd = videoPlaybackEnd - 0.04;
 
         const heroTimeline = gsap.timeline({
           defaults: { ease: 'none' },
           scrollTrigger: {
             trigger: calibrationRoot,
             start: `top top+=${Math.round(headerOffset)}`,
-            end: `+=${scrollDistance}`,
+            endTrigger: nextPanel instanceof HTMLElement ? nextPanel : calibrationRoot,
+            end:
+              nextPanel instanceof HTMLElement
+                ? `top top+=${Math.round(headerOffset)}`
+                : `+=${fallbackDistance}`,
             scrub: 1,
-            pin: calibrationFrame,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         });
 
@@ -402,25 +410,25 @@
                 scrollVideo,
                 {
                   currentTime: targetDuration,
-                  duration: 1,
+                  duration: videoPlaybackDuration,
                 },
-                0,
+                videoPlaybackStart,
               )
               .to(
                 loopVideo,
                 {
                   autoAlpha: 1,
-                  duration: 0.22,
+                  duration: 0.32,
                 },
-                0.78,
+                videoPlaybackEnd - 0.24,
               )
               .to(
                 scrollVideo,
                 {
                   autoAlpha: 0.16,
-                  duration: 0.16,
+                  duration: 0.22,
                 },
-                0.84,
+                videoPlaybackEnd - 0.18,
               );
           }
         }
@@ -431,10 +439,11 @@
           nextPreviewInner instanceof HTMLElement &&
           shapeOverlay instanceof SVGSVGElement
         ) {
-          const shapeOverlayStart = 0.84;
-          const shapeOverlayDuration = 0.8;
-          const previewSwapStart = shapeOverlayStart + shapeOverlayDuration * 0.34;
-          const previewRevealStart = shapeOverlayStart + shapeOverlayDuration * 0.4;
+          // Keep transition locked to the end of scroll-video playback.
+          const shapeOverlayStart = transitionStartAtVideoEnd;
+          const shapeOverlayDuration = 1.12;
+          const previewSwapStart = shapeOverlayStart + shapeOverlayDuration * 0.3;
+          const previewRevealStart = shapeOverlayStart + shapeOverlayDuration * 0.42;
 
           heroTimeline
             .set(
@@ -466,17 +475,17 @@
               {
                 autoAlpha: 0,
                 y: -58,
-                duration: 0.22,
+                duration: 0.34,
                 stagger: 0.02,
               },
-              shapeOverlayStart + 0.06,
+              shapeOverlayStart + 0.1,
             )
             .to(
               nextPreviewInner,
               {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.34,
+                duration: 0.54,
                 ease: 'power3.out',
               },
               previewRevealStart,
