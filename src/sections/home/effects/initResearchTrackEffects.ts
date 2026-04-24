@@ -17,12 +17,9 @@ export const initResearchTrackEffects = (prefersReducedMotion: boolean) => {
   }
 
   gsap.set(track, {
-    autoAlpha: 0,
     y: 54,
-    scale: 1.06,
-    filter: 'blur(8px)',
   });
-  gsap.set(panels, { autoAlpha: 0, y: 36 });
+  gsap.set(panels, { y: 36 });
 
   const handoffTimeline = gsap.timeline({
     defaults: { ease: 'none' },
@@ -34,10 +31,7 @@ export const initResearchTrackEffects = (prefersReducedMotion: boolean) => {
       onLeaveBack: () => {
         if (!nextPreview) return;
         gsap.set(nextPreview, {
-          autoAlpha: 1,
-          scale: 1,
           y: 0,
-          filter: 'blur(0px)',
           visibility: 'visible',
         });
       },
@@ -48,10 +42,7 @@ export const initResearchTrackEffects = (prefersReducedMotion: boolean) => {
     handoffTimeline.to(
       nextPreview,
       {
-        autoAlpha: 0,
-        scale: 0.9,
         y: -28,
-        filter: 'blur(6px)',
         duration: 0.72,
       },
       0,
@@ -61,10 +52,7 @@ export const initResearchTrackEffects = (prefersReducedMotion: boolean) => {
   handoffTimeline.to(
     track,
     {
-      autoAlpha: 1,
       y: 0,
-      scale: 1,
-      filter: 'blur(0px)',
       duration: 0.78,
     },
     0.18,
@@ -72,7 +60,6 @@ export const initResearchTrackEffects = (prefersReducedMotion: boolean) => {
 
   panels.forEach((panel, index) => {
     gsap.to(panel, {
-      autoAlpha: 1,
       y: 0,
       ease: 'none',
       scrollTrigger: {
