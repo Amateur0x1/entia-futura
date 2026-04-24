@@ -1,6 +1,7 @@
 ---
 import HomeEffects from '../../sections/home/HomeEffects.astro';
 import HomeHeroScreen from '../../sections/home/HomeHeroScreen.astro';
+import HomeMonolithVisual from '../../sections/home/HomeMonolithVisual.astro';
 import Layout from '../../layouts/Layout.astro';
 import { siteMeta } from '../../content/site';
 import { isLocale, pickByLocale } from '../../i18n/config';
@@ -41,6 +42,7 @@ const instituteIntro = pickByLocale(
             ))}
           </div>
         </article>
+        <HomeMonolithVisual />
       </div>
     </section>
   </main>
@@ -56,6 +58,7 @@ const instituteIntro = pickByLocale(
           ))}
         </div>
       </article>
+      <HomeMonolithVisual />
     </div>
   </section>
   <svg
@@ -124,6 +127,10 @@ const instituteIntro = pickByLocale(
   .landing-next-panel__inner {
     position: relative;
     z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(15rem, 0.95fr);
+    align-items: end;
+    gap: clamp(1.75rem, 4vw, 5rem);
     min-height: min(74svh, 760px);
   }
 
@@ -177,17 +184,92 @@ const instituteIntro = pickByLocale(
   }
 
   .landing-next-panel__block {
-    position: absolute;
     display: grid;
     gap: 0.95rem;
   }
 
   .landing-next-panel__block--top-right {
-    top: calc(-1rem);
-    left: 0.8rem;
-    width: min(56rem, 60vw);
+    width: min(48rem, 100%);
     text-align: left;
     justify-items: start;
+    padding-left: 50px;
+  }
+
+  :global(.landing-next-panel__visual-column) {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-right: 130px;
+    pointer-events: none;
+  }
+
+  :global(.landing-next-panel__visual-shell) {
+    position: relative;
+    width: min(100%, clamp(15rem, 28vw, 22rem));
+    aspect-ratio: 642 / 1281;
+  }
+
+  :global(.landing-next-panel__visual-base),
+  :global(.landing-next-panel__visual-binary),
+  :global(.landing-next-panel__visual-glow),
+  :global(.landing-next-panel__visual-scan) {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: url('/images/home-monolith-mask.png');
+    mask-image: url('/images/home-monolith-mask.png');
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  :global(.landing-next-panel__visual-base) {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.95) 58%, rgba(255, 255, 255, 0.89) 100%);
+    filter: drop-shadow(0 0 16px color-mix(in srgb, white 72%, transparent));
+  }
+
+  :global(.landing-next-panel__visual-binary) {
+    display: grid;
+    grid-template-columns: repeat(var(--binary-columns, 18), minmax(0, 1fr));
+    align-items: stretch;
+    gap: clamp(0.08rem, 0.2vw, 0.24rem);
+    opacity: 0.92;
+    overflow: hidden;
+    mix-blend-mode: screen;
+  }
+
+  :global(.landing-next-panel__visual-glow) {
+    display: none;
+  }
+
+  :global(.landing-next-panel__visual-scan) {
+    display: none;
+  }
+
+  :global(.landing-next-panel__binary-column) {
+    display: block;
+    align-self: stretch;
+    justify-self: center;
+    white-space: pre;
+    color: var(--stream-color, var(--color-primary));
+    opacity: var(--stream-opacity, 0.72);
+    font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: clamp(0.72rem, 0.82vw, 0.92rem);
+    line-height: 0.82;
+    letter-spacing: -0.08em;
+    text-align: center;
+    text-shadow:
+      0 0 10px color-mix(in srgb, var(--stream-color, var(--color-primary)) 80%, transparent),
+      0 0 18px color-mix(in srgb, var(--stream-color, var(--color-primary)) 36%, transparent);
+    user-select: none;
+    will-change: transform, opacity;
+    transform: translate3d(0, var(--stream-from, -20%), 0);
+    animation: landing-binary-stream var(--stream-duration, 8s) linear infinite;
+    animation-delay: var(--stream-delay, 0s);
   }
 
   .landing-shape-overlays {
@@ -202,6 +284,56 @@ const instituteIntro = pickByLocale(
 
   :global(body.theme-landing-dark .page-shell-landing) {
     padding: 0;
+  }
+
+  @keyframes landing-binary-stream {
+    from {
+      transform: translate3d(0, var(--stream-from, -20%), 0);
+    }
+
+    to {
+      transform: translate3d(0, var(--stream-to, 20%), 0);
+    }
+  }
+
+  @keyframes landing-monolith-scan {
+    0% {
+      transform: translateX(-36%);
+      opacity: 0.08;
+    }
+
+    20% {
+      opacity: 0.24;
+    }
+
+    50% {
+      opacity: 0.38;
+    }
+
+    100% {
+      transform: translateX(36%);
+      opacity: 0.08;
+    }
+  }
+
+  @keyframes landing-monolith-glow {
+    0%,
+    100% {
+      opacity: 0.16;
+    }
+
+    50% {
+      opacity: 0.32;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.landing-next-panel__visual-glow),
+    :global(.landing-next-panel__visual-scan),
+    :global(.landing-next-panel__binary-column) {
+      animation: none;
+      transform: none;
+    }
   }
 
   @media (max-width: 720px) {
@@ -223,12 +355,26 @@ const instituteIntro = pickByLocale(
     .landing-next-panel__inner {
       min-height: auto;
       display: grid;
+      grid-template-columns: 1fr;
       gap: 2rem;
     }
 
     .landing-next-panel__block {
       position: static;
       width: 100%;
+    }
+
+    .landing-next-panel__block--top-right {
+      padding-left: 0;
+    }
+
+    :global(.landing-next-panel__visual-column) {
+      justify-content: center;
+      padding-right: 0;
+    }
+
+    :global(.landing-next-panel__visual-shell) {
+      width: min(52vw, 15rem);
     }
 
     .landing-next-panel__title {
