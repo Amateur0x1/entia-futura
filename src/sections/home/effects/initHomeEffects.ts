@@ -7,6 +7,7 @@ import { getHomeCalibrationElements } from './getHomeCalibrationElements';
 import { initCalibrationSectionEffects } from './initCalibrationSectionEffects';
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
+import { initResearchTrackEffects } from './initResearchTrackEffects';
 import { initTransformSectionEffects } from './initTransformSectionEffects';
 import { revealSection } from './revealSection';
 import { setupShapeOverlayGrid } from './shapeOverlayGrid';
@@ -57,6 +58,7 @@ export const initHomeEffects = () => {
 
   initTransformSectionEffects();
   initMonolithBinaryVisuals(prefersReducedMotion);
+  initResearchTrackEffects(prefersReducedMotion);
 
   gsap.utils.toArray<Element>('[data-reveal]').forEach((section, index) => {
     revealSection(section, index);
