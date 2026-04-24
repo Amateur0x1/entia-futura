@@ -1,0 +1,63 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { siteMeta } from '../../content/site';
+import { isLocale, pickByLocale } from '../../i18n/config';
+
+const { locale } = Astro.params;
+
+if (!isLocale(locale)) {
+  throw new Error(`Unsupported locale: ${locale}`);
+}
+
+const pageTitle = pickByLocale(locale, '联系我们', 'Contact');
+const pageDescription = pickByLocale(
+  locale,
+  '联系未来人研究所。',
+  'Contact Entia Futura Institut.',
+);
+---
+
+<Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale}>
+  <main>
+    <section class="section-card contact-card">
+      <div class="section-heading">
+        <p class="eyebrow">{pickByLocale(locale, '联系', 'Contact')}</p>
+        <h1>{pickByLocale(locale, '带着问题写信给我们。', 'Write to Us with the Question.')}</h1>
+      </div>
+      <p>
+        {pickByLocale(
+          locale,
+          '告诉我们你是谁、你正在面对什么问题，以及你希望如何展开合作。',
+          'Tell us who you are, what question you are facing, and how you imagine the collaboration can begin.',
+        )}
+      </p>
+      <p class="email-row">
+        Email:
+        <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
+      </p>
+      <div class="cta-row">
+        <a class="button primary" href={`mailto:${siteMeta.email}`}>
+          {pickByLocale(locale, '发送邮件', 'Write to Us')}
+        </a>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .contact-card p {
+    margin: 0;
+    max-width: 52rem;
+    line-height: 1.9;
+    color: var(--color-text-body);
+  }
+
+  .email-row {
+    margin-top: 14px;
+  }
+
+  .email-row a {
+    margin-left: 0.4rem;
+    color: var(--color-primary);
+  }
+</style>

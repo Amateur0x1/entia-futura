@@ -1,5 +1,5 @@
 ---
-import { navItems, siteMeta } from '../content/site';
+import { siteMeta } from '../content/site';
 import { getLocaleFromPath, pickByLocale, toLocalePath, type Locale } from '../i18n/config';
 
 interface Props {
@@ -20,7 +20,10 @@ const currentPath = Astro.url.pathname;
 const activeLocale = locale ?? getLocaleFromPath(currentPath);
 const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : currentPath;
 const htmlLang = activeLocale === 'en' ? 'en' : 'zh-CN';
-const primaryNavItems = navItems.filter((item) => item.href !== '/publications').slice(0, 4);
+const navLinks = [
+  { href: '/', zh: '首页', en: 'Home' },
+  { href: '/contact', zh: '联系', en: 'Contact' },
+];
 ---
 
 <!doctype html>
@@ -41,8 +44,8 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     <meta property="og:url" content={`${siteMeta.siteUrl}${currentPath}`} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={`${siteMeta.siteUrl}/brand/entia-logo-cutout.png`} />
-    {activeLocale && <link rel="alternate" hrefLang="zh-CN" href={`${siteMeta.siteUrl}${toLocalePath('zh', currentPath)}`} />}
-    {activeLocale && <link rel="alternate" hrefLang="en" href={`${siteMeta.siteUrl}${toLocalePath('en', currentPath)}`} />}
+    {activeLocale && <link rel="alternate" hreflang="zh-CN" href={`${siteMeta.siteUrl}${toLocalePath('zh', currentPath)}`} />}
+    {activeLocale && <link rel="alternate" hreflang="en" href={`${siteMeta.siteUrl}${toLocalePath('en', currentPath)}`} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#05070B" />
   </head>
@@ -57,7 +60,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
             </div>
           </a>
           <nav class="nav">
-            {primaryNavItems.map((item) => (
+            {navLinks.map((item) => (
               <a
                 class:list={['nav-link', { active: localizedPath === (activeLocale ? toLocalePath(activeLocale, item.href) : item.href) }]}
                 href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}
@@ -93,7 +96,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
             <p>{siteMeta.oneLineEn}</p>
           </div>
           <nav class="footer-nav">
-            {navItems.slice(1).map((item) => (
+            {navLinks.map((item) => (
               <a href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}>
                 {activeLocale ? pickByLocale(activeLocale, item.zh, item.en) : item.zh}
               </a>
@@ -103,9 +106,6 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
             <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
             <a href={activeLocale ? toLocalePath(activeLocale, '/contact') : '/contact'}>
               {pickByLocale(activeLocale ?? 'zh', '联系方式', 'Contact')}
-            </a>
-            <a href={activeLocale ? toLocalePath(activeLocale, '/privacy') : '/privacy'}>
-              {pickByLocale(activeLocale ?? 'zh', '隐私政策', 'Privacy Policy')}
             </a>
             <a href={siteMeta.siteUrl} target="_blank" rel="noreferrer">entiafutura.com</a>
           </div>

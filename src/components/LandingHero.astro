@@ -69,10 +69,10 @@ const { locale = 'zh' } = Astro.props;
   const sheenButtons = Array.from(document.querySelectorAll('.floating-sheen-button')).filter(
     (button) => button instanceof HTMLElement,
   );
-  const resetSheen = (button) => {
+  const resetSheen = (button: HTMLElement) => {
     button.classList.remove('is-sheen-entering', 'is-sheen-leaving');
   };
-  const restartSheen = (button, className) => {
+  const restartSheen = (button: HTMLElement, className: string) => {
     resetSheen(button);
     void button.offsetWidth;
     button.classList.add(className);
@@ -94,7 +94,7 @@ const { locale = 'zh' } = Astro.props;
     });
   });
 
-  const getAnimatedTextNodes = (button) =>
+  const getAnimatedTextNodes = (button: Element) =>
     Array.from(button.querySelectorAll('[data-brand-animated-text]')).filter((node) => node instanceof HTMLElement);
 
   if (!prefersReducedMotion) {
@@ -145,7 +145,7 @@ const { locale = 'zh' } = Astro.props;
     };
     */
 
-    const playTextRotate = (elements, delay = 0) => {
+    const playTextRotate = (elements: HTMLElement[], delay = 0) => {
       if (elements.length === 0) {
         return;
       }
@@ -187,7 +187,7 @@ const { locale = 'zh' } = Astro.props;
       playTextRotate(logoTextNodes);
     };
 
-    const getMoreFillMetrics = (button, originX, originY) => {
+    const getMoreFillMetrics = (button: HTMLElement, originX: number, originY: number) => {
       const { width, height } = button.getBoundingClientRect();
       const maxX = Math.max(originX, width - originX);
       const maxY = Math.max(originY, height - originY);
@@ -201,13 +201,13 @@ const { locale = 'zh' } = Astro.props;
     };
     const moreFillStartScale = 0.016;
 
-    const setMoreFilled = (filled) => {
+    const setMoreFilled = (filled: boolean) => {
       if (moreButton instanceof HTMLElement) {
         moreButton.classList.toggle('is-more-filled', filled);
       }
     };
 
-    const expandMoreFill = (originX, originY) => {
+    const expandMoreFill = (originX: number, originY: number) => {
       if (!(moreButton instanceof HTMLElement) || !(moreFill instanceof HTMLElement)) {
         return;
       }
@@ -249,13 +249,13 @@ const { locale = 'zh' } = Astro.props;
       });
     };
 
-    const setContactFilled = (filled) => {
+    const setContactFilled = (filled: boolean) => {
       if (contactButton instanceof HTMLElement) {
         contactButton.classList.toggle('is-more-filled', filled);
       }
     };
 
-    const expandContactFill = (originX, originY) => {
+    const expandContactFill = (originX: number, originY: number) => {
       if (!(contactButton instanceof HTMLElement) || !(contactFill instanceof HTMLElement)) {
         return;
       }
@@ -316,7 +316,7 @@ const { locale = 'zh' } = Astro.props;
     });
 
     if (brandCluster instanceof HTMLElement) {
-      const setClusterActive = (active) => {
+      const setClusterActive = (active: boolean) => {
         brandCluster.classList.toggle('is-cluster-active', active);
       };
 
@@ -326,13 +326,11 @@ const { locale = 'zh' } = Astro.props;
 
       brandCluster.addEventListener('pointerleave', () => {
         setClusterActive(false);
-        // playClusterSheen('is-sheen-leaving');
       });
 
       brandCluster.addEventListener('focusin', () => {
         if (!brandCluster.classList.contains('is-cluster-active')) {
           setClusterActive(true);
-          // playClusterSheen('is-sheen-entering');
         }
       });
 
@@ -344,7 +342,6 @@ const { locale = 'zh' } = Astro.props;
         }
 
         setClusterActive(false);
-        // playClusterSheen('is-sheen-leaving');
       });
     }
 
