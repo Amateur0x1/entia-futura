@@ -30,9 +30,6 @@ const instituteIntro = pickByLocale(
   <main class="landing-main">
     <OrbitLanding locale={locale} />
     <section class="landing-next-panel" data-next-panel>
-      <div class="landing-next-panel__media" aria-hidden="true">
-        <img src="/images/howtoexist.png" alt="" loading="lazy" decoding="async" />
-      </div>
       <div class="landing-next-panel__inner" data-next-panel-inner>
         <article class="landing-next-panel__block landing-next-panel__block--top-right">
           <p class="landing-next-panel__label">{coreQuestionLabel}</p>
@@ -47,9 +44,6 @@ const instituteIntro = pickByLocale(
     </section>
   </main>
   <section class="landing-next-preview" data-next-preview aria-hidden="true">
-    <div class="landing-next-panel__media" aria-hidden="true">
-      <img src="/images/howtoexist.png" alt="" loading="lazy" decoding="async" />
-    </div>
     <div class="landing-next-panel__inner landing-next-preview__inner" data-next-preview-inner>
       <article class="landing-next-panel__block landing-next-panel__block--top-right">
         <p class="landing-next-panel__label">{coreQuestionLabel}</p>
@@ -100,7 +94,7 @@ const instituteIntro = pickByLocale(
     min-height: 100svh;
     margin-inline: calc(50% - 50vw);
     width: 100vw;
-    padding: clamp(5rem, 12vw, 9rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
+    padding: clamp(3.6rem, 9vw, 6.4rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
     background: var(--color-background);
     color: var(--color-secondary-foreground);
     overflow: clip;
@@ -112,7 +106,7 @@ const instituteIntro = pickByLocale(
     z-index: 45;
     display: grid;
     align-items: end;
-    padding: clamp(5rem, 12vw, 9rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
+    padding: clamp(3.6rem, 9vw, 6.4rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
     background: var(--color-background);
     color: var(--color-secondary-foreground);
     pointer-events: none;
@@ -122,35 +116,6 @@ const instituteIntro = pickByLocale(
 
   .landing-next-preview__inner {
     width: 100%;
-  }
-
-  .landing-next-panel__media {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .landing-next-panel__media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 72% center;
-    display: block;
-  }
-
-  .landing-next-panel__media::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-background) 90%, transparent) 0%,
-      color-mix(in srgb, var(--color-background) 74%, transparent) 34%,
-      color-mix(in srgb, var(--color-background) 42%, transparent) 52%,
-      transparent 68%
-    );
   }
 
   .landing-next-panel__inner {
@@ -210,7 +175,7 @@ const instituteIntro = pickByLocale(
   }
 
   .landing-next-panel__block--top-right {
-    top: -0.2rem;
+    top: calc(-1rem);
     left: 0.8rem;
     width: min(56rem, 60vw);
     text-align: left;

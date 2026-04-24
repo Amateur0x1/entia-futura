@@ -193,6 +193,7 @@
   const nextPanelInner = nextPanel?.querySelector('[data-next-panel-inner]');
   const nextPreview = document.querySelector('[data-next-preview]');
   const nextPreviewInner = nextPreview?.querySelector('[data-next-preview-inner]');
+  const knowMoreButton = document.querySelector('[data-know-more-button]');
   const shapeOverlay = document.querySelector('[data-shape-overlay]');
   const shapeOverlayNamespace = 'http://www.w3.org/2000/svg';
   const primaryVisual =
@@ -405,6 +406,33 @@
           },
         });
 
+        let knowMoreTrigger: ScrollTrigger | null = null;
+        if (knowMoreButton instanceof HTMLElement && nextPanel instanceof HTMLElement) {
+          knowMoreTrigger = ScrollTrigger.create({
+            trigger: nextPanel,
+            start: 'top 92%',
+            end: 'bottom top',
+            onEnter: () => {
+              gsap.to(knowMoreButton, {
+                autoAlpha: 0,
+                y: 10,
+                duration: 0.24,
+                ease: 'power2.out',
+                pointerEvents: 'none',
+              });
+            },
+            onLeaveBack: () => {
+              gsap.to(knowMoreButton, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.24,
+                ease: 'power2.out',
+                pointerEvents: 'auto',
+              });
+            },
+          });
+        }
+
         heroTimeline
           .to(
             primaryVisual,
@@ -567,6 +595,7 @@
 
         return () => {
           heroTimeline.kill();
+          knowMoreTrigger?.kill();
         };
       });
     };
