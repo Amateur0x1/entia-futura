@@ -17,12 +17,12 @@ const pageDescription = pickByLocale(
   '一个以轨道档案为视觉母题的研究所首页：问题被重新编目，研究通过横向转译链进入现实。',
   'An institute homepage built around an orbital archive: questions are re-indexed and research enters reality through a horizontal chain of translation.',
 );
-const nextPanelEyebrow = pickByLocale(locale, '下一屏', 'Next Screen');
-const nextPanelTitle = pickByLocale(locale, '当影像闭合，研究开始显影。', 'When the image closes, research comes into view.');
-const nextPanelBody = pickByLocale(
+const coreQuestionLabel = pickByLocale(locale, '核心问题：', 'Core Question:');
+const coreQuestion = pickByLocale(locale, '未来我们将如何存在？', 'How will we exist in the future?');
+const instituteIntro = pickByLocale(
   locale,
-  '这一屏先作为过渡场，承接首页视频结束后的形态变化。下一步可以在这里接入正式的栏目、叙事或内容编排。',
-  'This panel acts as the receiving field after the landing video finishes. It can later become the real second screen for content, navigation, or narrative structure.',
+  '未来人研究所是一个围绕“未来我们将如何存在？”这一核心问题展开工作的独立研究机构。我们以高等研究为基础，同时强调研究向现实问题、合作机制、未来项目与社会实验的持续转化。\n我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。',
+  'Entia Futura is an independent research institute centered on one core question: how will we exist in the future? We are grounded in advanced research while emphasizing continuous translation into real-world issues, collaboration mechanisms, future projects, and social experiments. We are concerned not only with how technology will change the world, but with how we will learn, work, live, connect, create, and reorganize knowledge, space, and community in an era of technological upheaval and social reconfiguration.',
 );
 ---
 
@@ -30,18 +30,36 @@ const nextPanelBody = pickByLocale(
   <main class="landing-main">
     <OrbitLanding locale={locale} />
     <section class="landing-next-panel" data-next-panel>
+      <div class="landing-next-panel__media" aria-hidden="true">
+        <img src="/images/howtoexist.png" alt="" loading="lazy" decoding="async" />
+      </div>
       <div class="landing-next-panel__inner" data-next-panel-inner>
-        <p class="landing-next-panel__eyebrow">{nextPanelEyebrow}</p>
-        <h2 class="landing-next-panel__title">{nextPanelTitle}</h2>
-        <p class="landing-next-panel__body">{nextPanelBody}</p>
+        <article class="landing-next-panel__block landing-next-panel__block--top-right">
+          <p class="landing-next-panel__label">{coreQuestionLabel}</p>
+          <h2 class="landing-next-panel__title">{coreQuestion}</h2>
+          <div class="landing-next-panel__body">
+            {instituteIntro.split('\n').map((paragraph) => (
+              <p class="landing-next-panel__paragraph">{paragraph}</p>
+            ))}
+          </div>
+        </article>
       </div>
     </section>
   </main>
   <section class="landing-next-preview" data-next-preview aria-hidden="true">
+    <div class="landing-next-panel__media" aria-hidden="true">
+      <img src="/images/howtoexist.png" alt="" loading="lazy" decoding="async" />
+    </div>
     <div class="landing-next-panel__inner landing-next-preview__inner" data-next-preview-inner>
-      <p class="landing-next-panel__eyebrow">{nextPanelEyebrow}</p>
-      <h2 class="landing-next-panel__title">{nextPanelTitle}</h2>
-      <p class="landing-next-panel__body">{nextPanelBody}</p>
+      <article class="landing-next-panel__block landing-next-panel__block--top-right">
+        <p class="landing-next-panel__label">{coreQuestionLabel}</p>
+        <h2 class="landing-next-panel__title">{coreQuestion}</h2>
+        <div class="landing-next-panel__body">
+          {instituteIntro.split('\n').map((paragraph) => (
+            <p class="landing-next-panel__paragraph">{paragraph}</p>
+          ))}
+        </div>
+      </article>
     </div>
   </section>
   <svg
@@ -80,9 +98,12 @@ const nextPanelBody = pickByLocale(
   .landing-next-panel {
     position: relative;
     min-height: 100svh;
+    margin-inline: calc(50% - 50vw);
+    width: 100vw;
     padding: clamp(5rem, 12vw, 9rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
     background: var(--color-background);
     color: var(--color-secondary-foreground);
+    overflow: clip;
   }
 
   .landing-next-preview {
@@ -96,44 +117,104 @@ const nextPanelBody = pickByLocale(
     color: var(--color-secondary-foreground);
     pointer-events: none;
     visibility: hidden;
+    overflow: clip;
   }
 
   .landing-next-preview__inner {
     width: 100%;
   }
 
+  .landing-next-panel__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .landing-next-panel__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 72% center;
+    display: block;
+  }
+
+  .landing-next-panel__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-background) 90%, transparent) 0%,
+      color-mix(in srgb, var(--color-background) 74%, transparent) 34%,
+      color-mix(in srgb, var(--color-background) 42%, transparent) 52%,
+      transparent 68%
+    );
+  }
+
   .landing-next-panel__inner {
     position: relative;
     z-index: 1;
-    display: grid;
-    gap: 1.1rem;
-    max-width: 720px;
-  }
-
-  .landing-next-panel__eyebrow {
-    margin: 0;
-    font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
-    font-size: 0.82rem;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 68%, transparent);
+    min-height: min(74svh, 760px);
   }
 
   .landing-next-panel__title {
     margin: 0;
-    max-width: 14ch;
-    font-size: clamp(2.4rem, 6vw, 5.4rem);
-    line-height: 0.95;
+    max-width: 18ch;
+    font-size: clamp(2.6rem, 6.4vw, 5.6rem);
+    line-height: 1.05;
     letter-spacing: -0.04em;
     font-weight: 500;
   }
 
+  .landing-next-panel__label {
+    margin: 0;
+    font-size: clamp(2.6rem, 6.4vw, 5.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+    color: var(--color-secondary-foreground);
+  }
+
   .landing-next-panel__body {
     margin: 0;
-    max-width: 34rem;
-    font-size: clamp(1rem, 1.6vw, 1.2rem);
-    line-height: 1.7;
+    max-width: 42rem;
+    font-size: clamp(1.22rem, 1.75vw, 1.44rem);
+    line-height: 1.74;
     color: color-mix(in srgb, var(--color-secondary-foreground) 84%, transparent);
+  }
+
+  .landing-next-panel__paragraph {
+    margin: 0;
+  }
+
+  .landing-next-panel__paragraph + .landing-next-panel__paragraph {
+    margin-top: 20px;
+  }
+
+  .landing-next-panel__body::before {
+    content: '';
+    display: block;
+    width: min(10rem, 28vw);
+    height: 1px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    background: color-mix(in srgb, white 92%, transparent);
+  }
+
+  .landing-next-panel__block {
+    position: absolute;
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .landing-next-panel__block--top-right {
+    top: -0.2rem;
+    left: 0.8rem;
+    width: min(56rem, 60vw);
+    text-align: left;
+    justify-items: start;
   }
 
   .landing-shape-overlays {
@@ -163,6 +244,17 @@ const nextPanelBody = pickByLocale(
       padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
         max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
       padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
+    }
+
+    .landing-next-panel__inner {
+      min-height: auto;
+      display: grid;
+      gap: 2rem;
+    }
+
+    .landing-next-panel__block {
+      position: static;
+      width: 100%;
     }
 
     .landing-next-panel__title {

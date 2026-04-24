@@ -259,8 +259,8 @@
         rect.setAttribute('y', `${row * cellHeight + gap / 2}`);
         rect.setAttribute('width', `${cellWidth - gap + 0.2}`);
         rect.setAttribute('height', `${cellHeight - gap + 0.2}`);
-        rect.setAttribute('rx', '1.6');
-        rect.setAttribute('ry', '1.6');
+        rect.setAttribute('rx', '0');
+        rect.setAttribute('ry', '0');
         rect.setAttribute('fill', 'url(#shape-overlay-accent-gradient)');
         rect.setAttribute('fill-opacity', '1');
         rect.dataset.shapeCellIndex = `${row * shapeGridCols + col}`;
@@ -472,7 +472,7 @@
           shapeGridCells.length > 0
         ) {
           // Keep transition locked to the end of scroll-video playback.
-          const shapeOverlayStart = transitionStartAtVideoEnd;
+          const shapeOverlayStart = transitionStartAtVideoEnd + 0.58;
           const shapeOverlayDuration = 1.12;
           const previewSwapStart = shapeOverlayStart + shapeOverlayDuration * 0.3;
           const previewRevealStart = shapeOverlayStart + shapeOverlayDuration * 0.42;
