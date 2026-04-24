@@ -223,11 +223,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     --effect-pressed-overlay: var(--palette-pressed-overlay);
 
     /* Composed tokens */
-    --gradient-page:
-      radial-gradient(circle at 18% 12%, var(--effect-glow-primary), transparent 24rem),
-      radial-gradient(circle at 82% 14%, var(--effect-glow-secondary), transparent 22rem),
-      radial-gradient(circle at 62% 72%, var(--color-atmosphere-secondary), transparent 26rem),
-      linear-gradient(180deg, var(--color-background) 0%, var(--color-background-strong) 100%);
+    --gradient-page: linear-gradient(180deg, var(--color-background) 0%, var(--color-background-strong) 100%);
     --gradient-atmosphere-primary:
       radial-gradient(circle, var(--effect-glow-primary) 0%, color-mix(in srgb, var(--color-primary) 16%, transparent) 58%, rgba(0, 229, 255, 0) 78%);
     --gradient-atmosphere-secondary:

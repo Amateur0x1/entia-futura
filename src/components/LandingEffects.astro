@@ -432,9 +432,9 @@
           shapeOverlay instanceof SVGSVGElement
         ) {
           const shapeOverlayStart = 0.84;
-          const shapeOverlayDuration = 0.64;
-          const previewSwapStart = shapeOverlayStart + shapeOverlayDuration * 0.74;
-          const previewRevealStart = shapeOverlayStart + shapeOverlayDuration * 0.82;
+          const shapeOverlayDuration = 0.8;
+          const previewSwapStart = shapeOverlayStart + shapeOverlayDuration * 0.34;
+          const previewRevealStart = shapeOverlayStart + shapeOverlayDuration * 0.4;
 
           heroTimeline
             .set(
@@ -476,7 +476,7 @@
               {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.18,
+                duration: 0.34,
                 ease: 'power3.out',
               },
               previewRevealStart,
