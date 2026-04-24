@@ -194,55 +194,86 @@
   const nextPreview = document.querySelector('[data-next-preview]');
   const nextPreviewInner = nextPreview?.querySelector('[data-next-preview-inner]');
   const shapeOverlay = document.querySelector('[data-shape-overlay]');
-  const shapeOverlayPaths = shapeOverlay?.querySelectorAll('.shape-overlays__path');
+  const shapeOverlayNamespace = 'http://www.w3.org/2000/svg';
   const primaryVisual =
     portalShell instanceof HTMLElement
       ? portalShell
       : heroVideoShell instanceof HTMLElement
         ? heroVideoShell
         : null;
-  const numShapePoints = 10;
-  const shapePaths =
-    shapeOverlayPaths ? Array.from(shapeOverlayPaths).filter((path) => path instanceof SVGPathElement) : [];
-  const shapeState = { progress: 0 };
-  const shapeEase = gsap.parseEase('power2.inOut');
-  const coverDelayPerPath = 0.05;
-  const coverDelayPointsMax = 0.12;
-  const coverPointSpan = 0.4;
-  const coverDelays = shapePaths.map((_, pathIndex) =>
-    Array.from({ length: numShapePoints }, () => pathIndex * coverDelayPerPath + Math.random() * coverDelayPointsMax),
-  );
+  const shapeGridRows = 4;
+  const shapeGridCols = 6;
+  const shapeGridCells: SVGRectElement[] = [];
+  const shapeDirections = ['left', 'right', 'top', 'bottom'] as const;
 
-  const buildCoverPath = (points) => {
-    let d = `M 0 0 V ${points[0]} C`;
-
-    for (let pointIndex = 0; pointIndex < numShapePoints - 1; pointIndex++) {
-      const position = ((pointIndex + 1) / (numShapePoints - 1)) * 100;
-      const controlPoint = position - (100 / (numShapePoints - 1)) / 2;
-      d += ` ${controlPoint} ${points[pointIndex]} ${controlPoint} ${points[pointIndex + 1]} ${position} ${points[pointIndex + 1]}`;
-    }
-
-    d += ' V 100 H 0';
-    return d;
-  };
-
-  const getPointValue = (progress, delay, span) => {
-    const normalized = gsap.utils.clamp(0, 1, (progress - delay) / span);
-    return 100 - shapeEase(normalized) * 100;
-  };
-
-  const renderShapeOverlay = () => {
-    if (shapePaths.length === 0) {
+  const setupShapeOverlayGrid = () => {
+    if (!(shapeOverlay instanceof SVGSVGElement)) {
       return;
     }
 
-    shapePaths.forEach((path, index) => {
-      const points = coverDelays[index].map((delay) => getPointValue(shapeState.progress, delay, coverPointSpan));
-      path.setAttribute('d', buildCoverPath(points));
-    });
+    shapeOverlay.innerHTML = '';
+    shapeGridCells.length = 0;
+
+    shapeOverlay.setAttribute('viewBox', '0 0 100 100');
+    shapeOverlay.setAttribute('preserveAspectRatio', 'none');
+
+    const defs = document.createElementNS(shapeOverlayNamespace, 'defs');
+    const gradient = document.createElementNS(shapeOverlayNamespace, 'linearGradient');
+    gradient.setAttribute('id', 'shape-overlay-accent-gradient');
+    gradient.setAttribute('x1', '0%');
+    gradient.setAttribute('y1', '0%');
+    gradient.setAttribute('x2', '100%');
+    gradient.setAttribute('y2', '100%');
+
+    const startStop = document.createElementNS(shapeOverlayNamespace, 'stop');
+    startStop.setAttribute('offset', '0%');
+    startStop.setAttribute('stop-color', 'var(--color-background)');
+    startStop.setAttribute('stop-opacity', '1');
+
+    const midStop = document.createElementNS(shapeOverlayNamespace, 'stop');
+    midStop.setAttribute('offset', '58%');
+    midStop.setAttribute('stop-color', 'var(--color-background)');
+    midStop.setAttribute('stop-opacity', '1');
+
+    const endStop = document.createElementNS(shapeOverlayNamespace, 'stop');
+    endStop.setAttribute('offset', '100%');
+    endStop.setAttribute('stop-color', 'var(--color-background)');
+    endStop.setAttribute('stop-opacity', '1');
+
+    gradient.append(startStop, midStop, endStop);
+    defs.appendChild(gradient);
+    shapeOverlay.appendChild(defs);
+
+    const cellsGroup = document.createElementNS(shapeOverlayNamespace, 'g');
+    cellsGroup.setAttribute('data-shape-grid-cells', '');
+    shapeOverlay.appendChild(cellsGroup);
+
+    const cellWidth = 100 / shapeGridCols;
+    const cellHeight = 100 / shapeGridRows;
+    const gap = 0;
+
+    for (let row = 0; row < shapeGridRows; row++) {
+      for (let col = 0; col < shapeGridCols; col++) {
+        const rect = document.createElementNS(shapeOverlayNamespace, 'rect');
+        rect.setAttribute('x', `${col * cellWidth + gap / 2}`);
+        rect.setAttribute('y', `${row * cellHeight + gap / 2}`);
+        rect.setAttribute('width', `${cellWidth - gap + 0.2}`);
+        rect.setAttribute('height', `${cellHeight - gap + 0.2}`);
+        rect.setAttribute('rx', '1.6');
+        rect.setAttribute('ry', '1.6');
+        rect.setAttribute('fill', 'url(#shape-overlay-accent-gradient)');
+        rect.setAttribute('fill-opacity', '1');
+        rect.dataset.shapeCellIndex = `${row * shapeGridCols + col}`;
+        rect.dataset.shapeDirection = shapeDirections[Math.floor(Math.random() * shapeDirections.length)];
+        rect.dataset.shapeDelay = `${Math.random() * 0.24}`;
+        rect.dataset.shapeDuration = `${0.3 + Math.random() * 0.28}`;
+        cellsGroup.appendChild(rect);
+        shapeGridCells.push(rect);
+      }
+    }
   };
 
-  renderShapeOverlay();
+  setupShapeOverlayGrid();
 
   const hideHeroVideoLoading = () => {
     if (!(heroVideoLoading instanceof HTMLElement)) {
@@ -437,13 +468,33 @@
           !prefersReducedMotion &&
           nextPreview instanceof HTMLElement &&
           nextPreviewInner instanceof HTMLElement &&
-          shapeOverlay instanceof SVGSVGElement
+          shapeOverlay instanceof SVGSVGElement &&
+          shapeGridCells.length > 0
         ) {
           // Keep transition locked to the end of scroll-video playback.
           const shapeOverlayStart = transitionStartAtVideoEnd;
           const shapeOverlayDuration = 1.12;
           const previewSwapStart = shapeOverlayStart + shapeOverlayDuration * 0.3;
           const previewRevealStart = shapeOverlayStart + shapeOverlayDuration * 0.42;
+
+          gsap.set(shapeGridCells, {
+            autoAlpha: 1,
+            scaleX: (_index, target) => {
+              const direction = (target as SVGRectElement).dataset.shapeDirection;
+              return direction === 'left' || direction === 'right' ? 0 : 1.05;
+            },
+            scaleY: (_index, target) => {
+              const direction = (target as SVGRectElement).dataset.shapeDirection;
+              return direction === 'top' || direction === 'bottom' ? 0 : 1.05;
+            },
+            transformOrigin: (_index, target) => {
+              const direction = (target as SVGRectElement).dataset.shapeDirection;
+              if (direction === 'right') return 'right center';
+              if (direction === 'top') return 'center top';
+              if (direction === 'bottom') return 'center bottom';
+              return 'left center';
+            },
+          });
 
           heroTimeline
             .set(
@@ -460,15 +511,37 @@
               },
               previewSwapStart,
             )
-            .to(
-              shapeState,
+            .fromTo(
+              shapeGridCells,
               {
-                progress: 1,
-                duration: shapeOverlayDuration,
-                ease: 'none',
-                onUpdate: renderShapeOverlay,
+                scaleX: (_index, target) => {
+                  const direction = (target as SVGRectElement).dataset.shapeDirection;
+                  return direction === 'left' || direction === 'right' ? 0 : 1.05;
+                },
+                scaleY: (_index, target) => {
+                  const direction = (target as SVGRectElement).dataset.shapeDirection;
+                  return direction === 'top' || direction === 'bottom' ? 0 : 1.05;
+                },
+              },
+              {
+                scaleX: 1,
+                scaleY: 1.05,
+                duration: (_index, target) =>
+                  Math.min(Number((target as SVGRectElement).dataset.shapeDuration ?? 0.4), shapeOverlayDuration * 0.72),
+                delay: (_index, target) =>
+                  Math.min(Number((target as SVGRectElement).dataset.shapeDelay ?? 0), shapeOverlayDuration * 0.26),
+                ease: 'power2.out',
               },
               shapeOverlayStart,
+            )
+            .to(
+              shapeOverlay,
+              {
+                autoAlpha: 0,
+                duration: 0.01,
+                ease: 'none',
+              },
+              shapeOverlayStart + shapeOverlayDuration * 0.82,
             )
             .to(
               notes,
