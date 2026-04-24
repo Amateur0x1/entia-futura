@@ -29,7 +29,18 @@ export const initResearchTrackEffects = (prefersReducedMotion: boolean) => {
     scrollTrigger: {
       trigger: track,
       start: 'top 98%',
-      toggleActions: 'play none none reset',
+      end: 'top 56%',
+      scrub: true,
+      onLeaveBack: () => {
+        if (!nextPreview) return;
+        gsap.set(nextPreview, {
+          autoAlpha: 1,
+          scale: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          visibility: 'visible',
+        });
+      },
     },
   });
 
@@ -77,10 +88,11 @@ export const initResearchTrackEffects = (prefersReducedMotion: boolean) => {
   ScrollTrigger.create({
     trigger: track,
     start: 'top 98%',
-    end: 'bottom top',
+    end: 'top 56%',
+    scrub: true,
     onUpdate: ({ progress }) => {
       if (!nextPreview) return;
-      gsap.set(nextPreview, { visibility: progress > 0.02 ? 'hidden' : 'visible' });
+      gsap.set(nextPreview, { visibility: progress > 0.98 ? 'hidden' : 'visible' });
     },
   });
 };
