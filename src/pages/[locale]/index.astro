@@ -234,12 +234,16 @@ const instituteIntro = pickByLocale(
 
   :global(.landing-next-panel__visual-binary) {
     display: grid;
-    grid-template-columns: repeat(var(--binary-columns, 18), minmax(0, 1fr));
-    align-items: stretch;
-    gap: clamp(0.08rem, 0.2vw, 0.24rem);
-    opacity: 0.92;
+    place-items: stretch;
+    opacity: 0.9;
     overflow: hidden;
-    mix-blend-mode: screen;
+    mix-blend-mode: multiply;
+  }
+
+  :global(.landing-next-panel__binary-canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   :global(.landing-next-panel__visual-glow) {
@@ -248,28 +252,6 @@ const instituteIntro = pickByLocale(
 
   :global(.landing-next-panel__visual-scan) {
     display: none;
-  }
-
-  :global(.landing-next-panel__binary-column) {
-    display: block;
-    align-self: stretch;
-    justify-self: center;
-    white-space: pre;
-    color: var(--stream-color, var(--color-primary));
-    opacity: var(--stream-opacity, 0.72);
-    font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    font-size: clamp(0.72rem, 0.82vw, 0.92rem);
-    line-height: 0.82;
-    letter-spacing: -0.08em;
-    text-align: center;
-    text-shadow:
-      0 0 10px color-mix(in srgb, var(--stream-color, var(--color-primary)) 80%, transparent),
-      0 0 18px color-mix(in srgb, var(--stream-color, var(--color-primary)) 36%, transparent);
-    user-select: none;
-    will-change: transform, opacity;
-    transform: translate3d(0, var(--stream-from, -20%), 0);
-    animation: landing-binary-stream var(--stream-duration, 8s) linear infinite;
-    animation-delay: var(--stream-delay, 0s);
   }
 
   .landing-shape-overlays {
@@ -284,16 +266,6 @@ const instituteIntro = pickByLocale(
 
   :global(body.theme-landing-dark .page-shell-landing) {
     padding: 0;
-  }
-
-  @keyframes landing-binary-stream {
-    from {
-      transform: translate3d(0, var(--stream-from, -20%), 0);
-    }
-
-    to {
-      transform: translate3d(0, var(--stream-to, 20%), 0);
-    }
   }
 
   @keyframes landing-monolith-scan {
@@ -330,7 +302,7 @@ const instituteIntro = pickByLocale(
   @media (prefers-reduced-motion: reduce) {
     :global(.landing-next-panel__visual-glow),
     :global(.landing-next-panel__visual-scan),
-    :global(.landing-next-panel__binary-column) {
+    :global(.landing-next-panel__binary-canvas) {
       animation: none;
       transform: none;
     }
