@@ -44,69 +44,73 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     {activeLocale && <link rel="alternate" hrefLang="zh-CN" href={`${siteMeta.siteUrl}${toLocalePath('zh', currentPath)}`} />}
     {activeLocale && <link rel="alternate" hrefLang="en" href={`${siteMeta.siteUrl}${toLocalePath('en', currentPath)}`} />}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#090907" />
+    <meta name="theme-color" content="#05070B" />
   </head>
   <body class:list={{ 'theme-landing-dark': theme === 'landing-dark' }}>
     <div class:list={['page-shell', { 'page-shell-landing': theme === 'landing-dark' }]}>
-      <header class:list={['site-header', { 'site-header-landing': theme === 'landing-dark' }]}>
-        <a class="brand" href={activeLocale ? toLocalePath(activeLocale, '/') : '/'}>
-          <div class="brand-copy">
-            <span class="brand-zh">{siteMeta.zhName}</span>
-            <span class="brand-en">{siteMeta.enName}</span>
-          </div>
-        </a>
-        <nav class="nav">
-          {primaryNavItems.map((item) => (
-            <a
-              class:list={['nav-link', { active: localizedPath === (activeLocale ? toLocalePath(activeLocale, item.href) : item.href) }]}
-              href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}
-            >
-              {
-                activeLocale ? (
-                  <span>{pickByLocale(activeLocale, item.zh, item.en)}</span>
-                ) : (
-                  <>
-                    <span>{item.zh}</span>
-                    <small>{item.en}</small>
-                  </>
-                )
-              }
-            </a>
-          ))}
-        </nav>
-      </header>
+      {theme !== 'landing-dark' && (
+        <header class="site-header">
+          <a class="brand" href={activeLocale ? toLocalePath(activeLocale, '/') : '/'}>
+            <div class="brand-copy">
+              <span class="brand-zh">{siteMeta.zhName}</span>
+              <span class="brand-en">{siteMeta.enName}</span>
+            </div>
+          </a>
+          <nav class="nav">
+            {primaryNavItems.map((item) => (
+              <a
+                class:list={['nav-link', { active: localizedPath === (activeLocale ? toLocalePath(activeLocale, item.href) : item.href) }]}
+                href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}
+              >
+                {
+                  activeLocale ? (
+                    <span>{pickByLocale(activeLocale, item.zh, item.en)}</span>
+                  ) : (
+                    <>
+                      <span>{item.zh}</span>
+                      <small>{item.en}</small>
+                    </>
+                  )
+                }
+              </a>
+            ))}
+          </nav>
+        </header>
+      )}
       <slot />
-      <footer class:list={['site-footer', { 'site-footer-landing': theme === 'landing-dark' }]}>
-        <div class="footer-brand">
-          <p>{siteMeta.zhName}</p>
-          <p>{siteMeta.enName}</p>
-          <p>{siteMeta.enSubtitle}</p>
-          <p>© {new Date().getFullYear()} Entia Futura Institut</p>
-        </div>
-        <div class="footer-statement">
-          <p>{siteMeta.coreQuestionZh}</p>
-          <p>{siteMeta.coreQuestionEn}</p>
-          <p>{siteMeta.oneLineZh}</p>
-          <p>{siteMeta.oneLineEn}</p>
-        </div>
-        <nav class="footer-nav">
-          {navItems.slice(1).map((item) => (
-            <a href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}>
-              {activeLocale ? pickByLocale(activeLocale, item.zh, item.en) : item.zh}
+      {theme !== 'landing-dark' && (
+        <footer class="site-footer">
+          <div class="footer-brand">
+            <p>{siteMeta.zhName}</p>
+            <p>{siteMeta.enName}</p>
+            <p>{siteMeta.enSubtitle}</p>
+            <p>© {new Date().getFullYear()} Entia Futura Institut</p>
+          </div>
+          <div class="footer-statement">
+            <p>{siteMeta.coreQuestionZh}</p>
+            <p>{siteMeta.coreQuestionEn}</p>
+            <p>{siteMeta.oneLineZh}</p>
+            <p>{siteMeta.oneLineEn}</p>
+          </div>
+          <nav class="footer-nav">
+            {navItems.slice(1).map((item) => (
+              <a href={activeLocale ? toLocalePath(activeLocale, item.href) : item.href}>
+                {activeLocale ? pickByLocale(activeLocale, item.zh, item.en) : item.zh}
+              </a>
+            ))}
+          </nav>
+          <div class="footer-meta">
+            <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
+            <a href={activeLocale ? toLocalePath(activeLocale, '/contact') : '/contact'}>
+              {pickByLocale(activeLocale ?? 'zh', '联系方式', 'Contact')}
             </a>
-          ))}
-        </nav>
-        <div class="footer-meta">
-          <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
-          <a href={activeLocale ? toLocalePath(activeLocale, '/contact') : '/contact'}>
-            {pickByLocale(activeLocale ?? 'zh', '联系方式', 'Contact')}
-          </a>
-          <a href={activeLocale ? toLocalePath(activeLocale, '/privacy') : '/privacy'}>
-            {pickByLocale(activeLocale ?? 'zh', '隐私政策', 'Privacy Policy')}
-          </a>
-          <a href={siteMeta.siteUrl} target="_blank" rel="noreferrer">entiafutura.com</a>
-        </div>
-      </footer>
+            <a href={activeLocale ? toLocalePath(activeLocale, '/privacy') : '/privacy'}>
+              {pickByLocale(activeLocale ?? 'zh', '隐私政策', 'Privacy Policy')}
+            </a>
+            <a href={siteMeta.siteUrl} target="_blank" rel="noreferrer">entiafutura.com</a>
+          </div>
+        </footer>
+      )}
     </div>
   </body>
 </html>
@@ -121,97 +125,137 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   }
 
   :root {
-    /* Primitive tokens */
-    --color-neutral-0: #ffffff;
-    --color-neutral-25: #f8f8f4;
-    --color-neutral-50: #f3f3f0;
-    --color-neutral-100: #d9e3e7;
-    --color-neutral-200: #b9cad0;
-    --color-neutral-300: #8e96a6;
-    --color-neutral-700: #4d4a60;
-    --color-neutral-900: #090907;
-    --color-neutral-950: #060605;
-    --color-neutral-975: #040403;
-    --color-brand-solar: #fefa71;
-    --color-brand-violet: #4d4a60;
-    --color-brand-mint: #b9cad0;
-    --color-brand-ice: #d9e3e7;
+    /* Palette layer */
+    --palette-bg-deep-space: #05070b;
+    --palette-bg-void-black: #0a0e14;
+    --palette-bg-cosmic-navy: #0f172a;
+    --palette-bg-stardust-navy: #111827;
+    --palette-bg-nebula-blue: #1b2336;
+    --palette-bg-space-steel: #1f2937;
+    --palette-surface-elevated: #11151e;
+    --palette-surface-glass: #0d1117cc;
+    --palette-text-starlight-white: #f5f7fa;
+    --palette-text-cosmic-silver: #ccd2e0;
+    --palette-text-galactic-grey: #a3a8b8;
+    --palette-text-neutral-grey: #7b8494;
+    --palette-text-subtle-grey: #5a6272;
+    --palette-text-muted-grey: #3b4252;
+    --palette-text-disabled-grey: #292a36;
+    --palette-cosmic-cyan: #00e5ff;
+    --palette-cyan-glow: #00e5ff66;
+    --palette-cosmic-violet: #7b5cff;
+    --palette-violet-glow: #8266ff66;
+    --palette-hover-overlay: #ffffff1a;
+    --palette-focus-ring: #7b5cff;
+    --palette-pressed-overlay: #00e5ff33;
+    --palette-success-500: #22d39a;
+    --palette-success-glow: #22d39a66;
+    --palette-warning-500: #f5a52a;
+    --palette-warning-glow: #f5a52a66;
+    --palette-error-500: #ff4d4f;
+    --palette-error-glow: #ff4d4f66;
+    --palette-info-500: #4da3ff;
+    --palette-info-glow: #4da3ff66;
 
-    /* Semantic tokens */
-    --color-bg-canvas: #090907;
-    --color-bg-canvas-subtle: #111015;
-    --color-bg-canvas-strong: #050504;
+    /* Semantic layer */
+    --color-background: var(--palette-bg-deep-space);
+    --color-background-subtle: var(--palette-bg-void-black);
+    --color-background-strong: var(--palette-bg-cosmic-navy);
     --color-surface-base: transparent;
-    --color-surface-raised: rgba(77, 74, 96, 0.34);
-    --color-surface-subtle: rgba(77, 74, 96, 0.18);
-    --color-surface-accent: rgba(254, 250, 113, 0.08);
-    --color-surface-action-subtle: rgba(77, 74, 96, 0.56);
-    --color-surface-action-strong: var(--color-brand-solar);
-    --color-surface-overlay: rgba(77, 74, 96, 0.28);
-    --color-surface-input: rgba(77, 74, 96, 0.3);
-    --color-text-primary: #f3f3f0;
-    --color-text-secondary: rgba(243, 243, 240, 0.88);
-    --color-text-tertiary: rgba(243, 243, 240, 0.74);
-    --color-text-body: rgba(243, 243, 240, 0.9);
-    --color-text-footer: rgba(243, 243, 240, 0.64);
-    --color-text-muted: rgba(243, 243, 240, 0.58);
-    --color-text-inverse: #090907;
-    --color-text-inverse-muted: rgba(243, 243, 240, 0.72);
-    --color-text-on-accent: #090907;
-    --color-border-subtle: rgba(185, 202, 208, 0.08);
-    --color-border-soft: rgba(185, 202, 208, 0.14);
-    --color-border-medium: rgba(185, 202, 208, 0.2);
-    --color-border-default: rgba(185, 202, 208, 0.18);
-    --color-border-strong: rgba(185, 202, 208, 0.28);
-    --color-border-accent: rgba(254, 250, 113, 0.46);
-    --color-border-accent-medium: rgba(254, 250, 113, 0.34);
-    --color-border-accent-soft: rgba(254, 250, 113, 0.22);
-    --color-border-signal: rgba(254, 250, 113, 0.56);
-    --color-border-inverse: rgba(185, 202, 208, 0.18);
-    --color-border-inverse-strong: rgba(185, 202, 208, 0.28);
-    --color-border-inverse-accent: rgba(254, 250, 113, 0.46);
-    --color-atmosphere-warm: rgba(254, 250, 113, 0.1);
-    --color-atmosphere-cool: rgba(77, 74, 96, 0.24);
-    --color-atmosphere-mint: rgba(185, 202, 208, 0.14);
-    --color-atmosphere-violet: rgba(77, 74, 96, 0.3);
-    --color-atmosphere-ice: rgba(185, 202, 208, 0.16);
+    --color-surface: var(--palette-surface-elevated);
+    --color-surface-variant: var(--palette-bg-stardust-navy);
+    --color-surface-strong: var(--palette-bg-nebula-blue);
+    --color-surface-glass: var(--palette-surface-glass);
+    --color-surface-overlay: var(--palette-surface-glass);
+    --color-surface-input: var(--palette-bg-nebula-blue);
+    --color-surface-accent: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    --color-surface-interactive: color-mix(in srgb, var(--color-secondary) 18%, transparent);
+    --color-surface-primary: var(--color-primary);
+    --color-text-primary: var(--palette-text-starlight-white);
+    --color-text-secondary: var(--palette-text-cosmic-silver);
+    --color-text-body: var(--palette-text-cosmic-silver);
+    --color-text-tertiary: var(--palette-text-galactic-grey);
+    --color-text-muted: var(--palette-text-subtle-grey);
+    --color-text-footer: var(--palette-text-neutral-grey);
+    --color-text-disabled: var(--palette-text-disabled-grey);
+    --color-text-inverse: var(--palette-bg-deep-space);
+    --color-text-inverse-muted: var(--palette-text-muted-grey);
+    --color-text-on-accent: var(--color-primary-foreground);
+    --color-primary: var(--palette-cosmic-cyan);
+    --color-primary-foreground: var(--palette-bg-deep-space);
+    --color-secondary: var(--palette-cosmic-violet);
+    --color-secondary-foreground: var(--palette-text-starlight-white);
+    --color-accent: var(--palette-cosmic-cyan);
+    --color-link: var(--palette-cosmic-cyan);
+    --color-success: var(--palette-success-500);
+    --color-warning: var(--palette-warning-500);
+    --color-error: var(--palette-error-500);
+    --color-info: var(--palette-info-500);
+    --color-border: var(--palette-bg-space-steel);
+    --color-border-subtle: color-mix(in srgb, var(--palette-text-cosmic-silver) 8%, transparent);
+    --color-border-medium: color-mix(in srgb, var(--palette-text-cosmic-silver) 16%, transparent);
+    --color-border-strong: color-mix(in srgb, var(--palette-text-cosmic-silver) 24%, transparent);
+    --color-border-soft: color-mix(in srgb, var(--palette-bg-space-steel) 72%, transparent);
+    --color-border-accent: var(--palette-violet-glow);
+    --color-border-accent-medium: color-mix(in srgb, var(--palette-cosmic-violet) 34%, transparent);
+    --color-border-accent-soft: color-mix(in srgb, var(--palette-cosmic-violet) 22%, transparent);
+    --color-border-signal: color-mix(in srgb, var(--palette-cosmic-cyan) 56%, transparent);
+    --color-border-inverse: color-mix(in srgb, var(--palette-text-starlight-white) 12%, transparent);
+    --color-border-inverse-strong: color-mix(in srgb, var(--palette-text-starlight-white) 22%, transparent);
+    --color-border-inverse-accent: var(--palette-violet-glow);
+    --color-divider: var(--color-border);
+    --color-ring: var(--palette-focus-ring);
+    --color-atmosphere-primary: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    --color-atmosphere-secondary: color-mix(in srgb, var(--color-secondary) 22%, transparent);
+    --color-atmosphere-tertiary: color-mix(in srgb, var(--palette-text-cosmic-silver) 14%, transparent);
     --color-shadow-soft: rgba(0, 0, 0, 0.24);
     --color-shadow-medium: rgba(0, 0, 0, 0.36);
-    --color-action-primary-bg: #fefa71;
-    --color-action-primary-fg: #090907;
-    --color-action-secondary-bg: rgba(77, 74, 96, 0.52);
-    --color-action-secondary-fg: #f3f3f0;
-    --color-action-secondary-border: rgba(185, 202, 208, 0.24);
+    --color-secondary-border: color-mix(in srgb, var(--palette-text-cosmic-silver) 24%, transparent);
+
+    /* Effect layer */
+    --effect-glow-primary: var(--palette-cyan-glow);
+    --effect-glow-secondary: var(--palette-violet-glow);
+    --effect-glow-success: var(--palette-success-glow);
+    --effect-glow-warning: var(--palette-warning-glow);
+    --effect-glow-error: var(--palette-error-glow);
+    --effect-glow-info: var(--palette-info-glow);
+    --effect-hover-overlay: var(--palette-hover-overlay);
+    --effect-pressed-overlay: var(--palette-pressed-overlay);
 
     /* Composed tokens */
     --gradient-page:
-      radial-gradient(circle at 18% 12%, var(--color-atmosphere-warm), transparent 24rem),
-      radial-gradient(circle at 82% 14%, rgba(185, 202, 208, 0.12), transparent 22rem),
-      radial-gradient(circle at 62% 72%, var(--color-atmosphere-cool), transparent 26rem),
-      linear-gradient(180deg, var(--color-bg-canvas) 0%, var(--color-bg-canvas-strong) 100%);
+      radial-gradient(circle at 18% 12%, var(--effect-glow-primary), transparent 24rem),
+      radial-gradient(circle at 82% 14%, var(--effect-glow-secondary), transparent 22rem),
+      radial-gradient(circle at 62% 72%, var(--color-atmosphere-secondary), transparent 26rem),
+      linear-gradient(180deg, var(--color-background) 0%, var(--color-background-strong) 100%);
     --gradient-atmosphere-primary:
-      radial-gradient(circle, rgba(254, 250, 113, 0.72) 0%, rgba(254, 250, 113, 0.16) 58%, rgba(254, 250, 113, 0) 78%);
+      radial-gradient(circle, var(--effect-glow-primary) 0%, color-mix(in srgb, var(--color-primary) 16%, transparent) 58%, rgba(0, 229, 255, 0) 78%);
     --gradient-atmosphere-secondary:
-      radial-gradient(circle, rgba(185, 202, 208, 0.18) 0%, rgba(185, 202, 208, 0) 74%);
+      radial-gradient(circle, var(--effect-glow-secondary) 0%, color-mix(in srgb, var(--color-secondary) 14%, transparent) 74%);
     --gradient-orb-primary:
-      radial-gradient(circle, rgba(254, 250, 113, 0.78) 0%, rgba(254, 250, 113, 0.12) 64%, transparent 78%);
+      radial-gradient(circle, color-mix(in srgb, var(--color-primary) 78%, white 22%) 0%, color-mix(in srgb, var(--color-primary) 12%, transparent) 64%, transparent 78%);
     --gradient-orb-secondary:
-      radial-gradient(circle, rgba(77, 74, 96, 0.52) 0%, rgba(77, 74, 96, 0.06) 68%, transparent 80%);
+      radial-gradient(
+        circle,
+        color-mix(in srgb, var(--color-secondary) 52%, transparent) 0%,
+        color-mix(in srgb, var(--color-secondary) 8%, transparent) 68%,
+        transparent 80%
+      );
     --gradient-orb-tertiary:
-      radial-gradient(circle, rgba(185, 202, 208, 0.3) 0%, rgba(185, 202, 208, 0.03) 60%, transparent 76%);
+      radial-gradient(circle, color-mix(in srgb, var(--palette-text-cosmic-silver) 30%, transparent) 0%, color-mix(in srgb, var(--palette-text-cosmic-silver) 3%, transparent) 60%, transparent 76%);
     --pattern-hero-grid:
       linear-gradient(var(--color-border-subtle) 1px, transparent 1px),
       linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
     --gradient-hero-stage:
-      radial-gradient(circle at 50% 42%, rgba(185, 202, 208, 0.12), transparent 20rem),
-      linear-gradient(180deg, #090907 0%, #111015 50%, #050504 100%);
+      radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--palette-text-cosmic-silver) 12%, transparent), transparent 20rem),
+      linear-gradient(180deg, var(--color-background) 0%, var(--color-background-subtle) 50%, var(--color-background-strong) 100%);
     --gradient-hero-overlay:
-      radial-gradient(circle at 50% 48%, var(--color-atmosphere-ice), transparent 14rem),
-      linear-gradient(180deg, rgba(9, 9, 7, 0.08), rgba(9, 9, 7, 0.28) 68%, rgba(9, 9, 7, 0.72));
+      radial-gradient(circle at 50% 48%, var(--color-atmosphere-tertiary), transparent 14rem),
+      linear-gradient(180deg, rgba(5, 7, 11, 0.08), rgba(10, 14, 20, 0.28) 68%, rgba(5, 7, 11, 0.72));
     --gradient-hero-vignette:
-      radial-gradient(circle at 50% 56%, rgba(9, 9, 7, 0), rgba(9, 9, 7, 0.34) 58%, rgba(9, 9, 7, 0.9) 100%);
-    --gradient-loading-screen: linear-gradient(180deg, rgba(9, 9, 7, 0.98), rgba(9, 9, 7, 0.82));
-    --gradient-interactive-sheen: linear-gradient(120deg, transparent 20%, rgba(254, 250, 113, 0.16) 50%, transparent 80%);
+      radial-gradient(circle at 50% 56%, rgba(5, 7, 11, 0), rgba(5, 7, 11, 0.34) 58%, rgba(5, 7, 11, 0.9) 100%);
+    --gradient-loading-screen: linear-gradient(180deg, rgba(5, 7, 11, 0.98), rgba(10, 14, 20, 0.82));
+    --gradient-interactive-sheen: linear-gradient(120deg, transparent 20%, var(--effect-glow-primary) 50%, transparent 80%);
     --filter-hero-scroll: saturate(0.92) contrast(1.02) brightness(0.94);
     --filter-hero-loop: saturate(0.94) contrast(1.02) brightness(0.92);
     --shadow-hero-figure: drop-shadow(0 26px 40px rgba(0, 0, 0, 0.28));
@@ -220,7 +264,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     color-scheme: dark;
     font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
     color: var(--color-text-primary);
-    background: var(--color-bg-canvas);
+    background: var(--color-background);
   }
 
   html,
@@ -254,13 +298,16 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 18px;
-    align-items: start;
+    align-items: center;
     margin-bottom: 28px;
-    padding: 10px 0 18px;
-    border-bottom: 1px solid var(--color-border-default);
-    border-radius: 0;
-    backdrop-filter: none;
-    background: transparent;
+    padding: 14px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    backdrop-filter: blur(16px) saturate(140%);
+    background: var(--color-surface-glass);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 8%, transparent),
+      0 18px 48px rgba(0, 0, 0, 0.22);
   }
 
   .brand {
@@ -296,13 +343,21 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   }
 
   .nav-link {
+    position: relative;
     display: grid;
     gap: 2px;
     min-width: 100px;
-    padding: 8px 0;
+    padding: 10px 14px;
     border: 1px solid transparent;
+    border-radius: 14px;
+    background: transparent;
     color: var(--color-text-muted);
-    transition: all 160ms ease;
+    transition:
+      color 160ms ease,
+      background 160ms ease,
+      border-color 160ms ease,
+      box-shadow 200ms ease,
+      transform 160ms ease;
   }
 
   .nav-link span {
@@ -315,6 +370,24 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     text-transform: uppercase;
   }
 
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    bottom: 8px;
+    left: 14px;
+    height: 1.5px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    box-shadow: 0 0 14px var(--effect-glow-primary);
+    opacity: 0;
+    transform: scaleX(0.2);
+    transform-origin: center;
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
   .locale-switcher {
     display: inline-flex;
     align-items: center;
@@ -322,7 +395,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     padding: 6px;
     border: 1px solid var(--color-border-strong);
     border-radius: 999px;
-    background: var(--color-surface-action-subtle);
+    background: color-mix(in srgb, var(--color-surface-glass) 88%, transparent);
   }
 
   .locale-link {
@@ -332,20 +405,31 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    transition: background 160ms ease, color 160ms ease;
+    transition:
+      background 160ms ease,
+      color 160ms ease,
+      box-shadow 180ms ease;
   }
 
   .locale-link.active,
   .locale-link:hover {
-    background: var(--color-action-primary-bg);
-    color: var(--color-action-primary-fg);
+    background: var(--effect-hover-overlay);
+    color: var(--color-text-primary);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 38%, transparent);
   }
 
   .nav-link:hover,
   .nav-link.active {
     color: var(--color-text-primary);
-    border-color: var(--color-border-accent);
-    background: transparent;
+    border-color: color-mix(in srgb, var(--color-secondary) 42%, transparent);
+    background: var(--effect-hover-overlay);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--effect-glow-secondary) 42%, transparent);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    opacity: 1;
+    transform: scaleX(1);
   }
 
   main {
@@ -368,7 +452,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
 
   .hero-panel {
     padding: 18px 0 42px;
-    border-bottom: 1px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .landing-hero {
@@ -658,7 +742,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     gap: 8px;
     margin-bottom: 28px;
     padding-bottom: 20px;
-    border-bottom: 1px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border);
     will-change: transform, opacity;
   }
 
@@ -720,7 +804,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   }
 
   .mini-card + .mini-card {
-    border-top: 1px solid var(--color-border-default);
+    border-top: 1px solid var(--color-border);
     padding-top: 4px;
   }
 
@@ -772,13 +856,13 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   }
 
   .button.primary {
-    background: var(--color-action-primary-bg);
-    color: var(--color-action-primary-fg);
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
   }
 
   .button.secondary {
-    background: color-mix(in srgb, var(--color-brand-mint) 18%, transparent);
-    color: var(--color-action-secondary-fg);
+    background: color-mix(in srgb, var(--palette-text-cosmic-silver) 18%, transparent);
+    color: var(--color-secondary-foreground);
   }
 
   .list-columns {
@@ -793,7 +877,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   }
 
   .list-card + .list-card {
-    border-left: 1px solid var(--color-border-default);
+    border-left: 1px solid var(--color-border);
     padding-left: 32px;
   }
 
@@ -808,7 +892,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     gap: 18px;
     margin-top: 32px;
     padding: 22px;
-    border-top: 1px solid var(--color-border-default);
+    border-top: 1px solid var(--color-border);
   }
 
   .site-footer p,
@@ -844,7 +928,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
   .contact-form textarea {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid var(--color-border-default);
+    border: 1px solid var(--color-border);
     border-radius: 14px;
     background: var(--color-surface-input);
     font: inherit;
@@ -871,7 +955,7 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
 
     .list-card + .list-card {
       border-left: 0;
-      border-top: 1px solid var(--color-border-default);
+      border-top: 1px solid var(--color-border);
       padding-left: 0;
       padding-top: 24px;
     }
@@ -952,7 +1036,8 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
     grid-template-columns: minmax(16rem, 18rem) 1fr;
     margin: 0 auto 14px;
     padding-inline: clamp(0.2rem, 1vw, 1rem);
-    border-bottom-color: var(--color-border-inverse);
+    border-color: var(--color-border-inverse);
+    background: color-mix(in srgb, var(--color-surface-glass) 92%, transparent);
   }
 
   body.theme-landing-dark .brand-en,
@@ -984,8 +1069,9 @@ const primaryNavItems = navItems.filter((item) => item.href !== '/publications')
 
   body.theme-landing-dark .locale-link.active,
   body.theme-landing-dark .locale-link:hover {
-    background: var(--color-action-primary-bg);
-    color: var(--color-action-primary-fg);
+    background: var(--effect-hover-overlay);
+    color: var(--color-text-primary);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 38%, transparent);
   }
 
   body.theme-landing-dark .site-footer-landing {

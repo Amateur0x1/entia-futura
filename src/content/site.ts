@@ -15,8 +15,6 @@ export const siteMeta = {
 export const navItems = [
   { href: '/about', zh: '关于我们', en: 'About' },
   { href: '/research', zh: '研究方向', en: 'Research' },
-  { href: '/programs', zh: '项目机制', en: 'Programs' },
-  { href: '/research-in-practice', zh: '研究转化', en: 'Research in Practice' },
   { href: '/future-ventures', zh: '未来项目', en: 'Future Ventures' },
   { href: '/collaboration', zh: '合作方式', en: 'Collaboration' },
   { href: '/people', zh: '成员', en: 'People' },
@@ -238,6 +236,20 @@ export const collaborationMethodEn = [
   'with real-world settings rather than conceptual packaging',
   'with a willingness to build together rather than outsource unilaterally',
 ];
+
+export const collaborationSummaryZh = '合作不是研究的妥协，而是研究进入现实的一种方式。';
+export const collaborationSummaryEn =
+  'Collaboration is not a compromise of research, but one of the ways research enters reality.';
+
+export const collaborationEntryZh =
+  '我们欢迎与企业、品牌、地方项目、文化空间、书店、学校及各类组织与个人展开合作。我们理解的合作，不只是项目执行，而是把研究能力、问题意识与现实场景连接起来。';
+export const collaborationEntryEn =
+  'We welcome collaboration with enterprises, brands, place-based initiatives, cultural spaces, bookstores, schools, and a wide range of organizations and individuals. For us, collaboration is not merely execution, but a way of connecting research capacity, problem-consciousness, and real-world settings.';
+
+export const collaborationAboutZh =
+  '未来人研究所是一个围绕“未来我们将如何存在？”这一核心问题展开工作的独立研究机构。我们以高等研究为基础，同时强调研究向现实问题、合作机制、未来项目与社会实验的持续转化。\n\n我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。';
+export const collaborationAboutEn =
+  'Entia Futura Institut is an independent institute organized around the question: “How shall we exist in the future?” Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, future ventures, and social experimentation.\n\nWe are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life.';
 
 export const joinWhoZh = [
   '对未来问题有真实兴趣的人',

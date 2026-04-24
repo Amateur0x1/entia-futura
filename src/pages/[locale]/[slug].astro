@@ -1,5 +1,6 @@
 ---
 import BilingualCards from '../../components/BilingualCards.astro';
+import CollaborationExperience from '../../components/CollaborationExperience.astro';
 import BilingualIntro from '../../components/BilingualIntro.astro';
 import BilingualList from '../../components/BilingualList.astro';
 import BilingualSection from '../../components/BilingualSection.astro';
@@ -17,8 +18,6 @@ import {
   joinWaysZh,
   joinWhoEn,
   joinWhoZh,
-  practiceItems,
-  programs,
   publicationCategoriesEn,
   publicationCategoriesZh,
   researchAreas,
@@ -30,8 +29,6 @@ import { isLocale, pickByLocale } from '../../i18n/config';
 const pageSlugs = [
   'about',
   'research',
-  'programs',
-  'research-in-practice',
   'future-ventures',
   'collaboration',
   'people',
@@ -66,22 +63,6 @@ const pageMeta: Record<PageSlug, { titleZh: string; titleEn: string; eyebrowZh: 
     eyebrowEn: 'Research',
     descriptionZh: '未来人研究所的研究方向。',
     descriptionEn: 'Research areas of Entia Futura Institut.',
-  },
-  programs: {
-    titleZh: '项目机制',
-    titleEn: 'Programs',
-    eyebrowZh: '项目机制',
-    eyebrowEn: 'Programs',
-    descriptionZh: '未来人研究所的项目机制。',
-    descriptionEn: 'Programs of Entia Futura Institut.',
-  },
-  'research-in-practice': {
-    titleZh: '研究转化',
-    titleEn: 'Research in Practice',
-    eyebrowZh: '研究转化',
-    eyebrowEn: 'Research in Practice',
-    descriptionZh: '未来人研究所的研究转化。',
-    descriptionEn: 'Research in Practice at Entia Futura Institut.',
   },
   'future-ventures': {
     titleZh: '未来项目',
@@ -136,6 +117,29 @@ const pageMeta: Record<PageSlug, { titleZh: string; titleEn: string; eyebrowZh: 
 const meta = pageMeta[pageSlug];
 const pageTitle = pickByLocale(locale, meta.titleZh, meta.titleEn);
 const pageDescription = pickByLocale(locale, meta.descriptionZh, meta.descriptionEn);
+const contactFocusAreas = [
+  {
+    zhTitle: '我们是谁',
+    enTitle: 'Who We Are',
+    zhBody: '一个围绕“未来我们将如何存在？”展开工作的独立研究机构，把高等研究与现实问题、合作机制和未来项目连接起来。',
+    enBody:
+      'An independent institute organized around the question “How shall we exist in the future?”, connecting advanced research with real-world problems, collaborative forms, and future-oriented projects.',
+  },
+  {
+    zhTitle: '我们做什么',
+    enTitle: 'What We Do',
+    zhBody: '我们通过研究、研究转化、未来项目与公共讨论，把关于技术、社会、空间、组织与生活形式的问题持续带入现实。',
+    enBody:
+      'Through research, research in practice, future ventures, and public inquiry, we bring questions about technology, society, space, organization, and forms of life into reality.',
+  },
+  {
+    zhTitle: '我们如何看待合作',
+    enTitle: 'How We See Collaboration',
+    zhBody: '对我们来说，合作不是研究的附属执行，而是让研究进入真实场景、真实组织与真实问题的一种方式。',
+    enBody:
+      'For us, collaboration is not secondary execution attached to research, but one of the ways research enters real settings, real organizations, and real questions.',
+  },
+];
 ---
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale}>
@@ -186,49 +190,6 @@ const pageDescription = pickByLocale(locale, meta.descriptionZh, meta.descriptio
       </section>
     )}
 
-    {pageSlug === 'programs' && (
-      <>
-        <section class="section-card">
-          <div class="section-heading">
-            <p class="eyebrow">{pickByLocale(locale, '导言', 'Intro')}</p>
-            <h2>{pickByLocale(locale, '项目机制', 'Programs')}</h2>
-          </div>
-          <BilingualIntro
-            locale={locale}
-            zh="未来人研究所通过研究、活动、协作、驻留、社群与实验等多种机制展开工作，持续回应一个核心问题：未来我们将如何存在？"
-            en="Entia Futura Institut works through research, public programs, collaboration, residencies, community structures, and experimentation, all organized around one core question: How shall we exist in the future?"
-          />
-        </section>
-        <section class="section-card">
-          <div class="section-heading">
-            <h2>{pickByLocale(locale, '工作机制', 'Program Structures')}</h2>
-          </div>
-          <BilingualCards items={programs} locale={locale} />
-        </section>
-      </>
-    )}
-
-    {pageSlug === 'research-in-practice' && (
-      <>
-        <section class="section-card">
-          <div class="section-heading">
-            <h2>{pickByLocale(locale, '研究转化', 'Research in Practice')}</h2>
-          </div>
-          <BilingualIntro
-            locale={locale}
-            zh="未来人研究所相信，研究不应停留在理论层面，也不应被压缩成单纯的策略包装。我们强调研究转化：让高等研究进入现实问题、组织实践、品牌叙事、空间场景与协作机制之中。"
-            en="Entia Futura Institut believes that research should not remain at the level of theory alone, nor be reduced to strategic packaging. We emphasize research in practice: bringing advanced inquiry into real-world problems, organizational practice, narrative work, spatial settings, and collaborative mechanisms."
-          />
-        </section>
-        <section class="section-card">
-          <div class="section-heading">
-            <h2>{pickByLocale(locale, '工作维度', 'Practice Areas')}</h2>
-          </div>
-          <BilingualCards items={practiceItems} locale={locale} />
-        </section>
-      </>
-    )}
-
     {pageSlug === 'future-ventures' && (
       <>
         <section class="section-card">
@@ -252,42 +213,7 @@ const pageDescription = pickByLocale(locale, meta.descriptionZh, meta.descriptio
 
     {pageSlug === 'collaboration' && (
       <>
-        <BilingualList
-          locale={locale}
-          zhTitle="我们合作的对象"
-          enTitle="Who We Work With"
-          zhItems={collaborationPartnersZh}
-          enItems={collaborationPartnersEn}
-        />
-        <BilingualList
-          locale={locale}
-          zhTitle="合作形式"
-          enTitle="Forms of Collaboration"
-          zhItems={collaborationFormsZh}
-          enItems={collaborationFormsEn}
-        />
-        <BilingualList
-          locale={locale}
-          zhTitle="我们的合作方法"
-          enTitle="How We Work"
-          zhItems={collaborationMethodZh}
-          enItems={collaborationMethodEn}
-        />
-        <section class="section-card">
-          <div class="section-heading">
-            <h2>{pickByLocale(locale, '合作的理解', 'Collaboration')}</h2>
-          </div>
-          <BilingualIntro
-            locale={locale}
-            zh="合作不是研究的妥协，而是研究进入现实的一种方式。"
-            en="Collaboration is not a compromise of research, but one of the ways research enters reality."
-          />
-          <div class="cta-row">
-            <a class="button primary" href={`/${locale}/contact`}>
-              {pickByLocale(locale, '发起合作', 'Start a Collaboration')}
-            </a>
-          </div>
-        </section>
+        <CollaborationExperience locale={locale} ctaHref={`/${locale}/contact`} />
       </>
     )}
 
@@ -368,47 +294,226 @@ const pageDescription = pickByLocale(locale, meta.descriptionZh, meta.descriptio
     )}
 
     {pageSlug === 'contact' && (
-      <section class="contact-card">
-        <div class="section-heading">
-          <h2>{pickByLocale(locale, '联系我们', 'Contact')}</h2>
-        </div>
-        <BilingualIntro
-          locale={locale}
-          zh="如果你希望围绕某个问题、合作、项目、提案或计划与未来人研究所建立联系，欢迎向我们写信。"
-          en="If you would like to connect with Entia Futura Institut around a question, collaboration, project, proposal, or program, we welcome you to write to us."
-        />
-        <p style="margin-top: 18px;">
-          Email:
-          <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
-        </p>
-        <form class="contact-form" action={`mailto:${siteMeta.email}`} method="post" enctype="text/plain">
-          <label>
-            {pickByLocale(locale, '姓名', 'Name')}
-            <input name="name" type="text" />
-          </label>
-          <label>
-            {pickByLocale(locale, '邮箱', 'Email')}
-            <input name="email" type="email" />
-          </label>
-          <label>
-            {pickByLocale(locale, '机构 / 公司', 'Organization / Company')}
-            <input name="organization" type="text" />
-          </label>
-          <label>
-            {pickByLocale(locale, '联系主题', 'Subject')}
-            <input name="subject" type="text" />
-          </label>
-          <label>
-            {pickByLocale(locale, '你的信息', 'Your Message')}
-            <textarea name="message"></textarea>
-          </label>
-          <div class="cta-row">
-            <button class="button primary" type="submit">
-              {pickByLocale(locale, '发送', 'Send')}
-            </button>
+      <>
+        <section class="section-card contact-positioning-card">
+          <div class="section-heading">
+            <p class="eyebrow">{pickByLocale(locale, '定位', 'Positioning')}</p>
+            <h2>{pickByLocale(locale, '研究方向与机构定位', 'Research Directions and Positioning')}</h2>
           </div>
-        </form>
-      </section>
+          <p class="contact-positioning-lead">
+            {pickByLocale(
+              locale,
+              '未来人研究所是一个围绕“未来我们将如何存在？”展开工作的独立研究机构。我们以高等研究为基础，同时强调研究向现实问题、合作机制、未来项目与社会实验的持续转化。',
+              'Entia Futura Institut is an independent institute organized around the question “How shall we exist in the future?” Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, future ventures, and social experimentation.',
+            )}
+          </p>
+          <p class="contact-positioning-note">
+            {pickByLocale(
+              locale,
+              '我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。',
+              'We are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life.',
+            )}
+          </p>
+        </section>
+
+        <section class="section-card contact-research-card">
+          <div class="section-heading">
+            <p class="eyebrow">{pickByLocale(locale, '研究方向', 'Research Directions')}</p>
+            <h2>{pickByLocale(locale, '我们正在持续追问的方向', 'Questions We Continue to Pursue')}</h2>
+          </div>
+          <BilingualCards items={researchAreas} locale={locale} />
+        </section>
+
+        <section class="section-card contact-collaboration-card">
+          <div class="section-heading">
+            <p class="eyebrow">{pickByLocale(locale, '合作', 'Collaboration')}</p>
+            <h2>{pickByLocale(locale, '我们如何看待商业合作', 'How We See Commercial Collaboration')}</h2>
+          </div>
+          <p class="contact-collaboration-lead">
+            {pickByLocale(
+              locale,
+              '我们会先确认问题，再讨论适合的合作方式、工作节奏与现实场景，而不是直接把问题压缩成一个待执行任务。',
+              'We begin by clarifying the question, then discuss the form, rhythm, and real-world setting of collaboration, rather than compressing everything into a task list to execute.',
+            )}
+          </p>
+          <div class="contact-collaboration-grid">
+            <article class="contact-collaboration-block">
+              <h3>{pickByLocale(locale, '我们合作的对象', 'Who We Work With')}</h3>
+              <ul class="clean">
+                {pickByLocale(locale, collaborationPartnersZh, collaborationPartnersEn).map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+            <article class="contact-collaboration-block">
+              <h3>{pickByLocale(locale, '合作形式', 'Forms of Collaboration')}</h3>
+              <ul class="clean">
+                {pickByLocale(locale, collaborationFormsZh, collaborationFormsEn).map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+            <article class="contact-collaboration-block">
+              <h3>{pickByLocale(locale, '我们的合作方法', 'How We Work')}</h3>
+              <ul class="clean">
+                {pickByLocale(locale, collaborationMethodZh, collaborationMethodEn).map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-card contact-join-card">
+          <div class="section-heading">
+            <p class="eyebrow">{pickByLocale(locale, '加入我们', 'Join Us')}</p>
+            <h2>{pickByLocale(locale, '我们希望连接怎样的人', 'Who We Hope to Connect With')}</h2>
+          </div>
+          <div class="contact-join-grid">
+            <article class="contact-collaboration-block">
+              <h3>{pickByLocale(locale, '我们想连接的人', 'Who We Hope to Connect With')}</h3>
+              <ul class="clean">
+                {pickByLocale(locale, joinWhoZh, joinWhoEn).map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+            <article class="contact-collaboration-block">
+              <h3>{pickByLocale(locale, '参与方式', 'Ways to Participate')}</h3>
+              <ul class="clean">
+                {pickByLocale(locale, joinWaysZh, joinWaysEn).map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+            <article class="contact-collaboration-block">
+              <h3>{pickByLocale(locale, '我们重视什么', 'What We Value')}</h3>
+              <ul class="clean">
+                {pickByLocale(locale, joinValuesZh, joinValuesEn).map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="contact-card contact-route-card">
+          <div class="section-heading">
+            <p class="eyebrow">{pickByLocale(locale, '联系我们', 'Contact')}</p>
+            <h2>{pickByLocale(locale, '带着问题写信给我们。', 'Write to Us with the Question.')}</h2>
+          </div>
+          <p class="contact-route-compact">
+            {pickByLocale(
+              locale,
+              '告诉我们你是谁、你正在面对什么问题，以及你希望如何展开合作。',
+              'The best way to begin is not a form, but a direct email. Tell us who you are, what question you are facing, and how you imagine the collaboration might begin.',
+            )}
+          </p>
+          <p class="contact-route-email">
+            Email:
+            <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
+          </p>
+          <div class="cta-row">
+            <a class="button primary" href={`mailto:${siteMeta.email}`}>
+              {pickByLocale(locale, '发送邮件', 'Write to Us')}
+            </a>
+          </div>
+        </section>
+      </>
     )}
   </main>
 </Layout>
+
+<style>
+  .contact-positioning-card,
+  .contact-research-card,
+  .contact-collaboration-card,
+  .contact-join-card,
+  .contact-route-card {
+    position: relative;
+  }
+
+  .contact-positioning-lead {
+    margin: 0;
+    max-width: 58rem;
+    font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+    line-height: 1.85;
+    color: var(--color-text-body);
+  }
+
+  .contact-route-email {
+    margin: 18px 0 0;
+    color: var(--color-text-body);
+  }
+
+  .contact-route-email a {
+    color: var(--color-primary);
+  }
+
+  .contact-positioning-note {
+    margin: 14px 0 0;
+    max-width: 58rem;
+    color: var(--color-text-body);
+    line-height: 1.85;
+  }
+
+  .contact-collaboration-lead,
+  .contact-route-compact {
+    margin: 0;
+    max-width: 54rem;
+    color: var(--color-text-body);
+    line-height: 1.9;
+  }
+
+  .contact-collaboration-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 22px;
+  }
+
+  .contact-join-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .contact-collaboration-block {
+    padding: 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 86%, transparent), color-mix(in srgb, var(--color-surface-variant) 80%, transparent)),
+      radial-gradient(circle at top right, var(--effect-glow-secondary), transparent 58%);
+  }
+
+  .contact-collaboration-block h3 {
+    margin: 0 0 12px;
+    font-size: clamp(1.08rem, 1.8vw, 1.36rem);
+    color: var(--color-text-primary);
+  }
+
+  .contact-collaboration-block ul {
+    display: grid;
+    gap: 10px;
+  }
+
+  .contact-collaboration-block li {
+    color: var(--color-text-body);
+    line-height: 1.78;
+  }
+
+  @media (max-width: 980px) {
+    .contact-collaboration-grid,
+    .contact-join-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .contact-collaboration-grid,
+    .contact-join-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

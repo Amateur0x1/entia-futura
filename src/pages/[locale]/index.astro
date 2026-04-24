@@ -53,12 +53,12 @@ const nextPanelBody = pickByLocale(
   >
     <defs>
       <linearGradient id="landing-shape-gradient-1" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#d9e3e7" />
-        <stop offset="100%" stop-color="#4d4a60" />
+        <stop offset="0%" stop-color="#7B5CFF" />
+        <stop offset="100%" stop-color="#0F172A" />
       </linearGradient>
       <linearGradient id="landing-shape-gradient-2" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#b9cad0" />
-        <stop offset="100%" stop-color="#4d4a60" />
+        <stop offset="0%" stop-color="#00E5FF" />
+        <stop offset="100%" stop-color="#7B5CFF" />
       </linearGradient>
     </defs>
     <path class="shape-overlays__path" fill="url(#landing-shape-gradient-2)"></path>
@@ -76,15 +76,8 @@ const nextPanelBody = pickByLocale(
     position: relative;
     min-height: 100svh;
     padding: clamp(5rem, 12vw, 9rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
-    background:
-      radial-gradient(circle at 18% 24%, rgba(185, 202, 208, 0.16), transparent 22rem),
-      radial-gradient(circle at 84% 18%, rgba(9, 9, 7, 0.36), transparent 18rem),
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--color-action-secondary-bg) 86%, black 14%),
-        color-mix(in srgb, var(--color-action-secondary-bg) 92%, black 8%)
-      );
-    color: var(--color-action-secondary-fg);
+    background: var(--color-background);
+    color: var(--color-secondary-foreground);
   }
 
   .landing-next-preview {
@@ -94,8 +87,8 @@ const nextPanelBody = pickByLocale(
     display: grid;
     align-items: end;
     padding: clamp(5rem, 12vw, 9rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
-    background: transparent;
-    color: var(--color-action-secondary-fg);
+    background: var(--color-background);
+    color: var(--color-secondary-foreground);
     pointer-events: none;
     visibility: hidden;
   }
@@ -118,7 +111,7 @@ const nextPanelBody = pickByLocale(
     font-size: 0.82rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-action-secondary-fg) 68%, transparent);
+    color: color-mix(in srgb, var(--color-secondary-foreground) 68%, transparent);
   }
 
   .landing-next-panel__title {
@@ -135,7 +128,7 @@ const nextPanelBody = pickByLocale(
     max-width: 34rem;
     font-size: clamp(1rem, 1.6vw, 1.2rem);
     line-height: 1.7;
-    color: color-mix(in srgb, var(--color-action-secondary-fg) 84%, transparent);
+    color: color-mix(in srgb, var(--color-secondary-foreground) 84%, transparent);
   }
 
   .landing-shape-overlays {
@@ -150,14 +143,6 @@ const nextPanelBody = pickByLocale(
 
   :global(body.theme-landing-dark .page-shell-landing) {
     padding: 0;
-  }
-
-  :global(.site-header) {
-    display: none;
-  }
-
-  :global(.site-footer) {
-    display: none;
   }
 
   @media (max-width: 720px) {

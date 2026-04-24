@@ -1,0 +1,223 @@
+---
+import {
+  collaborationAboutEn,
+  collaborationAboutZh,
+  collaborationEntryEn,
+  collaborationEntryZh,
+  collaborationFormsEn,
+  collaborationFormsZh,
+  collaborationMethodEn,
+  collaborationMethodZh,
+  collaborationPartnersEn,
+  collaborationPartnersZh,
+  collaborationSummaryEn,
+  collaborationSummaryZh,
+} from '../content/site';
+import { pickByLocale, type Locale } from '../i18n/config';
+
+interface Props {
+  locale: Locale;
+  showCta?: boolean;
+  ctaHref?: string;
+  ctaZh?: string;
+  ctaEn?: string;
+}
+
+const {
+  locale,
+  showCta = true,
+  ctaHref = `/${locale}/contact`,
+  ctaZh = '发起合作',
+  ctaEn = 'Start a Collaboration',
+} = Astro.props;
+---
+
+<section class="section-card collaboration-intro-card">
+  <div class="section-heading">
+    <p class="eyebrow">{pickByLocale(locale, '合作入口', 'Collaboration')}</p>
+    <h2>{pickByLocale(locale, '把研究能力接到现实场景里。', 'Bringing research capacity into real-world settings.')}</h2>
+  </div>
+  <p class="collaboration-lead">
+    {pickByLocale(locale, collaborationSummaryZh, collaborationSummaryEn)}
+  </p>
+  <p class="collaboration-entry-copy">
+    {pickByLocale(locale, collaborationEntryZh, collaborationEntryEn)}
+  </p>
+  {showCta && (
+    <div class="cta-row">
+      <a class="button primary" href={ctaHref}>
+        {pickByLocale(locale, ctaZh, ctaEn)}
+      </a>
+    </div>
+  )}
+</section>
+
+<section class="section-card collaboration-matrix">
+  <div class="section-heading">
+    <p class="eyebrow">{pickByLocale(locale, '结构', 'Structure')}</p>
+    <h2>{pickByLocale(locale, '合作方式', 'Collaboration')}</h2>
+  </div>
+  <div class="collaboration-grid">
+    <article class="collaboration-block">
+      <div class="collaboration-block-head">
+        <p>{pickByLocale(locale, '模块一', 'Section One')}</p>
+        <h3>{pickByLocale(locale, '我们合作的对象', 'Who We Work With')}</h3>
+      </div>
+      <ul class="clean collaboration-list">
+        {pickByLocale(locale, collaborationPartnersZh, collaborationPartnersEn).map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    </article>
+
+    <article class="collaboration-block">
+      <div class="collaboration-block-head">
+        <p>{pickByLocale(locale, '模块二', 'Section Two')}</p>
+        <h3>{pickByLocale(locale, '合作形式', 'Forms of Collaboration')}</h3>
+      </div>
+      <ul class="clean collaboration-list">
+        {pickByLocale(locale, collaborationFormsZh, collaborationFormsEn).map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    </article>
+
+    <article class="collaboration-block collaboration-block-wide">
+      <div class="collaboration-block-head">
+        <p>{pickByLocale(locale, '模块三', 'Section Three')}</p>
+        <h3>{pickByLocale(locale, '我们的合作方法', 'How We Work')}</h3>
+      </div>
+      <ul class="clean collaboration-list">
+        {pickByLocale(locale, collaborationMethodZh, collaborationMethodEn).map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    </article>
+  </div>
+</section>
+
+<section class="section-card collaboration-summary-card">
+  <div class="section-heading">
+    <p class="eyebrow">{pickByLocale(locale, '总结', 'Summary')}</p>
+    <h2>{pickByLocale(locale, '合作的理解', 'Collaboration')}</h2>
+  </div>
+  <p class="collaboration-summary-line">{pickByLocale(locale, collaborationSummaryZh, collaborationSummaryEn)}</p>
+</section>
+
+<section class="section-card collaboration-about-card">
+  <div class="section-heading">
+    <p class="eyebrow">{pickByLocale(locale, '研究所', 'Institute')}</p>
+    <h2>{pickByLocale(locale, '关于未来人研究所', 'About Entia Futura Institut')}</h2>
+  </div>
+  <div class="collaboration-about-copy">
+    {pickByLocale(locale, collaborationAboutZh, collaborationAboutEn)
+      .split('\n\n')
+      .map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+  </div>
+</section>
+
+<style>
+  .collaboration-intro-card,
+  .collaboration-matrix,
+  .collaboration-summary-card,
+  .collaboration-about-card {
+    position: relative;
+  }
+
+  .collaboration-lead {
+    margin: 0 0 18px;
+    max-width: 20ch;
+    font-size: clamp(1.5rem, 3vw, 2.6rem);
+    line-height: 1.08;
+    color: var(--color-text-primary);
+  }
+
+  .collaboration-entry-copy {
+    margin: 0;
+    max-width: 52rem;
+    color: var(--color-text-body);
+    font-size: 1.04rem;
+    line-height: 1.9;
+  }
+
+  .collaboration-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .collaboration-block {
+    padding: 18px 18px 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 88%, transparent), color-mix(in srgb, var(--color-surface-variant) 82%, transparent)),
+      radial-gradient(circle at top right, var(--effect-glow-secondary), transparent 55%);
+  }
+
+  .collaboration-block-wide {
+    grid-column: 1 / -1;
+  }
+
+  .collaboration-block-head {
+    margin-bottom: 18px;
+  }
+
+  .collaboration-block-head p {
+    margin: 0 0 8px;
+    color: var(--color-text-muted);
+    font-size: 0.76rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .collaboration-block-head h3 {
+    margin: 0;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .collaboration-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .collaboration-list li {
+    color: var(--color-text-body);
+    line-height: 1.8;
+  }
+
+  .collaboration-summary-line {
+    margin: 0;
+    max-width: 28ch;
+    font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+    line-height: 1.18;
+    color: var(--color-text-primary);
+  }
+
+  .collaboration-about-copy {
+    display: grid;
+    gap: 16px;
+    max-width: 58rem;
+  }
+
+  .collaboration-about-copy p {
+    margin: 0;
+    color: var(--color-text-body);
+    line-height: 1.95;
+    font-size: 1.02rem;
+  }
+
+  @media (max-width: 900px) {
+    .collaboration-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .collaboration-block-wide {
+      grid-column: auto;
+    }
+  }
+</style>
