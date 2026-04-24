@@ -1,9 +1,12 @@
 <script>
   import gsap from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { SplitText } from 'gsap/SplitText';
   import Lenis from 'lenis';
 
   gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(SplitText);
+  const splitTextAvailable = typeof SplitText !== 'undefined' && typeof SplitText.create === 'function';
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -24,7 +27,7 @@
     gsap.ticker.lagSmoothing(0);
   }
 
-  const revealSection = (section, index) => {
+  const revealSection = (section: Element, index: number) => {
     const element = section;
     const heading = element.querySelector('.section-heading');
     const eyebrow = element.querySelector('.eyebrow');
@@ -191,8 +194,24 @@
   const signalCards = calibrationRoot?.querySelectorAll('[data-signal-note]');
   const nextPanel = document.querySelector('[data-next-panel]');
   const nextPanelInner = nextPanel?.querySelector('[data-next-panel-inner]');
+  const nextPanelLabel = nextPanel?.querySelector('.landing-next-panel__label');
+  const nextPanelHeading = nextPanel?.querySelector('[data-next-panel-heading]');
+  const nextPanelDivider = nextPanel?.querySelector('[data-next-panel-divider]');
+  const nextPanelBody = nextPanel?.querySelector('[data-next-panel-body]');
   const nextPreview = document.querySelector('[data-next-preview]');
   const nextPreviewInner = nextPreview?.querySelector('[data-next-preview-inner]');
+  const nextPreviewLabel = nextPreview?.querySelector('.landing-next-panel__label');
+  const nextPreviewHeading = nextPreview?.querySelector('[data-next-panel-heading]');
+  const nextPreviewDivider = nextPreview?.querySelector('[data-next-panel-divider]');
+  const nextPreviewBody = nextPreview?.querySelector('[data-next-panel-body]');
+  const nextPanelParagraphs =
+    nextPanelBody instanceof HTMLElement
+      ? Array.from(nextPanelBody.querySelectorAll<HTMLElement>('.landing-next-panel__paragraph'))
+      : [];
+  const nextPreviewParagraphs =
+    nextPreviewBody instanceof HTMLElement
+      ? Array.from(nextPreviewBody.querySelectorAll<HTMLElement>('.landing-next-panel__paragraph'))
+      : [];
   const knowMoreButton = document.querySelector('[data-know-more-button]');
   const shapeOverlay = document.querySelector('[data-shape-overlay]');
   const shapeOverlayNamespace = 'http://www.w3.org/2000/svg';
@@ -311,6 +330,24 @@
         autoAlpha: 0,
         y: 48,
       });
+    }
+
+    if (!prefersReducedMotion) {
+      if (nextPanelDivider instanceof HTMLElement) {
+        gsap.set(nextPanelDivider, {
+          autoAlpha: 0,
+          scaleX: 0,
+          transformOrigin: 'left center',
+        });
+      }
+
+      if (nextPreviewDivider instanceof HTMLElement) {
+        gsap.set(nextPreviewDivider, {
+          autoAlpha: 0,
+          scaleX: 0,
+          transformOrigin: 'left center',
+        });
+      }
     }
 
     if (nextPreview instanceof HTMLElement) {
@@ -499,6 +536,37 @@
           shapeOverlay instanceof SVGSVGElement &&
           shapeGridCells.length > 0
         ) {
+          const previewHeadlineTargets = [nextPreviewHeading, nextPreviewDivider].filter(
+            (node): node is HTMLElement => node instanceof HTMLElement,
+          );
+          const nextPreviewLabelSplit =
+            splitTextAvailable && nextPreviewLabel instanceof HTMLElement
+              ? SplitText.create(nextPreviewLabel, { type: 'words' })
+              : null;
+          const nextPreviewHeadingSplit =
+            splitTextAvailable && nextPreviewHeading instanceof HTMLElement
+              ? SplitText.create(nextPreviewHeading, { type: 'words' })
+              : null;
+          const nextPreviewParagraphSplits =
+            splitTextAvailable
+              ? nextPreviewParagraphs.map((paragraph) =>
+                  SplitText.create(paragraph, {
+                    type: 'words',
+                  }),
+                )
+              : [];
+          const nextPreviewBodyWords = nextPreviewParagraphSplits.flatMap((split) => split.words);
+
+          if (nextPreviewLabelSplit) {
+            gsap.set(nextPreviewLabelSplit.words, { willChange: 'transform, opacity' });
+          }
+          if (nextPreviewHeadingSplit) {
+            gsap.set(nextPreviewHeadingSplit.words, { willChange: 'transform, opacity' });
+          }
+          if (nextPreviewBodyWords.length > 0) {
+            gsap.set(nextPreviewBodyWords, { willChange: 'transform, opacity' });
+          }
+
           // Keep transition locked to the end of scroll-video playback.
           const shapeOverlayStart = transitionStartAtVideoEnd + 0.58;
           const shapeOverlayDuration = 1.12;
@@ -590,7 +658,104 @@
                 ease: 'power3.out',
               },
               previewRevealStart,
+            )
+            .fromTo(
+              nextPreviewLabelSplit?.words ?? (nextPreviewLabel ?? previewHeadlineTargets),
+              {
+                immediateRender: false,
+                autoAlpha: 0,
+                xPercent: -20,
+                yPercent: 24,
+              },
+              {
+                autoAlpha: 1,
+                xPercent: 0,
+                yPercent: 0,
+                duration: 0.44,
+                stagger: 0.02,
+                ease: 'power3.out',
+              },
+              previewRevealStart + 0.02,
+            )
+            .fromTo(
+              nextPreviewHeadingSplit?.words ?? (nextPreviewHeading ?? previewHeadlineTargets),
+              {
+                immediateRender: false,
+                autoAlpha: 0,
+                xPercent: -30,
+                yPercent: 36,
+              },
+              {
+                autoAlpha: 1,
+                xPercent: 0,
+                yPercent: 0,
+                duration: 0.5,
+                stagger: 0.024,
+                ease: 'power3.out',
+              },
+              previewRevealStart + 0.04,
+            )
+            .to(
+              previewHeadlineTargets,
+              {
+                autoAlpha: 1,
+                x: 0,
+                y: 0,
+                duration: 0.44,
+                ease: 'power3.out',
+              },
+              previewRevealStart + 0.09,
             );
+
+          if (nextPreviewDivider instanceof HTMLElement) {
+            heroTimeline.fromTo(
+              nextPreviewDivider,
+              {
+                scaleX: 0,
+                transformOrigin: 'left center',
+              },
+              {
+                scaleX: 1,
+                duration: 0.48,
+                ease: 'power2.out',
+              },
+              previewRevealStart + 0.12,
+            );
+          }
+
+          if (nextPreviewParagraphs.length > 0) {
+            heroTimeline.fromTo(
+              nextPreviewBodyWords.length > 0 ? nextPreviewBodyWords : nextPreviewParagraphs,
+              {
+                immediateRender: false,
+                autoAlpha: 0,
+                xPercent: 12,
+                yPercent: 54,
+              },
+              {
+                autoAlpha: 1,
+                xPercent: 0,
+                yPercent: 0,
+                duration: 0.44,
+                stagger: 0.01,
+                ease: 'power3.out',
+              },
+              previewRevealStart + 0.42,
+            );
+          }
+
+          if (nextPreviewBody instanceof HTMLElement) {
+            heroTimeline.to(
+              nextPreviewBody,
+              {
+                autoAlpha: 1,
+                x: 0,
+                y: 0,
+                duration: 0.01,
+              },
+              previewRevealStart + 0.96,
+            );
+          }
         }
 
         return () => {
@@ -604,6 +769,132 @@
       scrollVideo.addEventListener('loadedmetadata', setupCalibrationScroll, { once: true });
     } else {
       setupCalibrationScroll();
+    }
+
+    if (
+      !prefersReducedMotion &&
+      nextPanel instanceof HTMLElement &&
+      nextPanelHeading instanceof HTMLElement &&
+      nextPanelDivider instanceof HTMLElement &&
+      nextPanelBody instanceof HTMLElement
+    ) {
+      const nextPanelLabelSplit =
+        splitTextAvailable && nextPanelLabel instanceof HTMLElement ? SplitText.create(nextPanelLabel, { type: 'words' }) : null;
+      const nextPanelHeadingSplit = splitTextAvailable ? SplitText.create(nextPanelHeading, { type: 'words' }) : null;
+      const nextPanelParagraphSplits =
+        splitTextAvailable
+          ? nextPanelParagraphs.map((paragraph) =>
+              SplitText.create(paragraph, {
+                type: 'words',
+              }),
+            )
+          : [];
+      const nextPanelBodyWords = nextPanelParagraphSplits.flatMap((split) => split.words);
+
+      if (nextPanelLabelSplit) {
+        gsap.set(nextPanelLabelSplit.words, { willChange: 'transform, opacity' });
+      }
+      if (nextPanelHeadingSplit) {
+        gsap.set(nextPanelHeadingSplit.words, { willChange: 'transform, opacity' });
+      }
+      gsap.set(nextPanelBodyWords, { willChange: 'transform, opacity' });
+
+      const nextPanelTextTimeline = gsap.timeline({
+        defaults: {
+          ease: 'power3.out',
+        },
+        scrollTrigger: {
+          trigger: nextPanel,
+          start: 'top 72%',
+          once: true,
+        },
+      });
+
+      nextPanelTextTimeline
+        .fromTo(
+          nextPanelLabelSplit?.words ?? (nextPanelLabel ?? nextPanelHeading),
+          {
+            immediateRender: false,
+            autoAlpha: 0,
+            xPercent: -20,
+            yPercent: 24,
+          },
+          {
+            autoAlpha: 1,
+            xPercent: 0,
+            yPercent: 0,
+            duration: 0.44,
+            stagger: 0.02,
+          },
+          0,
+        )
+        .fromTo(
+          nextPanelHeadingSplit?.words ?? nextPanelHeading,
+          {
+            immediateRender: false,
+            autoAlpha: 0,
+            xPercent: -30,
+            yPercent: 36,
+          },
+          {
+            autoAlpha: 1,
+            xPercent: 0,
+            yPercent: 0,
+            duration: 0.5,
+            stagger: 0.024,
+          },
+          0,
+        )
+        .to(
+          nextPanelDivider,
+          {
+            autoAlpha: 1,
+            x: 0,
+            y: 0,
+            duration: 0.5,
+          },
+          0.08,
+        )
+        .to(
+          nextPanelDivider,
+          {
+            scaleX: 1,
+            duration: 0.44,
+            ease: 'power2.out',
+          },
+          0.08,
+        )
+        .to(
+          nextPanelBody,
+          {
+            autoAlpha: 1,
+            x: 0,
+            y: 0,
+            duration: 0.01,
+          },
+          0.95,
+        );
+
+      if (nextPanelParagraphs.length > 0) {
+        nextPanelTextTimeline.fromTo(
+          nextPanelBodyWords.length > 0 ? nextPanelBodyWords : nextPanelParagraphs,
+          {
+            immediateRender: false,
+            autoAlpha: 0,
+            xPercent: 12,
+            yPercent: 54,
+          },
+          {
+            autoAlpha: 1,
+            xPercent: 0,
+            yPercent: 0,
+            duration: 0.44,
+            stagger: 0.01,
+            ease: 'power3.out',
+          },
+          0.42,
+        );
+      }
     }
   }
 
@@ -816,7 +1107,7 @@
     });
   }
 
-  gsap.utils.toArray('[data-reveal]').forEach((section, index) => {
+  gsap.utils.toArray<Element>('[data-reveal]').forEach((section, index) => {
     revealSection(section, index);
   });
 
