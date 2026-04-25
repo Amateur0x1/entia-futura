@@ -21,9 +21,10 @@ interface InitHeroToIntroScrollTransitionOptions {
 
 export const HERO_TO_INTRO_TIMING = {
   videoPlaybackStart: 0,
-  videoPlaybackDuration: 1.38,
-  panelRevealDelayAfterVideoEnd: 0.18,
-  transitionScrollDistance: 2400,
+  videoPlaybackDuration: 4.1,
+  panelRevealDelayAfterVideoEnd: 0.52,
+  transitionScrollDistanceDesktop: 3000,
+  transitionScrollDistanceMobile: 2100,
   heroHideAtProgress: 0.985,
 } as const;
 
@@ -47,13 +48,18 @@ export const initHeroToIntroScrollTransition = ({
 
     initialized = true;
 
+    const transitionScrollDistance =
+      window.innerWidth <= 720
+        ? HERO_TO_INTRO_TIMING.transitionScrollDistanceMobile
+        : HERO_TO_INTRO_TIMING.transitionScrollDistanceDesktop;
+
     const heroTimeline = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: heroTransitionRoot,
         start: 'top top',
-        end: `+=${HERO_TO_INTRO_TIMING.transitionScrollDistance}`,
-        scrub: 1,
+        end: `+=${transitionScrollDistance}`,
+        scrub: 0.35,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: ({ progress }) => {

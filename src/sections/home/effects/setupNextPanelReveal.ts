@@ -50,12 +50,51 @@ export const setupNextPanelReveal = ({
   const nextPanelBodyWords = nextPanelParagraphSplits.flatMap((split) => split.words);
 
   if (nextPanelLabelSplit) {
-    gsap.set(nextPanelLabelSplit.words, { willChange: 'transform, opacity' });
+    gsap.set(nextPanelLabelSplit.words, {
+      willChange: 'transform, opacity',
+      autoAlpha: 0,
+      xPercent: -20,
+      yPercent: 24,
+    });
   }
   if (nextPanelHeadingSplit) {
-    gsap.set(nextPanelHeadingSplit.words, { willChange: 'transform, opacity' });
+    gsap.set(nextPanelHeadingSplit.words, {
+      willChange: 'transform, opacity',
+      autoAlpha: 0,
+      xPercent: -30,
+      yPercent: 36,
+    });
   }
-  gsap.set(nextPanelBodyWords, { willChange: 'transform, opacity' });
+  if (!nextPanelLabelSplit && nextPanelLabel instanceof HTMLElement) {
+    gsap.set(nextPanelLabel, {
+      autoAlpha: 0,
+      xPercent: -20,
+      yPercent: 24,
+    });
+  }
+  if (!nextPanelHeadingSplit) {
+    gsap.set(nextPanelHeading, {
+      autoAlpha: 0,
+      xPercent: -30,
+      yPercent: 36,
+    });
+  }
+  gsap.set(nextPanelBodyWords, {
+    willChange: 'transform, opacity',
+    autoAlpha: 0,
+    xPercent: 12,
+    yPercent: 54,
+  });
+  if (nextPanelBodyWords.length === 0 && nextPanelParagraphs.length > 0) {
+    gsap.set(nextPanelParagraphs, {
+      autoAlpha: 0,
+      xPercent: 12,
+      yPercent: 54,
+    });
+  }
+  gsap.set(nextPanelBody, {
+    autoAlpha: 0,
+  });
 
   const nextPanelTextTimeline =
     timeline ??
@@ -83,8 +122,9 @@ export const setupNextPanelReveal = ({
         autoAlpha: 1,
         xPercent: 0,
         yPercent: 0,
-        duration: 0.44,
+        duration: 0.74,
         stagger: 0.02,
+        ease: 'power2.out',
       },
       startAt,
     )
@@ -100,10 +140,11 @@ export const setupNextPanelReveal = ({
         autoAlpha: 1,
         xPercent: 0,
         yPercent: 0,
-        duration: 0.5,
-        stagger: 0.024,
+        duration: 0.82,
+        stagger: 0.022,
+        ease: 'power2.out',
       },
-      startAt,
+      startAt + 0.06,
     )
     .to(
       nextPanelDivider,
@@ -111,18 +152,19 @@ export const setupNextPanelReveal = ({
         autoAlpha: 1,
         x: 0,
         y: 0,
-        duration: 0.5,
+        duration: 0.54,
+        ease: 'power2.out',
       },
-      startAt + 0.08,
+      startAt + 0.1,
     )
     .to(
       nextPanelDivider,
       {
         scaleX: 1,
-        duration: 0.44,
+        duration: 0.52,
         ease: 'power2.out',
       },
-      startAt + 0.08,
+      startAt + 0.1,
     )
     .to(
       nextPanelBody,
@@ -130,9 +172,10 @@ export const setupNextPanelReveal = ({
         autoAlpha: 1,
         x: 0,
         y: 0,
-        duration: 0.01,
+        duration: 0.12,
+        ease: 'none',
       },
-      startAt + 0.95,
+      startAt + 0.62,
     );
 
   if (nextPanelParagraphs.length > 0) {
@@ -141,18 +184,18 @@ export const setupNextPanelReveal = ({
       {
         immediateRender: false,
         autoAlpha: 0,
-        xPercent: 12,
-        yPercent: 54,
+        xPercent: 8,
+        yPercent: 30,
       },
       {
         autoAlpha: 1,
         xPercent: 0,
         yPercent: 0,
-        duration: 0.44,
-        stagger: 0.01,
-        ease: 'power3.out',
+        duration: 0.82,
+        stagger: 0.014,
+        ease: 'power2.out',
       },
-      startAt + 0.42,
+      startAt + 0.36,
     );
   }
 };

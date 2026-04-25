@@ -45,6 +45,7 @@ const instituteIntro = pickByLocale(
         <HomeMonolithVisual />
       </div>
     </section>
+    <div class="landing-scroll-spacer" aria-hidden="true"></div>
   </main>
   <svg
     class="shape-overlays landing-shape-overlays"
@@ -59,6 +60,12 @@ const instituteIntro = pickByLocale(
 <style>
   .landing-main {
     gap: 0;
+  }
+
+  .landing-scroll-spacer {
+    height: 180svh;
+    width: 100%;
+    pointer-events: none;
   }
 
   .landing-next-panel {
@@ -258,6 +265,10 @@ const instituteIntro = pickByLocale(
   }
 
   @media (max-width: 720px) {
+    .landing-scroll-spacer {
+      height: 120svh;
+    }
+
     .landing-next-panel {
       padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
       padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
