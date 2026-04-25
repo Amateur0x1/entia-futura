@@ -240,14 +240,14 @@ small[data-brand-animated-text] {
   }
 }
 
-.calibration-stage {
+.hero-transition-stage {
   position: relative;
   min-height: 340svh;
   margin-inline: calc(50% - 50vw);
   width: 100vw;
 }
 
-.calibration-frame {
+.hero-transition-frame {
   position: sticky;
   top: 0;
   height: 100svh;
@@ -311,7 +311,7 @@ small[data-brand-animated-text] {
 }
 
 @media (max-width: 720px) {
-  .calibration-stage {
+  .hero-transition-stage {
     min-height: 300svh;
   }
 

@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 
-import type { HomeCalibrationElements } from './getHomeCalibrationElements';
+import type { HomeHeroTransitionElements } from './getHomeCalibrationElements';
 import {
   getShapeDelay,
   getShapeDuration,
@@ -11,7 +11,7 @@ import {
 } from './shapeOverlayGrid';
 
 interface AddNextPreviewTransitionOptions {
-  elements: HomeCalibrationElements;
+  elements: HomeHeroTransitionElements;
   heroTimeline: gsap.core.Timeline;
   notes: HTMLElement[];
   shapeGridCells: SVGRectElement[];

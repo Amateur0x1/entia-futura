@@ -1,19 +1,19 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import type { HomeCalibrationElements } from './getHomeCalibrationElements';
+import type { HomeHeroTransitionElements } from './getHomeCalibrationElements';
 import { addNextPreviewTransition } from './addNextPreviewTransition';
 import { setupNextPanelReveal } from './setupNextPanelReveal';
 
-interface InitCalibrationSectionEffectsOptions {
-  elements: HomeCalibrationElements;
+interface InitHeroTransitionSectionEffectsOptions {
+  elements: HomeHeroTransitionElements;
   prefersReducedMotion: boolean;
   splitTextAvailable: boolean;
   shapeGridCells: SVGRectElement[];
 }
 
 interface HeroScrollOrchestratorOptions {
-  elements: HomeCalibrationElements;
+  elements: HomeHeroTransitionElements;
   notes: HTMLElement[];
   prefersReducedMotion: boolean;
   shapeGridCells: SVGRectElement[];
@@ -39,11 +39,11 @@ const getHeaderOffset = () => {
   return Math.max(shellPaddingTop + headerHeight + headerMarginBottom, 0);
 };
 
-const applyCalibrationInitialStates = ({
+const applyHeroTransitionInitialStates = ({
   elements,
   prefersReducedMotion,
 }: {
-  elements: HomeCalibrationElements;
+  elements: HomeHeroTransitionElements;
   prefersReducedMotion: boolean;
 }) => {
   const { nextPanelDivider, nextPreview, nextPreviewDivider, nextPreviewInner, primaryVisual, shapeOverlay } = elements;
@@ -94,7 +94,7 @@ const applyCalibrationInitialStates = ({
   }
 };
 
-const createCalibrationIntroTimeline = (primaryVisual: HTMLElement, notes: HTMLElement[]) => {
+const createHeroTransitionIntroTimeline = (primaryVisual: HTMLElement, notes: HTMLElement[]) => {
   const introTimeline = gsap.timeline({
     defaults: {
       ease: 'power3.out',
@@ -165,7 +165,7 @@ const addHeroVideoSegment = ({
   elements,
   heroTimeline,
 }: {
-  elements: HomeCalibrationElements;
+  elements: HomeHeroTransitionElements;
   heroTimeline: gsap.core.Timeline;
 }) => {
   const { heroVideoShell, loopVideo, scrollVideo } = elements;
@@ -254,8 +254,8 @@ const initHeroScrollOrchestrator = ({
   shapeGridCells,
   splitTextAvailable,
 }: HeroScrollOrchestratorOptions) => {
-  const { calibrationRoot, nextPanel } = elements;
-  if (!calibrationRoot) {
+  const { heroTransitionRoot, nextPanel } = elements;
+  if (!heroTransitionRoot) {
     return;
   }
 
@@ -273,9 +273,9 @@ const initHeroScrollOrchestrator = ({
     const heroTimeline = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        trigger: calibrationRoot,
+        trigger: heroTransitionRoot,
         start: `top top+=${Math.round(headerOffset)}`,
-        endTrigger: nextPanel ?? calibrationRoot,
+        endTrigger: nextPanel ?? heroTransitionRoot,
         end: nextPanel ? `top top+=${Math.round(headerOffset)}` : `+=${fallbackDistance}`,
         scrub: 1,
         anticipatePin: 1,
@@ -319,15 +319,15 @@ const initHeroScrollOrchestrator = ({
   });
 };
 
-export const initCalibrationSectionEffects = ({
+export const initHeroTransitionSectionEffects = ({
   elements,
   prefersReducedMotion,
   splitTextAvailable,
   shapeGridCells,
-}: InitCalibrationSectionEffectsOptions) => {
+}: InitHeroTransitionSectionEffectsOptions) => {
   const {
-    calibrationFrame,
-    calibrationRoot,
+    heroTransitionFrame,
+    heroTransitionRoot,
     heroVideoShell,
     knowMoreButton,
     loopVideo,
@@ -346,26 +346,26 @@ export const initCalibrationSectionEffects = ({
     signalCards,
   } = elements;
 
-  if (!calibrationRoot || !calibrationFrame || !primaryVisual) {
+  if (!heroTransitionRoot || !heroTransitionFrame || !primaryVisual) {
     return;
   }
 
   const notes = signalCards;
 
-  applyCalibrationInitialStates({
+  applyHeroTransitionInitialStates({
     elements,
     prefersReducedMotion,
   });
-  createCalibrationIntroTimeline(primaryVisual, notes);
+  createHeroTransitionIntroTimeline(primaryVisual, notes);
 
-  let calibrationScrollInitialized = false;
+  let heroTransitionScrollInitialized = false;
 
-  const setupCalibrationScroll = () => {
-    if (calibrationScrollInitialized) {
+  const setupHeroTransitionScroll = () => {
+    if (heroTransitionScrollInitialized) {
       return;
     }
 
-    calibrationScrollInitialized = true;
+    heroTransitionScrollInitialized = true;
     initHeroScrollOrchestrator({
       elements,
       notes,
@@ -376,9 +376,9 @@ export const initCalibrationSectionEffects = ({
   };
 
   if (heroVideoShell && scrollVideo && scrollVideo.readyState < 1) {
-    scrollVideo.addEventListener('loadedmetadata', setupCalibrationScroll, { once: true });
+    scrollVideo.addEventListener('loadedmetadata', setupHeroTransitionScroll, { once: true });
   } else {
-    setupCalibrationScroll();
+    setupHeroTransitionScroll();
   }
 
   setupNextPanelReveal({

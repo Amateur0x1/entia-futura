@@ -3,8 +3,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
 
-import { getHomeCalibrationElements } from './getHomeCalibrationElements';
-import { initCalibrationSectionEffects } from './initCalibrationSectionEffects';
+import { getHomeHeroTransitionElements } from './getHomeCalibrationElements';
+import { initHeroTransitionSectionEffects } from './initCalibrationSectionEffects';
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
 import { initResearchTrackEffects } from './initResearchTrackEffects';
@@ -39,26 +39,26 @@ export const initHomeEffects = () => {
     initSmoothScrolling();
   }
 
-  const calibrationElements = getHomeCalibrationElements();
-  const shapeGridCells = setupShapeOverlayGrid(calibrationElements.shapeOverlay);
+  const heroTransitionElements = getHomeHeroTransitionElements();
+  const shapeGridCells = setupShapeOverlayGrid(heroTransitionElements.shapeOverlay);
 
-  initCalibrationSectionEffects({
-    elements: calibrationElements,
+  initHeroTransitionSectionEffects({
+    elements: heroTransitionElements,
     prefersReducedMotion,
     splitTextAvailable,
     shapeGridCells,
   });
 
   initHeroVideoEffects({
-    heroVideoShell: calibrationElements.heroVideoShell,
-    scrollVideo: calibrationElements.scrollVideo,
-    loopVideo: calibrationElements.loopVideo,
-    heroVideoLoading: calibrationElements.heroVideoLoading,
+    heroVideoShell: heroTransitionElements.heroVideoShell,
+    scrollVideo: heroTransitionElements.scrollVideo,
+    loopVideo: heroTransitionElements.loopVideo,
+    heroVideoLoading: heroTransitionElements.heroVideoLoading,
   });
 
   initTransformSectionEffects();
   initMonolithBinaryVisuals(prefersReducedMotion);
-  initResearchTrackEffects(prefersReducedMotion, calibrationElements.shapeOverlay, shapeGridCells);
+  initResearchTrackEffects(prefersReducedMotion, heroTransitionElements.shapeOverlay, shapeGridCells);
 
   gsap.utils.toArray<Element>('[data-reveal]').forEach((section, index) => {
     revealSection(section, index);

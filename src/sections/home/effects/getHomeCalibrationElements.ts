@@ -1,6 +1,6 @@
-export interface HomeCalibrationElements {
-  calibrationRoot: HTMLElement | null;
-  calibrationFrame: HTMLElement | null;
+export interface HomeHeroTransitionElements {
+  heroTransitionRoot: HTMLElement | null;
+  heroTransitionFrame: HTMLElement | null;
   heroVideoShell: HTMLElement | null;
   scrollVideo: HTMLVideoElement | null;
   loopVideo: HTMLVideoElement | null;
@@ -44,16 +44,16 @@ const getSVGElement = (root: ParentNode | null, selector: string) => {
 const getParagraphs = (root: HTMLElement | null) =>
   root ? Array.from(root.querySelectorAll<HTMLElement>('.landing-next-panel__paragraph')) : [];
 
-export const getHomeCalibrationElements = (): HomeCalibrationElements => {
-  const calibrationRoot = getHTMLElement(document, '[data-calibration-root]');
-  const calibrationFrame = getHTMLElement(calibrationRoot, '[data-orbit-frame]');
-  const heroVideoShell = getHTMLElement(calibrationRoot, '[data-hero-video-shell]');
-  const scrollVideo = getVideoElement(calibrationRoot, '[data-scroll-video]');
-  const loopVideo = getVideoElement(calibrationRoot, '[data-loop-video]');
-  const heroVideoLoading = getHTMLElement(calibrationRoot, '[data-hero-video-loading]');
-  const portalShell = getHTMLElement(calibrationRoot, '[data-future-portal-shell]');
-  const signalCards = calibrationRoot
-    ? Array.from(calibrationRoot.querySelectorAll<HTMLElement>('[data-signal-note]'))
+export const getHomeHeroTransitionElements = (): HomeHeroTransitionElements => {
+  const heroTransitionRoot = getHTMLElement(document, '[data-hero-transition-root]');
+  const heroTransitionFrame = getHTMLElement(heroTransitionRoot, '[data-orbit-frame]');
+  const heroVideoShell = getHTMLElement(heroTransitionRoot, '[data-hero-video-shell]');
+  const scrollVideo = getVideoElement(heroTransitionRoot, '[data-scroll-video]');
+  const loopVideo = getVideoElement(heroTransitionRoot, '[data-loop-video]');
+  const heroVideoLoading = getHTMLElement(heroTransitionRoot, '[data-hero-video-loading]');
+  const portalShell = getHTMLElement(heroTransitionRoot, '[data-future-portal-shell]');
+  const signalCards = heroTransitionRoot
+    ? Array.from(heroTransitionRoot.querySelectorAll<HTMLElement>('[data-signal-note]'))
     : [];
   const nextPanel = getHTMLElement(document, '[data-next-panel]');
   const nextPanelInner = getHTMLElement(nextPanel, '[data-next-panel-inner]');
@@ -70,8 +70,8 @@ export const getHomeCalibrationElements = (): HomeCalibrationElements => {
   const shapeOverlay = getSVGElement(document, '[data-shape-overlay]');
 
   return {
-    calibrationRoot,
-    calibrationFrame,
+    heroTransitionRoot,
+    heroTransitionFrame,
     heroVideoShell,
     scrollVideo,
     loopVideo,
