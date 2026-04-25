@@ -26,18 +26,6 @@ export const startLoopVideo = (loopVideo: HTMLVideoElement | null) => {
   }
 };
 
-const syncScrollFrame = (scrollVideo: HTMLVideoElement) => {
-  if (!('requestVideoFrameCallback' in scrollVideo)) {
-    return;
-  }
-
-  const callback = () => {
-    scrollVideo.requestVideoFrameCallback(callback);
-  };
-
-  scrollVideo.requestVideoFrameCallback(callback);
-};
-
 export const initHeroVideoEffects = ({
   heroVideoShell,
   scrollVideo,
@@ -56,7 +44,6 @@ export const initHeroVideoEffects = ({
     });
 
     startLoopVideo(loopVideo);
-    syncScrollFrame(scrollVideo);
     hideHeroVideoLoading(heroVideoLoading);
   };
 

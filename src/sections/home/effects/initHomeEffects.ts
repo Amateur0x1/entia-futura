@@ -42,18 +42,18 @@ export const initHomeEffects = () => {
   const heroTransitionElements = getHomeHeroTransitionElements();
   const shapeGridCells = setupShapeOverlayGrid(heroTransitionElements.shapeOverlay);
 
-  initHeroTransitionSectionEffects({
-    elements: heroTransitionElements,
-    prefersReducedMotion,
-    splitTextAvailable,
-    shapeGridCells,
-  });
-
   initHeroVideoEffects({
     heroVideoShell: heroTransitionElements.heroVideoShell,
     scrollVideo: heroTransitionElements.scrollVideo,
     loopVideo: heroTransitionElements.loopVideo,
     heroVideoLoading: heroTransitionElements.heroVideoLoading,
+  });
+
+  initHeroTransitionSectionEffects({
+    elements: heroTransitionElements,
+    prefersReducedMotion,
+    splitTextAvailable,
+    shapeGridCells,
   });
 
   initTransformSectionEffects();
