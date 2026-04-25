@@ -132,6 +132,27 @@ const researchPanels = [
       <HomeMonolithVisual />
     </div>
   </section>
+  <section class="landing-research-preview" data-research-preview aria-hidden="true">
+    <div class="landing-research-track__inner landing-research-preview__inner" data-research-preview-inner>
+      <header class="landing-research-track__header">
+        <p class="landing-research-track__label-zh">研究方向</p>
+        <p class="landing-research-track__label-en">Research</p>
+      </header>
+      <div class="landing-research-track__viewport">
+        <div class="landing-research-track__rail">
+          {researchPanels.map((panel, index) => (
+            <article class="landing-research-panel">
+              <p class="landing-research-panel__index">模块 {index + 1}</p>
+              <h3 class="landing-research-panel__title-zh">{panel.zhTitle}</h3>
+              <h4 class="landing-research-panel__title-en">{panel.enTitle}</h4>
+              <p class="landing-research-panel__body-zh">{panel.zhBody}</p>
+              <p class="landing-research-panel__body-en">{panel.enBody}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
   <svg
     class="shape-overlays landing-shape-overlays"
     data-shape-overlay
@@ -392,6 +413,25 @@ const researchPanels = [
     overflow: clip;
   }
 
+  .landing-research-preview {
+    position: fixed;
+    inset: 0;
+    z-index: 46;
+    display: grid;
+    align-items: start;
+    padding: calc(clamp(1.55rem, 3.2vw, 2.2rem) + 60px) clamp(1.2rem, 4vw, 3rem)
+      clamp(1.6rem, 3.4vw, 2.2rem);
+    background: #000;
+    color: var(--color-secondary-foreground);
+    pointer-events: none;
+    visibility: hidden;
+    overflow: clip;
+  }
+
+  .landing-research-preview__inner {
+    width: 100%;
+  }
+
   .landing-research-track__inner {
     display: grid;
     gap: clamp(0.55rem, 1.2vw, 0.9rem);
@@ -531,6 +571,13 @@ const researchPanels = [
     }
 
     .landing-research-track {
+      padding-top: max(4.2rem, calc(env(safe-area-inset-top) + 3.4rem));
+      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
+        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
+      padding-bottom: max(2.6rem, calc(env(safe-area-inset-bottom) + 2rem));
+    }
+
+    .landing-research-preview {
       padding-top: max(4.2rem, calc(env(safe-area-inset-top) + 3.4rem));
       padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
         max(1rem, calc(env(safe-area-inset-right) + 0.9rem));

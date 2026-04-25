@@ -58,7 +58,7 @@ export const initHomeEffects = () => {
 
   initTransformSectionEffects();
   initMonolithBinaryVisuals(prefersReducedMotion);
-  initResearchTrackEffects(prefersReducedMotion);
+  initResearchTrackEffects(prefersReducedMotion, calibrationElements.shapeOverlay, shapeGridCells);
 
   gsap.utils.toArray<Element>('[data-reveal]').forEach((section, index) => {
     revealSection(section, index);
