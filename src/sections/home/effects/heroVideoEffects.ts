@@ -1,10 +1,17 @@
 import gsap from 'gsap';
 
+import type { HomeHeroTransitionElements } from './getHomeCalibrationElements';
+
 interface InitHeroVideoEffectsOptions {
   heroVideoShell: HTMLElement | null;
   scrollVideo: HTMLVideoElement | null;
   loopVideo: HTMLVideoElement | null;
   heroVideoLoading: HTMLElement | null;
+}
+
+interface AddHeroVideoTransitionSegmentOptions {
+  elements: HomeHeroTransitionElements;
+  heroTimeline: gsap.core.Timeline;
 }
 
 export const hideHeroVideoLoading = (heroVideoLoading: HTMLElement | null) => {
@@ -65,4 +72,51 @@ export const initHeroVideoEffects = ({
   } else {
     loopVideo.addEventListener('canplay', () => startLoopVideo(loopVideo), { once: true });
   }
+};
+
+export const addHeroVideoTransitionSegment = ({
+  elements,
+  heroTimeline,
+}: AddHeroVideoTransitionSegmentOptions) => {
+  const { heroVideoShell, loopVideo, scrollVideo } = elements;
+  const videoPlaybackStart = 0;
+  const videoPlaybackDuration = 1.38;
+  const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
+
+  if (!heroVideoShell || !scrollVideo || !loopVideo) {
+    return;
+  }
+
+  const targetDuration = Math.max(scrollVideo.duration - 0.04, 0);
+  if (targetDuration <= 0) {
+    return;
+  }
+
+  gsap.set(loopVideo, { autoAlpha: 0 });
+
+  heroTimeline
+    .to(
+      scrollVideo,
+      {
+        currentTime: targetDuration,
+        duration: videoPlaybackDuration,
+      },
+      videoPlaybackStart,
+    )
+    .to(
+      loopVideo,
+      {
+        autoAlpha: 1,
+        duration: 0.32,
+      },
+      videoPlaybackEnd - 0.24,
+    )
+    .to(
+      scrollVideo,
+      {
+        autoAlpha: 0.16,
+        duration: 0.22,
+      },
+      videoPlaybackEnd - 0.18,
+    );
 };

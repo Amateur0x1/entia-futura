@@ -3,6 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import type { HomeHeroTransitionElements } from './getHomeCalibrationElements';
 import { addNextPreviewTransition } from './addNextPreviewTransition';
+import { addHeroVideoTransitionSegment } from './heroVideoEffects';
 import { setupNextPanelReveal } from './setupNextPanelReveal';
 
 interface InitHeroTransitionSectionEffectsOptions {
@@ -161,56 +162,6 @@ const addHeroVisualSegment = ({
     );
 };
 
-const addHeroVideoSegment = ({
-  elements,
-  heroTimeline,
-}: {
-  elements: HomeHeroTransitionElements;
-  heroTimeline: gsap.core.Timeline;
-}) => {
-  const { heroVideoShell, loopVideo, scrollVideo } = elements;
-  const videoPlaybackStart = 0;
-  const videoPlaybackDuration = 1.38;
-  const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
-
-  if (!heroVideoShell || !scrollVideo || !loopVideo) {
-    return;
-  }
-
-  const targetDuration = Math.max(scrollVideo.duration - 0.04, 0);
-  if (targetDuration <= 0) {
-    return;
-  }
-
-  gsap.set(loopVideo, { autoAlpha: 0 });
-
-  heroTimeline
-    .to(
-      scrollVideo,
-      {
-        currentTime: targetDuration,
-        duration: videoPlaybackDuration,
-      },
-      videoPlaybackStart,
-    )
-    .to(
-      loopVideo,
-      {
-        autoAlpha: 1,
-        duration: 0.32,
-      },
-      videoPlaybackEnd - 0.24,
-    )
-    .to(
-      scrollVideo,
-      {
-        autoAlpha: 0.16,
-        duration: 0.22,
-      },
-      videoPlaybackEnd - 0.18,
-    );
-};
-
 const createKnowMoreTrigger = ({
   knowMoreButton,
   nextPanel,
@@ -293,7 +244,7 @@ const initHeroScrollOrchestrator = ({
     });
   }
 
-  addHeroVideoSegment({
+  addHeroVideoTransitionSegment({
     elements,
     heroTimeline,
   });
