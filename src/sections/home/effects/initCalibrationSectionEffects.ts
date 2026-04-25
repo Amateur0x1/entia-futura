@@ -259,64 +259,55 @@ const initHeroScrollOrchestrator = ({
     return;
   }
 
-  const media = gsap.matchMedia();
+  const headerOffset = getHeaderOffset();
+  const playbackStretch = 3;
+  const fallbackDistance = (window.innerWidth <= 720 ? 1400 : 2400) * playbackStretch;
+  const videoPlaybackStart = 0;
+  const videoPlaybackDuration = 1.38;
+  const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
+  const transitionStartAtVideoEnd = videoPlaybackEnd - 0.04;
 
-  media.add('(min-width: 0px)', () => {
-    const headerOffset = getHeaderOffset();
-    const playbackStretch = 3;
-    const fallbackDistance = (window.innerWidth <= 720 ? 1400 : 2400) * playbackStretch;
-    const videoPlaybackStart = 0;
-    const videoPlaybackDuration = 1.38;
-    const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
-    const transitionStartAtVideoEnd = videoPlaybackEnd - 0.04;
+  const heroTimeline = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: {
+      trigger: heroTransitionRoot,
+      start: `top top+=${Math.round(headerOffset)}`,
+      endTrigger: nextPanel ?? heroTransitionRoot,
+      end: nextPanel ? `top top+=${Math.round(headerOffset)}` : `+=${fallbackDistance}`,
+      scrub: 1,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+    },
+  });
 
-    const heroTimeline = gsap.timeline({
-      defaults: { ease: 'none' },
-      scrollTrigger: {
-        trigger: heroTransitionRoot,
-        start: `top top+=${Math.round(headerOffset)}`,
-        endTrigger: nextPanel ?? heroTransitionRoot,
-        end: nextPanel ? `top top+=${Math.round(headerOffset)}` : `+=${fallbackDistance}`,
-        scrub: 1,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      },
+  createKnowMoreTrigger({
+    knowMoreButton: elements.knowMoreButton,
+    nextPanel,
+  });
+
+  if (elements.primaryVisual) {
+    addHeroVisualSegment({
+      heroTimeline,
+      notes,
+      primaryVisual: elements.primaryVisual,
     });
+  }
 
-    const knowMoreTrigger = createKnowMoreTrigger({
-      knowMoreButton: elements.knowMoreButton,
-      nextPanel,
-    });
+  addHeroVideoSegment({
+    elements,
+    heroTimeline,
+  });
 
-    if (elements.primaryVisual) {
-      addHeroVisualSegment({
-        heroTimeline,
-        notes,
-        primaryVisual: elements.primaryVisual,
-      });
-    }
-
-    addHeroVideoSegment({
+  if (!prefersReducedMotion) {
+    addNextPreviewTransition({
       elements,
       heroTimeline,
+      notes,
+      shapeGridCells,
+      splitTextAvailable,
+      transitionStartAtVideoEnd,
     });
-
-    if (!prefersReducedMotion) {
-      addNextPreviewTransition({
-        elements,
-        heroTimeline,
-        notes,
-        shapeGridCells,
-        splitTextAvailable,
-        transitionStartAtVideoEnd,
-      });
-    }
-
-    return () => {
-      heroTimeline.kill();
-      knowMoreTrigger?.kill();
-    };
-  });
+  }
 };
 
 export const initHeroTransitionSectionEffects = ({
