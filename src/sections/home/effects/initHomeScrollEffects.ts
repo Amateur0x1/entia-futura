@@ -7,10 +7,16 @@ import { revealSection } from './revealSection';
 
 interface InitHomeScrollEffectsOptions {
   homeHeroElements: HomeHeroElements;
+  prefersReducedMotion: boolean;
+  shapeGridCells: SVGRectElement[];
+  splitTextAvailable: boolean;
 }
 
 export const initHomeScrollEffects = ({
   homeHeroElements,
+  prefersReducedMotion,
+  shapeGridCells,
+  splitTextAvailable,
 }: InitHomeScrollEffectsOptions) => {
   initHeroKnowMoreInteractionEffects({
     knowMoreButton: homeHeroElements.knowMoreButton,
@@ -19,6 +25,9 @@ export const initHomeScrollEffects = ({
 
   initHeroToIntroScrollTransition({
     elements: homeHeroElements,
+    prefersReducedMotion,
+    shapeGridCells,
+    splitTextAvailable,
   });
 
   gsap.utils.toArray<Element>('[data-reveal]').forEach((section, index) => {

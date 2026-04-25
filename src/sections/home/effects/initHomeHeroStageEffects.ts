@@ -1,12 +1,10 @@
 import gsap from 'gsap';
 
 import type { HomeHeroElements } from './getHomeHeroElements';
-import { setupNextPanelReveal } from './setupNextPanelReveal';
 
 interface InitHomeHeroStageEffectsOptions {
   elements: HomeHeroElements;
   prefersReducedMotion: boolean;
-  splitTextAvailable: boolean;
 }
 
 const applyHomeHeroInitialStates = ({
@@ -16,7 +14,7 @@ const applyHomeHeroInitialStates = ({
   elements: HomeHeroElements;
   prefersReducedMotion: boolean;
 }) => {
-  const { nextPanelDivider, primaryVisual } = elements;
+  const { nextPanel, nextPanelDivider, primaryVisual, shapeOverlay } = elements;
 
   if (!primaryVisual) {
     return;
@@ -27,11 +25,26 @@ const applyHomeHeroInitialStates = ({
   });
 
   if (!prefersReducedMotion) {
+    if (nextPanel) {
+      gsap.set(nextPanel, {
+        autoAlpha: 0,
+        y: 36,
+        visibility: 'hidden',
+      });
+    }
+
     if (nextPanelDivider) {
       gsap.set(nextPanelDivider, {
         autoAlpha: 0,
         scaleX: 0,
         transformOrigin: 'left center',
+      });
+    }
+
+    if (shapeOverlay) {
+      gsap.set(shapeOverlay, {
+        autoAlpha: 0,
+        visibility: 'hidden',
       });
     }
   }
@@ -77,17 +90,11 @@ const createHomeHeroEntranceTimeline = (primaryVisual: HTMLElement, notes: HTMLE
 export const initHomeHeroStageEffects = ({
   elements,
   prefersReducedMotion,
-  splitTextAvailable,
 }: InitHomeHeroStageEffectsOptions) => {
   const {
     heroTransitionFrame,
     heroTransitionRoot,
-    nextPanel,
-    nextPanelBody,
     nextPanelDivider,
-    nextPanelHeading,
-    nextPanelLabel,
-    nextPanelParagraphs,
     primaryVisual,
     signalCards,
   } = elements;
@@ -103,15 +110,4 @@ export const initHomeHeroStageEffects = ({
     prefersReducedMotion,
   });
   createHomeHeroEntranceTimeline(primaryVisual, notes);
-
-  setupNextPanelReveal({
-    prefersReducedMotion,
-    splitTextAvailable,
-    nextPanel,
-    nextPanelLabel,
-    nextPanelHeading,
-    nextPanelDivider,
-    nextPanelBody,
-    nextPanelParagraphs,
-  });
 };

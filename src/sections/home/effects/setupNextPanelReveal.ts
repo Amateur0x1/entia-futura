@@ -10,6 +10,8 @@ interface SetupNextPanelRevealArgs {
   nextPanelDivider: Element | null | undefined;
   nextPanelBody: Element | null | undefined;
   nextPanelParagraphs: HTMLElement[];
+  timeline?: gsap.core.Timeline;
+  startAt?: number;
 }
 
 export const setupNextPanelReveal = ({
@@ -21,6 +23,8 @@ export const setupNextPanelReveal = ({
   nextPanelDivider,
   nextPanelBody,
   nextPanelParagraphs,
+  timeline,
+  startAt = 0,
 }: SetupNextPanelRevealArgs) => {
   if (
     prefersReducedMotion ||
@@ -53,16 +57,18 @@ export const setupNextPanelReveal = ({
   }
   gsap.set(nextPanelBodyWords, { willChange: 'transform, opacity' });
 
-  const nextPanelTextTimeline = gsap.timeline({
-    defaults: {
-      ease: 'power3.out',
-    },
-    scrollTrigger: {
-      trigger: nextPanel,
-      start: 'top 72%',
-      once: true,
-    },
-  });
+  const nextPanelTextTimeline =
+    timeline ??
+    gsap.timeline({
+      defaults: {
+        ease: 'power3.out',
+      },
+      scrollTrigger: {
+        trigger: nextPanel,
+        start: 'top 72%',
+        once: true,
+      },
+    });
 
   nextPanelTextTimeline
     .fromTo(
@@ -80,7 +86,7 @@ export const setupNextPanelReveal = ({
         duration: 0.44,
         stagger: 0.02,
       },
-      0,
+      startAt,
     )
     .fromTo(
       nextPanelHeadingSplit?.words ?? nextPanelHeading,
@@ -97,7 +103,7 @@ export const setupNextPanelReveal = ({
         duration: 0.5,
         stagger: 0.024,
       },
-      0,
+      startAt,
     )
     .to(
       nextPanelDivider,
@@ -107,7 +113,7 @@ export const setupNextPanelReveal = ({
         y: 0,
         duration: 0.5,
       },
-      0.08,
+      startAt + 0.08,
     )
     .to(
       nextPanelDivider,
@@ -116,7 +122,7 @@ export const setupNextPanelReveal = ({
         duration: 0.44,
         ease: 'power2.out',
       },
-      0.08,
+      startAt + 0.08,
     )
     .to(
       nextPanelBody,
@@ -126,7 +132,7 @@ export const setupNextPanelReveal = ({
         y: 0,
         duration: 0.01,
       },
-      0.95,
+      startAt + 0.95,
     );
 
   if (nextPanelParagraphs.length > 0) {
@@ -146,7 +152,7 @@ export const setupNextPanelReveal = ({
         stagger: 0.01,
         ease: 'power3.out',
       },
-      0.42,
+      startAt + 0.42,
     );
   }
 };
