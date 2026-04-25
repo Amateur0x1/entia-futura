@@ -10,6 +10,7 @@ const STREAM_HEIGHT_MULTIPLIER = 3.2;
 const EXTRA_TRAVEL_VIEWPORT_MULTIPLIER = 1;
 const LEFT_STATIC_REGION_RATIO = 0.25;
 const ACCELERATION_END_REGION_RATIO = 0.75;
+const MOVING_MIN_SPEED_MULTIPLIER = 0.15;
 const RIGHT_EDGE_MAX_SPEED_MULTIPLIER = 0.6;
 const COLUMN_START_STAGGER_ROWS = 10;
 const BASE_COLUMN_DENSITY = 1.18;
@@ -134,7 +135,9 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
 
       const availableWidth = Math.max(accelerationEndPx - leftBoundaryPx, 1);
       const progress = Math.min(1, Math.max(0, (event.clientX - leftBoundaryPx) / availableWidth));
-      pointerSpeedMultiplier = progress * RIGHT_EDGE_MAX_SPEED_MULTIPLIER;
+      pointerSpeedMultiplier =
+        MOVING_MIN_SPEED_MULTIPLIER +
+        progress * (RIGHT_EDGE_MAX_SPEED_MULTIPLIER - MOVING_MIN_SPEED_MULTIPLIER);
     };
 
     const handlePointerCancel = () => {
