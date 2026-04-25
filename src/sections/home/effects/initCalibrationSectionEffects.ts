@@ -12,6 +12,14 @@ interface InitCalibrationSectionEffectsOptions {
   shapeGridCells: SVGRectElement[];
 }
 
+interface HeroScrollOrchestratorOptions {
+  elements: HomeCalibrationElements;
+  notes: HTMLElement[];
+  prefersReducedMotion: boolean;
+  shapeGridCells: SVGRectElement[];
+  splitTextAvailable: boolean;
+}
+
 const getHeaderOffset = () => {
   const pageShell = document.querySelector('.page-shell');
   const siteHeader = document.querySelector('.site-header');
@@ -31,38 +39,18 @@ const getHeaderOffset = () => {
   return Math.max(shellPaddingTop + headerHeight + headerMarginBottom, 0);
 };
 
-export const initCalibrationSectionEffects = ({
+const applyCalibrationInitialStates = ({
   elements,
   prefersReducedMotion,
-  splitTextAvailable,
-  shapeGridCells,
-}: InitCalibrationSectionEffectsOptions) => {
-  const {
-    calibrationFrame,
-    calibrationRoot,
-    heroVideoShell,
-    knowMoreButton,
-    loopVideo,
-    nextPanel,
-    nextPanelBody,
-    nextPanelDivider,
-    nextPanelHeading,
-    nextPanelLabel,
-    nextPanelParagraphs,
-    nextPreview,
-    nextPreviewDivider,
-    nextPreviewInner,
-    primaryVisual,
-    scrollVideo,
-    shapeOverlay,
-    signalCards,
-  } = elements;
+}: {
+  elements: HomeCalibrationElements;
+  prefersReducedMotion: boolean;
+}) => {
+  const { nextPanelDivider, nextPreview, nextPreviewDivider, nextPreviewInner, primaryVisual, shapeOverlay } = elements;
 
-  if (!calibrationRoot || !calibrationFrame || !primaryVisual) {
+  if (!primaryVisual) {
     return;
   }
-
-  const notes = signalCards;
 
   gsap.set(primaryVisual, {
     transformOrigin: '50% 50%',
@@ -104,7 +92,9 @@ export const initCalibrationSectionEffects = ({
       autoAlpha: 0,
     });
   }
+};
 
+const createCalibrationIntroTimeline = (primaryVisual: HTMLElement, notes: HTMLElement[]) => {
   const introTimeline = gsap.timeline({
     defaults: {
       ease: 'power3.out',
@@ -138,6 +128,235 @@ export const initCalibrationSectionEffects = ({
       },
       '-=0.42',
     );
+};
+
+const addHeroVisualSegment = ({
+  heroTimeline,
+  notes,
+  primaryVisual,
+}: {
+  heroTimeline: gsap.core.Timeline;
+  primaryVisual: HTMLElement;
+  notes: HTMLElement[];
+}) => {
+  heroTimeline
+    .to(
+      primaryVisual,
+      {
+        yPercent: -2,
+        scale: 1.03,
+        duration: 1.2,
+      },
+      0,
+    )
+    .to(
+      notes,
+      {
+        y: -42,
+        autoAlpha: (index: number) => (index === notes.length - 1 ? 1 : 0.52),
+        duration: 0.7,
+        stagger: 0.03,
+      },
+      0.08,
+    );
+};
+
+const addHeroVideoSegment = ({
+  elements,
+  heroTimeline,
+}: {
+  elements: HomeCalibrationElements;
+  heroTimeline: gsap.core.Timeline;
+}) => {
+  const { heroVideoShell, loopVideo, scrollVideo } = elements;
+  const videoPlaybackStart = 0;
+  const videoPlaybackDuration = 1.38;
+  const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
+
+  if (!heroVideoShell || !scrollVideo || !loopVideo) {
+    return;
+  }
+
+  const targetDuration = Math.max(scrollVideo.duration - 0.04, 0);
+  if (targetDuration <= 0) {
+    return;
+  }
+
+  gsap.set(loopVideo, { autoAlpha: 0 });
+
+  heroTimeline
+    .to(
+      scrollVideo,
+      {
+        currentTime: targetDuration,
+        duration: videoPlaybackDuration,
+      },
+      videoPlaybackStart,
+    )
+    .to(
+      loopVideo,
+      {
+        autoAlpha: 1,
+        duration: 0.32,
+      },
+      videoPlaybackEnd - 0.24,
+    )
+    .to(
+      scrollVideo,
+      {
+        autoAlpha: 0.16,
+        duration: 0.22,
+      },
+      videoPlaybackEnd - 0.18,
+    );
+};
+
+const createKnowMoreTrigger = ({
+  knowMoreButton,
+  nextPanel,
+}: {
+  knowMoreButton: HTMLElement | null;
+  nextPanel: HTMLElement | null;
+}) => {
+  if (!knowMoreButton || !nextPanel) {
+    return null;
+  }
+
+  return ScrollTrigger.create({
+    trigger: nextPanel,
+    start: 'top 92%',
+    end: 'bottom top',
+    onEnter: () => {
+      gsap.to(knowMoreButton, {
+        autoAlpha: 0,
+        y: 10,
+        duration: 0.24,
+        ease: 'power2.out',
+        pointerEvents: 'none',
+      });
+    },
+    onLeaveBack: () => {
+      gsap.to(knowMoreButton, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.24,
+        ease: 'power2.out',
+        pointerEvents: 'auto',
+      });
+    },
+  });
+};
+
+const initHeroScrollOrchestrator = ({
+  elements,
+  notes,
+  prefersReducedMotion,
+  shapeGridCells,
+  splitTextAvailable,
+}: HeroScrollOrchestratorOptions) => {
+  const { calibrationRoot, nextPanel } = elements;
+  if (!calibrationRoot) {
+    return;
+  }
+
+  const media = gsap.matchMedia();
+
+  media.add('(min-width: 0px)', () => {
+    const headerOffset = getHeaderOffset();
+    const playbackStretch = 3;
+    const fallbackDistance = (window.innerWidth <= 720 ? 1400 : 2400) * playbackStretch;
+    const videoPlaybackStart = 0;
+    const videoPlaybackDuration = 1.38;
+    const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
+    const transitionStartAtVideoEnd = videoPlaybackEnd - 0.04;
+
+    const heroTimeline = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: {
+        trigger: calibrationRoot,
+        start: `top top+=${Math.round(headerOffset)}`,
+        endTrigger: nextPanel ?? calibrationRoot,
+        end: nextPanel ? `top top+=${Math.round(headerOffset)}` : `+=${fallbackDistance}`,
+        scrub: 1,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+      },
+    });
+
+    const knowMoreTrigger = createKnowMoreTrigger({
+      knowMoreButton: elements.knowMoreButton,
+      nextPanel,
+    });
+
+    if (elements.primaryVisual) {
+      addHeroVisualSegment({
+        heroTimeline,
+        notes,
+        primaryVisual: elements.primaryVisual,
+      });
+    }
+
+    addHeroVideoSegment({
+      elements,
+      heroTimeline,
+    });
+
+    if (!prefersReducedMotion) {
+      addNextPreviewTransition({
+        elements,
+        heroTimeline,
+        notes,
+        shapeGridCells,
+        splitTextAvailable,
+        transitionStartAtVideoEnd,
+      });
+    }
+
+    return () => {
+      heroTimeline.kill();
+      knowMoreTrigger?.kill();
+    };
+  });
+};
+
+export const initCalibrationSectionEffects = ({
+  elements,
+  prefersReducedMotion,
+  splitTextAvailable,
+  shapeGridCells,
+}: InitCalibrationSectionEffectsOptions) => {
+  const {
+    calibrationFrame,
+    calibrationRoot,
+    heroVideoShell,
+    knowMoreButton,
+    loopVideo,
+    nextPanel,
+    nextPanelBody,
+    nextPanelDivider,
+    nextPanelHeading,
+    nextPanelLabel,
+    nextPanelParagraphs,
+    nextPreview,
+    nextPreviewDivider,
+    nextPreviewInner,
+    primaryVisual,
+    scrollVideo,
+    shapeOverlay,
+    signalCards,
+  } = elements;
+
+  if (!calibrationRoot || !calibrationFrame || !primaryVisual) {
+    return;
+  }
+
+  const notes = signalCards;
+
+  applyCalibrationInitialStates({
+    elements,
+    prefersReducedMotion,
+  });
+  createCalibrationIntroTimeline(primaryVisual, notes);
 
   let calibrationScrollInitialized = false;
 
@@ -147,128 +366,12 @@ export const initCalibrationSectionEffects = ({
     }
 
     calibrationScrollInitialized = true;
-
-    const media = gsap.matchMedia();
-
-    media.add('(min-width: 0px)', () => {
-      const headerOffset = getHeaderOffset();
-      const playbackStretch = 3;
-      const fallbackDistance = (window.innerWidth <= 720 ? 1400 : 2400) * playbackStretch;
-      const videoPlaybackStart = 0;
-      const videoPlaybackDuration = 1.38;
-      const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
-      const transitionStartAtVideoEnd = videoPlaybackEnd - 0.04;
-
-      const heroTimeline = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: calibrationRoot,
-          start: `top top+=${Math.round(headerOffset)}`,
-          endTrigger: nextPanel ?? calibrationRoot,
-          end: nextPanel ? `top top+=${Math.round(headerOffset)}` : `+=${fallbackDistance}`,
-          scrub: 1,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-
-      let knowMoreTrigger: ScrollTrigger | null = null;
-      if (knowMoreButton && nextPanel) {
-        knowMoreTrigger = ScrollTrigger.create({
-          trigger: nextPanel,
-          start: 'top 92%',
-          end: 'bottom top',
-          onEnter: () => {
-            gsap.to(knowMoreButton, {
-              autoAlpha: 0,
-              y: 10,
-              duration: 0.24,
-              ease: 'power2.out',
-              pointerEvents: 'none',
-            });
-          },
-          onLeaveBack: () => {
-            gsap.to(knowMoreButton, {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.24,
-              ease: 'power2.out',
-              pointerEvents: 'auto',
-            });
-          },
-        });
-      }
-
-      heroTimeline
-        .to(
-          primaryVisual,
-          {
-            yPercent: -2,
-            scale: 1.03,
-            duration: 1.2,
-          },
-          0,
-        )
-        .to(
-          notes,
-          {
-            y: -42,
-            autoAlpha: (index: number) => (index === notes.length - 1 ? 1 : 0.52),
-            duration: 0.7,
-            stagger: 0.03,
-          },
-          0.08,
-        );
-
-      if (heroVideoShell && scrollVideo && loopVideo) {
-        const targetDuration = Math.max(scrollVideo.duration - 0.04, 0);
-
-        if (targetDuration > 0) {
-          gsap.set(loopVideo, { autoAlpha: 0 });
-
-          heroTimeline
-            .to(
-              scrollVideo,
-              {
-                currentTime: targetDuration,
-                duration: videoPlaybackDuration,
-              },
-              videoPlaybackStart,
-            )
-            .to(
-              loopVideo,
-              {
-                autoAlpha: 1,
-                duration: 0.32,
-              },
-              videoPlaybackEnd - 0.24,
-            )
-            .to(
-              scrollVideo,
-              {
-                autoAlpha: 0.16,
-                duration: 0.22,
-              },
-              videoPlaybackEnd - 0.18,
-            );
-        }
-      }
-
-      if (!prefersReducedMotion) {
-        addNextPreviewTransition({
-          elements,
-          heroTimeline,
-          notes,
-          shapeGridCells,
-          splitTextAvailable,
-          transitionStartAtVideoEnd,
-        });
-      }
-
-      return () => {
-        heroTimeline.kill();
-        knowMoreTrigger?.kill();
-      };
+    initHeroScrollOrchestrator({
+      elements,
+      notes,
+      prefersReducedMotion,
+      shapeGridCells,
+      splitTextAvailable,
     });
   };
 

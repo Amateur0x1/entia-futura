@@ -13,19 +13,13 @@ export const initResearchTrackEffects = (
   shapeOverlay: SVGSVGElement | null,
   shapeGridCells: SVGRectElement[],
 ) => {
-  const TRANSITION_SWAP_START = 0.3;
-  const TRANSITION_SWAP_END = 0.82;
+  const TRANSITION_OVERLAY_FADE_AT = 0.78;
   const TRANSITION_COMMIT_AT = 0.98;
 
   const track = document.querySelector<HTMLElement>('[data-research-track]');
   const rail = track?.querySelector<HTMLElement>('[data-research-rail]');
   const panels = rail ? Array.from(rail.querySelectorAll<HTMLElement>('[data-research-panel]')) : [];
-  const nextPreview = document.querySelector<HTMLElement>('[data-next-preview]');
-  const researchPreview = document.querySelector<HTMLElement>('[data-research-preview]');
-  const researchPreviewInner = researchPreview?.querySelector<HTMLElement>('[data-research-preview-inner]') ?? null;
-  const researchPreviewPanels = researchPreview
-    ? Array.from(researchPreview.querySelectorAll<HTMLElement>('.landing-research-panel'))
-    : [];
+  const preResearchPreview = document.querySelector<HTMLElement>('[data-next-preview]');
 
   if (!track || !rail || panels.length === 0) {
     return;
@@ -38,13 +32,6 @@ export const initResearchTrackEffects = (
 
   gsap.set(track, { autoAlpha: 0 });
   gsap.set(panels, { y: 36 });
-  gsap.set(researchPreviewPanels, { y: 36 });
-  if (researchPreview) {
-    gsap.set(researchPreview, { autoAlpha: 0 });
-  }
-  if (researchPreviewInner) {
-    gsap.set(researchPreviewInner, { autoAlpha: 0, y: 42 });
-  }
   if (shapeOverlay) {
     gsap.set(shapeOverlay, { autoAlpha: 0 });
   }
@@ -63,10 +50,8 @@ export const initResearchTrackEffects = (
       end: 'top top',
       scrub: true,
       onLeaveBack: () => {
-        if (!nextPreview) return;
-        gsap.set(nextPreview, { autoAlpha: 1, y: 0, visibility: 'visible' });
-        if (researchPreview) {
-          gsap.set(researchPreview, { autoAlpha: 0, visibility: 'hidden' });
+        if (preResearchPreview) {
+          gsap.set(preResearchPreview, { autoAlpha: 1, y: 0, visibility: 'visible' });
         }
         gsap.set(track, { autoAlpha: 0 });
       },
@@ -107,55 +92,8 @@ export const initResearchTrackEffects = (
           duration: 0.01,
           ease: 'none',
         },
-        0.78,
+        TRANSITION_OVERLAY_FADE_AT,
       );
-  }
-
-  if (nextPreview) {
-    handoffTimeline.to(
-      nextPreview,
-      {
-        autoAlpha: 0,
-        y: -28,
-        duration: TRANSITION_SWAP_END - TRANSITION_SWAP_START,
-      },
-      TRANSITION_SWAP_START,
-    );
-  }
-
-  if (researchPreview) {
-    handoffTimeline.set(
-      researchPreview,
-      {
-        autoAlpha: 1,
-        visibility: 'visible',
-      },
-      TRANSITION_SWAP_START,
-    );
-  }
-
-  if (researchPreviewInner) {
-    handoffTimeline.to(
-      researchPreviewInner,
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: TRANSITION_SWAP_END - TRANSITION_SWAP_START,
-        ease: 'power3.out',
-      },
-      TRANSITION_SWAP_START,
-    );
-  }
-  if (researchPreviewPanels.length > 0) {
-    handoffTimeline.to(
-      researchPreviewPanels,
-      {
-        y: 0,
-        duration: TRANSITION_SWAP_END - TRANSITION_SWAP_START,
-        ease: 'none',
-      },
-      TRANSITION_SWAP_START,
-    );
   }
 
   handoffTimeline.to(
@@ -168,11 +106,12 @@ export const initResearchTrackEffects = (
     TRANSITION_COMMIT_AT,
   );
 
-  if (researchPreview) {
+  if (preResearchPreview) {
     handoffTimeline.to(
-      researchPreview,
+      preResearchPreview,
       {
         autoAlpha: 0,
+        y: -28,
         duration: 0.01,
       },
       TRANSITION_COMMIT_AT,
@@ -194,14 +133,15 @@ export const initResearchTrackEffects = (
     },
   });
 
-  ScrollTrigger.create({
-    trigger: track,
-    start: 'top 98%',
-    end: 'top top',
-    scrub: true,
-    onUpdate: ({ progress }) => {
-      if (!nextPreview) return;
-      gsap.set(nextPreview, { visibility: progress > TRANSITION_COMMIT_AT ? 'hidden' : 'visible' });
-    },
-  });
+  if (preResearchPreview) {
+    ScrollTrigger.create({
+      trigger: track,
+      start: 'top 98%',
+      end: 'top top',
+      scrub: true,
+      onUpdate: ({ progress }) => {
+        gsap.set(preResearchPreview, { visibility: progress > TRANSITION_COMMIT_AT ? 'hidden' : 'visible' });
+      },
+    });
+  }
 };
