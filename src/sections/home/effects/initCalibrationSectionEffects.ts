@@ -1,9 +1,10 @@
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import type { HomeHeroTransitionElements } from './getHomeCalibrationElements';
+import { addHeroVisualTransitionSegment } from './addHeroVisualTransitionSegment';
 import { addNextPreviewTransition } from './addNextPreviewTransition';
 import { addHeroVideoTransitionSegment } from './heroVideoEffects';
+import { initHeroKnowMoreInteractionEffects } from './initHeroKnowMoreInteractionEffects';
 import { setupNextPanelReveal } from './setupNextPanelReveal';
 
 interface InitHeroTransitionSectionEffectsOptions {
@@ -131,73 +132,6 @@ const createHeroTransitionIntroTimeline = (primaryVisual: HTMLElement, notes: HT
     );
 };
 
-const addHeroVisualSegment = ({
-  heroTimeline,
-  notes,
-  primaryVisual,
-}: {
-  heroTimeline: gsap.core.Timeline;
-  primaryVisual: HTMLElement;
-  notes: HTMLElement[];
-}) => {
-  heroTimeline
-    .to(
-      primaryVisual,
-      {
-        yPercent: -2,
-        scale: 1.03,
-        duration: 1.2,
-      },
-      0,
-    )
-    .to(
-      notes,
-      {
-        y: -42,
-        autoAlpha: (index: number) => (index === notes.length - 1 ? 1 : 0.52),
-        duration: 0.7,
-        stagger: 0.03,
-      },
-      0.08,
-    );
-};
-
-const createKnowMoreTrigger = ({
-  knowMoreButton,
-  nextPanel,
-}: {
-  knowMoreButton: HTMLElement | null;
-  nextPanel: HTMLElement | null;
-}) => {
-  if (!knowMoreButton || !nextPanel) {
-    return null;
-  }
-
-  return ScrollTrigger.create({
-    trigger: nextPanel,
-    start: 'top 92%',
-    end: 'bottom top',
-    onEnter: () => {
-      gsap.to(knowMoreButton, {
-        autoAlpha: 0,
-        y: 10,
-        duration: 0.24,
-        ease: 'power2.out',
-        pointerEvents: 'none',
-      });
-    },
-    onLeaveBack: () => {
-      gsap.to(knowMoreButton, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.24,
-        ease: 'power2.out',
-        pointerEvents: 'auto',
-      });
-    },
-  });
-};
-
 const initHeroScrollOrchestrator = ({
   elements,
   notes,
@@ -231,13 +165,13 @@ const initHeroScrollOrchestrator = ({
     },
   });
 
-  createKnowMoreTrigger({
+  initHeroKnowMoreInteractionEffects({
     knowMoreButton: elements.knowMoreButton,
     nextPanel,
   });
 
   if (elements.primaryVisual) {
-    addHeroVisualSegment({
+    addHeroVisualTransitionSegment({
       heroTimeline,
       notes,
       primaryVisual: elements.primaryVisual,
