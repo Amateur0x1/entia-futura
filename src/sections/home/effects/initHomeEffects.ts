@@ -8,7 +8,6 @@ import { initHeroTransitionSectionEffects } from './initCalibrationSectionEffect
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
 import { initResearchTrackEffects } from './initResearchTrackEffects';
-import { initTransformSectionEffects } from './initTransformSectionEffects';
 import { revealSection } from './revealSection';
 import { setupShapeOverlayGrid } from './shapeOverlayGrid';
 
@@ -56,7 +55,6 @@ export const initHomeEffects = () => {
     shapeGridCells,
   });
 
-  initTransformSectionEffects();
   initMonolithBinaryVisuals(prefersReducedMotion);
   initResearchTrackEffects(prefersReducedMotion, heroTransitionElements.shapeOverlay, shapeGridCells);
 
