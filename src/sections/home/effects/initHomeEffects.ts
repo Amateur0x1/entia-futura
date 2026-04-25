@@ -8,7 +8,6 @@ import { initHomeHeroStageEffects } from './initHomeHeroStageEffects';
 import { initHomeScrollEffects } from './initHomeScrollEffects';
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
-import { setupShapeOverlayGrid } from './shapeOverlayGrid';
 
 const initSmoothScrolling = () => {
   const lenis = new Lenis({
@@ -38,7 +37,6 @@ export const initHomeEffects = () => {
   }
 
   const homeHeroElements = getHomeHeroElements();
-  const shapeGridCells = setupShapeOverlayGrid(homeHeroElements.shapeOverlay);
 
   initHeroVideoEffects({
     heroVideoShell: homeHeroElements.heroVideoShell,
@@ -57,9 +55,6 @@ export const initHomeEffects = () => {
 
   initHomeScrollEffects({
     homeHeroElements,
-    prefersReducedMotion,
-    shapeGridCells,
-    splitTextAvailable,
   });
 
   window.addEventListener(

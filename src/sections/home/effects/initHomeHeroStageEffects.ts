@@ -16,7 +16,7 @@ const applyHomeHeroInitialStates = ({
   elements: HomeHeroElements;
   prefersReducedMotion: boolean;
 }) => {
-  const { nextPanelDivider, primaryVisual, shapeOverlay } = elements;
+  const { nextPanelDivider, primaryVisual } = elements;
 
   if (!primaryVisual) {
     return;
@@ -36,11 +36,6 @@ const applyHomeHeroInitialStates = ({
     }
   }
 
-  if (shapeOverlay) {
-    gsap.set(shapeOverlay, {
-      autoAlpha: 0,
-    });
-  }
 };
 
 const createHomeHeroEntranceTimeline = (primaryVisual: HTMLElement, notes: HTMLElement[]) => {

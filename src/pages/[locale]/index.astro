@@ -25,56 +25,6 @@ const instituteIntro = pickByLocale(
   '未来人研究所是一个围绕“未来我们将如何存在？”这一核心问题展开工作的独立研究机构。我们以高等研究为基础，同时强调研究向现实问题、合作机制、未来项目与社会实验的持续转化。\n我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。',
   'Entia Futura Institut is an independent institute organized around the question: “How shall we exist in the future?” Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, future ventures, and social experimentation.\nWe are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life.',
 );
-const researchPanels = [
-  {
-    zhTitle: 'AI 与未来生活',
-    enTitle: 'AI and Future Life',
-    zhBody:
-      '关注 AI 如何重组学习、劳动、表达、情感与日常存在，理解技术如何改变我们存在于世界中的方式。',
-    enBody:
-      'How AI reshapes learning, labor, expression, feeling, and everyday existence, and how technology changes the ways we exist in the world.',
-  },
-  {
-    zhTitle: '知识生产与新型学习共同体',
-    enTitle: 'Knowledge Production and New Learning Communities',
-    zhBody:
-      '关注大学转型背景下，新的研究机构、学习机制、写作网络与知识共同体如何形成。',
-    enBody:
-      'How new research institutions, learning structures, writing networks, and communities of inquiry may emerge amid the transformation of the university.',
-  },
-  {
-    zhTitle: '社群、空间与新的公共生活',
-    enTitle: 'Communities, Space, and New Public Life',
-    zhBody:
-      '关注书店、研究所、城市空间、线上网络如何成为新的公共节点，形成新的知识交换与共同生活形式。',
-    enBody:
-      'How bookstores, institutes, urban spaces, and online networks can become new public nodes for knowledge exchange and collective life.',
-  },
-  {
-    zhTitle: '地方文化与未来组织形式',
-    enTitle: 'Local Culture and Future Forms of Organization',
-    zhBody:
-      '关注地方文化、区域产业、青年流动与新型组织机制之间的关系，探索地方如何重新获得主动性。',
-    enBody:
-      'How local culture, regional industries, youth mobility, and new organizational forms intersect, and how localities may regain agency.',
-  },
-  {
-    zhTitle: '商业世界中的研究能力',
-    enTitle: 'Research Capacity in the Commercial World',
-    zhBody:
-      '关注企业如何发展更深的社会理解、文化判断与长期研究能力，让研究真正进入组织实践。',
-    enBody:
-      'How enterprises may develop deeper social understanding, cultural judgment, and long-term research capacity, allowing inquiry to enter organizational practice.',
-  },
-  {
-    zhTitle: '未来共同体与生活形式实验',
-    enTitle: 'Experimenting with Future Forms of Collective Life',
-    zhBody:
-      '关注新的生活方式、协作关系、空间原型与组织机制如何在现实中被测试并逐渐成立。',
-    enBody:
-      'How new ways of living, collaborating, spatial prototyping, and organizing may be tested in reality and gradually take form.',
-  },
-] as const;
 ---
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
@@ -95,74 +45,7 @@ const researchPanels = [
         <HomeMonolithVisual />
       </div>
     </section>
-    <section class="landing-research-track" data-research-track>
-      <div class="landing-research-track__inner">
-        <header class="landing-research-track__header">
-          <p class="landing-research-track__label-zh">研究方向</p>
-          <p class="landing-research-track__label-en">Research</p>
-        </header>
-        <div class="landing-research-track__viewport">
-          <div class="landing-research-track__rail" data-research-rail>
-            {researchPanels.map((panel, index) => (
-              <article class="landing-research-panel" data-research-panel>
-                <p class="landing-research-panel__index">模块 {index + 1}</p>
-                <h3 class="landing-research-panel__title-zh">{panel.zhTitle}</h3>
-                <h4 class="landing-research-panel__title-en">{panel.enTitle}</h4>
-                <p class="landing-research-panel__body-zh">{panel.zhBody}</p>
-                <p class="landing-research-panel__body-en">{panel.enBody}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
-  <section class="landing-research-preview" data-research-preview aria-hidden="true">
-    <div class="landing-research-track__inner landing-research-preview__inner" data-research-preview-inner>
-      <header class="landing-research-track__header">
-        <p class="landing-research-track__label-zh">研究方向</p>
-        <p class="landing-research-track__label-en">Research</p>
-      </header>
-      <div class="landing-research-track__viewport">
-        <div class="landing-research-track__rail">
-          {researchPanels.map((panel, index) => (
-            <article class="landing-research-panel">
-              <p class="landing-research-panel__index">模块 {index + 1}</p>
-              <h3 class="landing-research-panel__title-zh">{panel.zhTitle}</h3>
-              <h4 class="landing-research-panel__title-en">{panel.enTitle}</h4>
-              <p class="landing-research-panel__body-zh">{panel.zhBody}</p>
-              <p class="landing-research-panel__body-en">{panel.enBody}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-  <svg
-    class="shape-overlays landing-shape-overlays"
-    data-shape-overlay
-    viewBox="0 0 100 100"
-    preserveAspectRatio="none"
-    aria-hidden="true"
-  >
-    <defs>
-      <linearGradient id="landing-shape-gradient-1" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#00E5FF" />
-        <stop offset="100%" stop-color="#7B5CFF" />
-      </linearGradient>
-      <linearGradient id="landing-shape-gradient-2" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#7B5CFF" />
-        <stop offset="100%" stop-color="#0F172A" />
-      </linearGradient>
-      <linearGradient id="landing-shape-gradient-3" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#05070B" />
-        <stop offset="100%" stop-color="#05070B" />
-      </linearGradient>
-    </defs>
-    <path class="shape-overlays__path" fill="url(#landing-shape-gradient-1)"></path>
-    <path class="shape-overlays__path" fill="url(#landing-shape-gradient-2)"></path>
-    <path class="shape-overlays__path" fill="url(#landing-shape-gradient-3)"></path>
-  </svg>
   <HomeEffects />
 </Layout>
 
@@ -181,26 +64,6 @@ const researchPanels = [
     color: var(--color-secondary-foreground);
     overflow: clip;
   }
-
-
-  .landing-next-preview {
-    position: fixed;
-    inset: 0;
-    z-index: 45;
-    display: grid;
-    align-items: end;
-    padding: clamp(3.6rem, 9vw, 6.4rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
-    background: var(--color-background);
-    color: var(--color-secondary-foreground);
-    pointer-events: none;
-    visibility: hidden;
-    overflow: clip;
-  }
-
-  .landing-next-preview__inner {
-    width: 100%;
-  }
-
   .landing-next-panel__inner {
     position: relative;
     z-index: 1;
@@ -243,8 +106,7 @@ const researchPanels = [
     margin: 0;
   }
 
-  .landing-next-panel--en .landing-next-panel__body,
-  .landing-next-preview--en .landing-next-panel__body {
+  .landing-next-panel--en .landing-next-panel__body {
     gap: 30px;
   }
 
@@ -333,16 +195,6 @@ const researchPanels = [
     display: none;
   }
 
-  .landing-shape-overlays {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    visibility: hidden;
-  }
-
   :global(body.theme-landing-dark .page-shell-landing) {
     padding: 0;
   }
@@ -387,129 +239,6 @@ const researchPanels = [
     }
   }
 
-  .landing-research-track {
-    position: relative;
-    min-height: 100svh;
-    margin-inline: calc(50% - 50vw);
-    width: 100vw;
-    padding: calc(clamp(1.55rem, 3.2vw, 2.2rem) + 60px) clamp(1.2rem, 4vw, 3rem)
-      clamp(1.6rem, 3.4vw, 2.2rem);
-    background: #000;
-    overflow: clip;
-  }
-
-  .landing-research-preview {
-    position: fixed;
-    inset: 0;
-    z-index: 46;
-    display: grid;
-    align-items: start;
-    padding: calc(clamp(1.55rem, 3.2vw, 2.2rem) + 60px) clamp(1.2rem, 4vw, 3rem)
-      clamp(1.6rem, 3.4vw, 2.2rem);
-    background: #000;
-    color: var(--color-secondary-foreground);
-    pointer-events: none;
-    visibility: hidden;
-    overflow: clip;
-  }
-
-  .landing-research-preview__inner {
-    width: 100%;
-  }
-
-  .landing-research-track__inner {
-    display: grid;
-    gap: clamp(0.55rem, 1.2vw, 0.9rem);
-    min-height: min(68svh, 640px);
-    grid-template-rows: auto 1fr;
-  }
-
-  .landing-research-track__header {
-    display: grid;
-    gap: 0.2rem;
-  }
-
-  .landing-research-track__label-zh,
-  .landing-research-track__label-en {
-    margin: 0;
-    line-height: 1.06;
-    letter-spacing: -0.03em;
-    color: var(--color-secondary-foreground);
-  }
-
-  .landing-research-track__label-zh {
-    font-size: clamp(1.7rem, 3.8vw, 3rem);
-    font-weight: 520;
-  }
-
-  .landing-research-track__label-en {
-    font-size: clamp(1.15rem, 1.9vw, 1.6rem);
-    font-weight: 450;
-    opacity: 0.82;
-  }
-
-  .landing-research-track__viewport {
-    position: relative;
-    overflow: visible;
-    min-height: 0;
-  }
-
-  .landing-research-track__rail {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
-    gap: clamp(0.45rem, 0.9vw, 0.72rem);
-    width: 100%;
-    height: 100%;
-  }
-
-  .landing-research-panel {
-    width: 100%;
-    min-height: min(22svh, 210px);
-    display: grid;
-    align-content: start;
-    gap: 0.42rem;
-    padding: clamp(0.68rem, 1.2vw, 0.9rem);
-    border: 1px solid color-mix(in srgb, var(--color-border-inverse-strong) 76%, transparent);
-    background: linear-gradient(
-      175deg,
-      color-mix(in srgb, var(--color-background) 84%, white 16%) 0%,
-      color-mix(in srgb, var(--color-background) 94%, #120f25 6%) 100%
-    );
-    backdrop-filter: blur(2px);
-  }
-
-  .landing-research-panel__index {
-    margin: 0;
-    font-size: 0.74rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 58%, transparent);
-  }
-
-  .landing-research-panel__title-zh {
-    margin: 0;
-    font-size: clamp(1.02rem, 1.5vw, 1.32rem);
-    line-height: 1.18;
-    color: var(--color-secondary-foreground);
-  }
-
-  .landing-research-panel__title-en {
-    margin: 0;
-    font-size: clamp(0.82rem, 1.05vw, 1rem);
-    line-height: 1.2;
-    font-weight: 460;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 86%, transparent);
-  }
-
-  .landing-research-panel__body-zh,
-  .landing-research-panel__body-en {
-    margin: 0;
-    font-size: clamp(0.74rem, 0.9vw, 0.86rem);
-    line-height: 1.42;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 80%, transparent);
-  }
-
   @media (max-width: 720px) {
     .landing-next-panel {
       padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
@@ -517,14 +246,6 @@ const researchPanels = [
         max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
       padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
     }
-
-    .landing-next-preview {
-      padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
-      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
-        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
-      padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
-    }
-
 
     .landing-next-panel__inner {
       min-height: auto;
@@ -555,28 +276,5 @@ const researchPanels = [
       max-width: 11ch;
     }
 
-    .landing-research-track {
-      padding-top: max(4.2rem, calc(env(safe-area-inset-top) + 3.4rem));
-      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
-        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
-      padding-bottom: max(2.6rem, calc(env(safe-area-inset-bottom) + 2rem));
-    }
-
-    .landing-research-preview {
-      padding-top: max(4.2rem, calc(env(safe-area-inset-top) + 3.4rem));
-      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
-        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
-      padding-bottom: max(2.6rem, calc(env(safe-area-inset-bottom) + 2rem));
-    }
-
-    .landing-research-panel {
-      width: 100%;
-      min-height: auto;
-    }
-
-    .landing-research-track__rail {
-      grid-template-columns: 1fr;
-      grid-template-rows: none;
-    }
   }
 </style>
