@@ -1,12 +1,18 @@
 import gsap from 'gsap';
-import { initResearchTrackSectionEffects } from './initResearchTrackSectionEffects';
-import { initResearchTrackTransitionEffects } from './initResearchTrackTransitionEffects';
+import { addIntroToResearchHandoffSegment } from './addIntroToResearchHandoffSegment';
+import { addResearchTrackPanelMotion } from './addResearchTrackPanelMotion';
 
-export const initResearchTrackEffects = (
-  prefersReducedMotion: boolean,
-  shapeOverlay: SVGSVGElement | null,
-  shapeGridCells: SVGRectElement[],
-) => {
+interface InitIntroToResearchScrollTransitionOptions {
+  prefersReducedMotion: boolean;
+  shapeOverlay: SVGSVGElement | null;
+  shapeGridCells: SVGRectElement[];
+}
+
+export const initIntroToResearchScrollTransition = ({
+  prefersReducedMotion,
+  shapeOverlay,
+  shapeGridCells,
+}: InitIntroToResearchScrollTransitionOptions) => {
   const track = document.querySelector<HTMLElement>('[data-research-track]');
   const rail = track?.querySelector<HTMLElement>('[data-research-rail]');
   const panels = rail ? Array.from(rail.querySelectorAll<HTMLElement>('[data-research-panel]')) : [];
@@ -23,14 +29,14 @@ export const initResearchTrackEffects = (
 
   gsap.set(track, { autoAlpha: 0 });
   gsap.set(panels, { y: 36 });
-  initResearchTrackTransitionEffects({
+  addIntroToResearchHandoffSegment({
     track,
     preResearchPreview,
     shapeOverlay,
     shapeGridCells,
   });
 
-  initResearchTrackSectionEffects({
+  addResearchTrackPanelMotion({
     track,
     panels,
   });

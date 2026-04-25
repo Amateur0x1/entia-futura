@@ -9,19 +9,19 @@ import {
   getShapeTransformOrigin,
 } from './shapeOverlayGrid';
 
-interface InitResearchTrackTransitionEffectsOptions {
+interface AddIntroToResearchHandoffSegmentOptions {
   track: HTMLElement;
   preResearchPreview: HTMLElement | null;
   shapeOverlay: SVGSVGElement | null;
   shapeGridCells: SVGRectElement[];
 }
 
-export const initResearchTrackTransitionEffects = ({
+export const addIntroToResearchHandoffSegment = ({
   track,
   preResearchPreview,
   shapeOverlay,
   shapeGridCells,
-}: InitResearchTrackTransitionEffectsOptions) => {
+}: AddIntroToResearchHandoffSegmentOptions) => {
   const TRANSITION_OVERLAY_FADE_AT = 0.78;
   const TRANSITION_COMMIT_AT = 0.98;
 
@@ -35,7 +35,7 @@ export const initResearchTrackTransitionEffects = ({
     transformOrigin: (_index: number, target: Element) => getShapeTransformOrigin(target),
   });
 
-  const handoffTimeline = gsap.timeline({
+  const introToResearchTimeline = gsap.timeline({
     defaults: { ease: 'none' },
     scrollTrigger: {
       trigger: track,
@@ -52,7 +52,7 @@ export const initResearchTrackTransitionEffects = ({
   });
 
   if (shapeOverlay && shapeGridCells.length > 0) {
-    handoffTimeline
+    introToResearchTimeline
       .set(
         shapeOverlay,
         {
@@ -89,7 +89,7 @@ export const initResearchTrackTransitionEffects = ({
       );
   }
 
-  handoffTimeline.to(
+  introToResearchTimeline.to(
     track,
     {
       autoAlpha: 1,
@@ -100,7 +100,7 @@ export const initResearchTrackTransitionEffects = ({
   );
 
   if (preResearchPreview) {
-    handoffTimeline.to(
+    introToResearchTimeline.to(
       preResearchPreview,
       {
         autoAlpha: 0,

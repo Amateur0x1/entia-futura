@@ -1,14 +1,14 @@
 import gsap from 'gsap';
 
-interface InitResearchTrackSectionEffectsOptions {
+interface AddResearchTrackPanelMotionOptions {
   track: HTMLElement;
   panels: HTMLElement[];
 }
 
-export const initResearchTrackSectionEffects = ({
+export const addResearchTrackPanelMotion = ({
   track,
   panels,
-}: InitResearchTrackSectionEffectsOptions) => {
+}: AddResearchTrackPanelMotionOptions) => {
   gsap.to(panels, {
     y: 0,
     ease: 'none',

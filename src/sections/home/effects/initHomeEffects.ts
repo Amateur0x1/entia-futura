@@ -3,12 +3,11 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
 
-import { getHomeHeroTransitionElements } from './getHomeCalibrationElements';
-import { initHeroTransitionSectionEffects } from './initCalibrationSectionEffects';
+import { getHomeHeroElements } from './getHomeHeroElements';
+import { initHomeHeroStageEffects } from './initHomeHeroStageEffects';
+import { initHomeScrollEffects } from './initHomeScrollEffects';
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
-import { initResearchTrackEffects } from './initResearchTrackEffects';
-import { revealSection } from './revealSection';
 import { setupShapeOverlayGrid } from './shapeOverlayGrid';
 
 const initSmoothScrolling = () => {
@@ -38,28 +37,29 @@ export const initHomeEffects = () => {
     initSmoothScrolling();
   }
 
-  const heroTransitionElements = getHomeHeroTransitionElements();
-  const shapeGridCells = setupShapeOverlayGrid(heroTransitionElements.shapeOverlay);
+  const homeHeroElements = getHomeHeroElements();
+  const shapeGridCells = setupShapeOverlayGrid(homeHeroElements.shapeOverlay);
 
   initHeroVideoEffects({
-    heroVideoShell: heroTransitionElements.heroVideoShell,
-    scrollVideo: heroTransitionElements.scrollVideo,
-    loopVideo: heroTransitionElements.loopVideo,
-    heroVideoLoading: heroTransitionElements.heroVideoLoading,
+    heroVideoShell: homeHeroElements.heroVideoShell,
+    scrollVideo: homeHeroElements.scrollVideo,
+    loopVideo: homeHeroElements.loopVideo,
+    heroVideoLoading: homeHeroElements.heroVideoLoading,
   });
 
-  initHeroTransitionSectionEffects({
-    elements: heroTransitionElements,
+  initHomeHeroStageEffects({
+    elements: homeHeroElements,
     prefersReducedMotion,
     splitTextAvailable,
-    shapeGridCells,
   });
 
   initMonolithBinaryVisuals(prefersReducedMotion);
-  initResearchTrackEffects(prefersReducedMotion, heroTransitionElements.shapeOverlay, shapeGridCells);
 
-  gsap.utils.toArray<Element>('[data-reveal]').forEach((section, index) => {
-    revealSection(section, index);
+  initHomeScrollEffects({
+    homeHeroElements,
+    prefersReducedMotion,
+    shapeGridCells,
+    splitTextAvailable,
   });
 
   window.addEventListener(

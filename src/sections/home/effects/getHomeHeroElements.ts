@@ -1,4 +1,4 @@
-export interface HomeHeroTransitionElements {
+export interface HomeHeroElements {
   heroTransitionRoot: HTMLElement | null;
   heroTransitionFrame: HTMLElement | null;
   heroVideoShell: HTMLElement | null;
@@ -44,7 +44,7 @@ const getSVGElement = (root: ParentNode | null, selector: string) => {
 const getParagraphs = (root: HTMLElement | null) =>
   root ? Array.from(root.querySelectorAll<HTMLElement>('.landing-next-panel__paragraph')) : [];
 
-export const getHomeHeroTransitionElements = (): HomeHeroTransitionElements => {
+export const getHomeHeroElements = (): HomeHeroElements => {
   const heroTransitionRoot = getHTMLElement(document, '[data-hero-transition-root]');
   const heroTransitionFrame = getHTMLElement(heroTransitionRoot, '[data-orbit-frame]');
   const heroVideoShell = getHTMLElement(heroTransitionRoot, '[data-hero-video-shell]');

@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 
-import type { HomeHeroTransitionElements } from './getHomeCalibrationElements';
+import type { HomeHeroElements } from './getHomeHeroElements';
 
 interface InitHeroVideoEffectsOptions {
   heroVideoShell: HTMLElement | null;
@@ -10,8 +10,10 @@ interface InitHeroVideoEffectsOptions {
 }
 
 interface AddHeroVideoTransitionSegmentOptions {
-  elements: HomeHeroTransitionElements;
+  elements: HomeHeroElements;
   heroTimeline: gsap.core.Timeline;
+  videoPlaybackDuration: number;
+  videoPlaybackStart: number;
 }
 
 export const hideHeroVideoLoading = (heroVideoLoading: HTMLElement | null) => {
@@ -77,10 +79,10 @@ export const initHeroVideoEffects = ({
 export const addHeroVideoTransitionSegment = ({
   elements,
   heroTimeline,
+  videoPlaybackDuration,
+  videoPlaybackStart,
 }: AddHeroVideoTransitionSegmentOptions) => {
   const { heroVideoShell, loopVideo, scrollVideo } = elements;
-  const videoPlaybackStart = 0;
-  const videoPlaybackDuration = 1.38;
   const videoPlaybackEnd = videoPlaybackStart + videoPlaybackDuration;
 
   if (!heroVideoShell || !scrollVideo || !loopVideo) {

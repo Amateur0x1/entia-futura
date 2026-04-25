@@ -1,16 +1,16 @@
 import gsap from 'gsap';
 
-interface AddHeroVisualTransitionSegmentOptions {
+interface AddHeroMediaDriftSegmentOptions {
   heroTimeline: gsap.core.Timeline;
   primaryVisual: HTMLElement;
   notes: HTMLElement[];
 }
 
-export const addHeroVisualTransitionSegment = ({
+export const addHeroMediaDriftSegment = ({
   heroTimeline,
   primaryVisual,
   notes,
-}: AddHeroVisualTransitionSegmentOptions) => {
+}: AddHeroMediaDriftSegmentOptions) => {
   heroTimeline
     .to(
       primaryVisual,

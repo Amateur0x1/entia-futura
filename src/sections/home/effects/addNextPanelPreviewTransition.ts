@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 
-import type { HomeHeroTransitionElements } from './getHomeCalibrationElements';
+import type { HomeHeroElements } from './getHomeHeroElements';
 import {
   getShapeDelay,
   getShapeDuration,
@@ -10,23 +10,23 @@ import {
   getShapeTransformOrigin,
 } from './shapeOverlayGrid';
 
-interface AddNextPreviewTransitionOptions {
-  elements: HomeHeroTransitionElements;
+interface AddNextPanelPreviewTransitionOptions {
+  elements: HomeHeroElements;
   heroTimeline: gsap.core.Timeline;
   notes: HTMLElement[];
+  previewStartAt: number;
   shapeGridCells: SVGRectElement[];
   splitTextAvailable: boolean;
-  transitionStartAtVideoEnd: number;
 }
 
-export const addNextPreviewTransition = ({
+export const addNextPanelPreviewTransition = ({
   elements,
   heroTimeline,
   notes,
+  previewStartAt,
   shapeGridCells,
   splitTextAvailable,
-  transitionStartAtVideoEnd,
-}: AddNextPreviewTransitionOptions) => {
+}: AddNextPanelPreviewTransitionOptions) => {
   const {
     nextPreview,
     nextPreviewBody,
@@ -74,10 +74,10 @@ export const addNextPreviewTransition = ({
     gsap.set(nextPreviewBodyWords, { willChange: 'transform, opacity' });
   }
 
-  const shapeOverlayStart = transitionStartAtVideoEnd + 0.58;
-  const shapeOverlayDuration = 1.12;
-  const previewSwapStart = shapeOverlayStart + shapeOverlayDuration * 0.3;
-  const previewRevealStart = shapeOverlayStart + shapeOverlayDuration * 0.42;
+  const curtainStart = previewStartAt;
+  const curtainDuration = 1.12;
+  const previewSwapStart = curtainStart + curtainDuration * 0.3;
+  const previewRevealStart = curtainStart + curtainDuration * 0.42;
 
   gsap.set(shapeGridCells, {
     autoAlpha: 1,
@@ -92,7 +92,7 @@ export const addNextPreviewTransition = ({
       {
         autoAlpha: 1,
       },
-      shapeOverlayStart,
+      curtainStart,
     )
     .set(
       nextPreview,
@@ -111,11 +111,11 @@ export const addNextPreviewTransition = ({
         scaleX: 1,
         scaleY: 1.05,
         duration: (_index: number, target: Element) =>
-          getShapeDuration(target, shapeOverlayDuration * 0.72),
-        delay: (_index: number, target: Element) => getShapeDelay(target, shapeOverlayDuration * 0.26),
+          getShapeDuration(target, curtainDuration * 0.72),
+        delay: (_index: number, target: Element) => getShapeDelay(target, curtainDuration * 0.26),
         ease: 'power2.out',
       },
-      shapeOverlayStart,
+      curtainStart,
     )
     .to(
       shapeOverlay,
@@ -124,7 +124,7 @@ export const addNextPreviewTransition = ({
         duration: 0.01,
         ease: 'none',
       },
-      shapeOverlayStart + shapeOverlayDuration * 0.82,
+      curtainStart + curtainDuration * 0.82,
     )
     .to(
       notes,
@@ -134,7 +134,7 @@ export const addNextPreviewTransition = ({
         duration: 0.34,
         stagger: 0.02,
       },
-      shapeOverlayStart + 0.1,
+      curtainStart + 0.1,
     )
     .to(
       nextPreviewInner,
