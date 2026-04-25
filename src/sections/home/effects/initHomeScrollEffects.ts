@@ -26,9 +26,6 @@ export const initHomeScrollEffects = ({
 
   initHeroToIntroScrollTransition({
     elements: homeHeroElements,
-    prefersReducedMotion,
-    shapeGridCells,
-    splitTextAvailable,
   });
 
   initIntroToResearchScrollTransition({

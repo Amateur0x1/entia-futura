@@ -13,14 +13,7 @@ export interface HomeHeroElements {
   nextPanelHeading: HTMLElement | null;
   nextPanelDivider: HTMLElement | null;
   nextPanelBody: HTMLElement | null;
-  nextPreview: HTMLElement | null;
-  nextPreviewInner: HTMLElement | null;
-  nextPreviewLabel: HTMLElement | null;
-  nextPreviewHeading: HTMLElement | null;
-  nextPreviewDivider: HTMLElement | null;
-  nextPreviewBody: HTMLElement | null;
   nextPanelParagraphs: HTMLElement[];
-  nextPreviewParagraphs: HTMLElement[];
   knowMoreButton: HTMLElement | null;
   shapeOverlay: SVGSVGElement | null;
   primaryVisual: HTMLElement | null;
@@ -61,12 +54,6 @@ export const getHomeHeroElements = (): HomeHeroElements => {
   const nextPanelHeading = getHTMLElement(nextPanel, '[data-next-panel-heading]');
   const nextPanelDivider = getHTMLElement(nextPanel, '[data-next-panel-divider]');
   const nextPanelBody = getHTMLElement(nextPanel, '[data-next-panel-body]');
-  const nextPreview = getHTMLElement(document, '[data-next-preview]');
-  const nextPreviewInner = getHTMLElement(nextPreview, '[data-next-preview-inner]');
-  const nextPreviewLabel = getHTMLElement(nextPreview, '.landing-next-panel__label');
-  const nextPreviewHeading = getHTMLElement(nextPreview, '[data-next-panel-heading]');
-  const nextPreviewDivider = getHTMLElement(nextPreview, '[data-next-panel-divider]');
-  const nextPreviewBody = getHTMLElement(nextPreview, '[data-next-panel-body]');
   const shapeOverlay = getSVGElement(document, '[data-shape-overlay]');
 
   return {
@@ -84,14 +71,7 @@ export const getHomeHeroElements = (): HomeHeroElements => {
     nextPanelHeading,
     nextPanelDivider,
     nextPanelBody,
-    nextPreview,
-    nextPreviewInner,
-    nextPreviewLabel,
-    nextPreviewHeading,
-    nextPreviewDivider,
-    nextPreviewBody,
     nextPanelParagraphs: getParagraphs(nextPanelBody),
-    nextPreviewParagraphs: getParagraphs(nextPreviewBody),
     knowMoreButton: getHTMLElement(document, '[data-know-more-button]'),
     shapeOverlay,
     primaryVisual: portalShell ?? heroVideoShell,

@@ -11,7 +11,7 @@ import {
 interface AddIntroToResearchHandoffSegmentOptions {
   introToResearchTimeline: gsap.core.Timeline;
   track: HTMLElement;
-  preResearchPreview: HTMLElement | null;
+  nextPanel: HTMLElement;
   shapeOverlay: SVGSVGElement | null;
   shapeGridCells: SVGRectElement[];
   overlayFadeAt: number;
@@ -21,7 +21,7 @@ interface AddIntroToResearchHandoffSegmentOptions {
 export const addIntroToResearchHandoffSegment = ({
   introToResearchTimeline,
   track,
-  preResearchPreview,
+  nextPanel,
   shapeOverlay,
   shapeGridCells,
   overlayFadeAt,
@@ -85,23 +85,21 @@ export const addIntroToResearchHandoffSegment = ({
     commitAt,
   );
 
-  if (preResearchPreview) {
-    introToResearchTimeline
-      .set(
-        preResearchPreview,
-        {
-          visibility: 'visible',
-        },
-        0,
-      )
-      .set(
-        preResearchPreview,
-        {
-          autoAlpha: 0,
-          y: -28,
-          visibility: 'hidden',
-        },
-        commitAt,
-      );
-  }
+  introToResearchTimeline
+    .set(
+      nextPanel,
+      {
+        visibility: 'visible',
+      },
+      0,
+    )
+    .set(
+      nextPanel,
+      {
+        autoAlpha: 0,
+        y: -28,
+        visibility: 'hidden',
+      },
+      commitAt,
+    );
 };

@@ -18,12 +18,12 @@ export const initIntroToResearchScrollTransition = ({
   shapeOverlay,
   shapeGridCells,
 }: InitIntroToResearchScrollTransitionOptions) => {
+  const nextPanel = document.querySelector<HTMLElement>('[data-next-panel]');
   const track = document.querySelector<HTMLElement>('[data-research-track]');
   const rail = track?.querySelector<HTMLElement>('[data-research-rail]');
   const panels = rail ? Array.from(rail.querySelectorAll<HTMLElement>('[data-research-panel]')) : [];
-  const preResearchPreview = document.querySelector<HTMLElement>('[data-next-preview]');
 
-  if (!track || !rail || panels.length === 0) {
+  if (!nextPanel || !track || !rail || panels.length === 0) {
     return;
   }
 
@@ -47,14 +47,15 @@ export const initIntroToResearchScrollTransition = ({
     const introToResearchTimeline = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        trigger: track,
+        trigger: nextPanel,
         start: 'top 98%',
-        end: 'top top',
+        end: 'bottom top',
         scrub: true,
+        pin: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
         onLeaveBack: () => {
-          if (preResearchPreview) {
-            gsap.set(preResearchPreview, { autoAlpha: 1, y: 0, visibility: 'visible' });
-          }
+          gsap.set(nextPanel, { autoAlpha: 1, y: 0, visibility: 'visible' });
           gsap.set(track, { autoAlpha: 0 });
         },
       },
@@ -63,7 +64,7 @@ export const initIntroToResearchScrollTransition = ({
     addIntroToResearchHandoffSegment({
       introToResearchTimeline,
       track,
-      preResearchPreview,
+      nextPanel,
       shapeOverlay,
       shapeGridCells,
       overlayFadeAt: INTRO_TO_RESEARCH_TIMING.overlayFadeAt,

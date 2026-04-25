@@ -16,7 +16,7 @@ const applyHomeHeroInitialStates = ({
   elements: HomeHeroElements;
   prefersReducedMotion: boolean;
 }) => {
-  const { nextPanelDivider, nextPreview, nextPreviewDivider, nextPreviewInner, primaryVisual, shapeOverlay } = elements;
+  const { nextPanelDivider, primaryVisual, shapeOverlay } = elements;
 
   if (!primaryVisual) {
     return;
@@ -26,13 +26,6 @@ const applyHomeHeroInitialStates = ({
     transformOrigin: '50% 50%',
   });
 
-  if (!prefersReducedMotion && nextPreviewInner) {
-    gsap.set(nextPreviewInner, {
-      autoAlpha: 0,
-      y: 48,
-    });
-  }
-
   if (!prefersReducedMotion) {
     if (nextPanelDivider) {
       gsap.set(nextPanelDivider, {
@@ -41,20 +34,6 @@ const applyHomeHeroInitialStates = ({
         transformOrigin: 'left center',
       });
     }
-
-    if (nextPreviewDivider) {
-      gsap.set(nextPreviewDivider, {
-        autoAlpha: 0,
-        scaleX: 0,
-        transformOrigin: 'left center',
-      });
-    }
-  }
-
-  if (nextPreview) {
-    gsap.set(nextPreview, {
-      autoAlpha: 0,
-    });
   }
 
   if (shapeOverlay) {
