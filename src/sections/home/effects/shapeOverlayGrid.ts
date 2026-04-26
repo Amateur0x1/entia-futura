@@ -1,36 +1,24 @@
 const SHAPE_OVERLAY_NAMESPACE = 'http://www.w3.org/2000/svg';
 const SHAPE_GRID_ROWS = 4;
 const SHAPE_GRID_COLS = 6;
-const SHAPE_DIRECTIONS = ['left', 'right', 'top', 'bottom'] as const;
-
-type ShapeDirection = (typeof SHAPE_DIRECTIONS)[number];
-
-const getShapeDirection = (target: Element): ShapeDirection => {
-  const direction = target instanceof SVGRectElement ? target.dataset.shapeDirection : null;
-  return SHAPE_DIRECTIONS.includes(direction as ShapeDirection) ? (direction as ShapeDirection) : 'left';
-};
 
 export const getShapeScaleX = (target: Element) => {
-  const direction = getShapeDirection(target);
-  return direction === 'left' || direction === 'right' ? 0 : 1;
+  void target;
+  return 0;
 };
 
 export const getShapeScaleY = (target: Element) => {
-  const direction = getShapeDirection(target);
-  return direction === 'top' || direction === 'bottom' ? 0 : 1;
+  void target;
+  return 0;
 };
 
 export const getShapeTransformOrigin = (target: Element) => {
-  const direction = getShapeDirection(target);
-
-  if (direction === 'right') return 'right center';
-  if (direction === 'top') return 'center top';
-  if (direction === 'bottom') return 'center bottom';
-  return 'left center';
+  void target;
+  return 'center center';
 };
 
 export const getShapeDuration = (target: Element, maxDuration: number) =>
-  Math.min(Number(target.getAttribute('data-shape-duration') ?? 0.4), maxDuration);
+  Math.min(Number(target.getAttribute('data-shape-duration') ?? 0.42), maxDuration);
 
 export const getShapeDelay = (target: Element, maxDelay: number) =>
   Math.min(Number(target.getAttribute('data-shape-delay') ?? 0), maxDelay);
@@ -56,17 +44,17 @@ export const setupShapeOverlayGrid = (shapeOverlay: SVGSVGElement | null) => {
 
   const startStop = document.createElementNS(SHAPE_OVERLAY_NAMESPACE, 'stop');
   startStop.setAttribute('offset', '0%');
-  startStop.setAttribute('stop-color', 'var(--color-background)');
+  startStop.setAttribute('stop-color', 'var(--color-background-strong)');
   startStop.setAttribute('stop-opacity', '1');
 
   const midStop = document.createElementNS(SHAPE_OVERLAY_NAMESPACE, 'stop');
   midStop.setAttribute('offset', '58%');
-  midStop.setAttribute('stop-color', 'var(--color-background)');
+  midStop.setAttribute('stop-color', 'var(--color-surface-variant)');
   midStop.setAttribute('stop-opacity', '1');
 
   const endStop = document.createElementNS(SHAPE_OVERLAY_NAMESPACE, 'stop');
   endStop.setAttribute('offset', '100%');
-  endStop.setAttribute('stop-color', 'var(--color-background)');
+  endStop.setAttribute('stop-color', 'color-mix(in srgb, var(--color-background-strong) 84%, var(--color-text-primary) 16%)');
   endStop.setAttribute('stop-opacity', '1');
 
   gradient.append(startStop, midStop, endStop);
@@ -93,9 +81,15 @@ export const setupShapeOverlayGrid = (shapeOverlay: SVGSVGElement | null) => {
       rect.setAttribute('fill', 'url(#shape-overlay-accent-gradient)');
       rect.setAttribute('fill-opacity', '1');
       rect.dataset.shapeCellIndex = `${row * SHAPE_GRID_COLS + col}`;
-      rect.dataset.shapeDirection = SHAPE_DIRECTIONS[Math.floor(Math.random() * SHAPE_DIRECTIONS.length)];
-      rect.dataset.shapeDelay = `${Math.random() * 0.24}`;
-      rect.dataset.shapeDuration = `${0.3 + Math.random() * 0.28}`;
+      const centerCol = (SHAPE_GRID_COLS - 1) / 2;
+      const centerRow = (SHAPE_GRID_ROWS - 1) / 2;
+      const deltaCol = Math.abs(col - centerCol);
+      const deltaRow = Math.abs(row - centerRow);
+      const maxDistance = Math.sqrt(centerCol * centerCol + centerRow * centerRow) || 1;
+      const normalizedDistance = Math.sqrt(deltaCol * deltaCol + deltaRow * deltaRow) / maxDistance;
+
+      rect.dataset.shapeDelay = `${normalizedDistance * 0.22}`;
+      rect.dataset.shapeDuration = `${0.36 + normalizedDistance * 0.16}`;
       cellsGroup.appendChild(rect);
       shapeGridCells.push(rect);
     }

@@ -146,7 +146,7 @@ const instituteIntro = pickByLocale(
     width: min(48rem, 100%);
     text-align: left;
     justify-items: start;
-    padding-left: 50px;
+    padding-left: clamp(1.5rem, 3.2vw, 3.125rem);
   }
 
   :global(.landing-next-panel__visual-column) {
@@ -154,7 +154,7 @@ const instituteIntro = pickByLocale(
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
-    padding-right: 200px;
+    padding-right: clamp(2rem, 25%, 24rem);
     pointer-events: none;
   }
 

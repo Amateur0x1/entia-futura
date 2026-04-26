@@ -92,10 +92,13 @@ export const initHeroToIntroScrollTransition = ({
       HERO_TO_INTRO_TIMING.videoPlaybackStart +
       HERO_TO_INTRO_TIMING.videoPlaybackDuration +
       HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
-    const curtainDuration = 1.08;
+    const curtainDuration = 2.84;
     const curtainOpenStart = curtainStart + curtainDuration + 0.02;
-    const curtainOpenDuration = 0.46;
-    const panelRevealStart = curtainOpenStart - 0.02;
+    const curtainOpenDuration = 1.56;
+    const panelVisibleStart = curtainOpenStart - 0.02;
+    const panelTextRevealStart = curtainOpenStart + curtainOpenDuration * 0.94 + 0.08;
+    const curtainExpandScale = 1.16;
+    const curtainCloseDurationScale = 5;
 
     if (!prefersReducedMotion && elements.shapeOverlay && shapeGridCells.length > 0) {
       gsap.set(shapeGridCells, {
@@ -121,10 +124,11 @@ export const initHeroToIntroScrollTransition = ({
             scaleY: (_index: number, target: Element) => getShapeScaleY(target),
           },
           {
-            scaleX: 1,
-            scaleY: 1,
-            duration: (_index: number, target: Element) => getShapeDuration(target, curtainDuration * 0.72),
-            delay: (_index: number, target: Element) => getShapeDelay(target, curtainDuration * 0.28),
+            scaleX: curtainExpandScale,
+            scaleY: curtainExpandScale,
+            duration: (_index: number, target: Element) =>
+              getShapeDuration(target, curtainDuration * 0.72) * curtainCloseDurationScale,
+            delay: (_index: number, target: Element) => getShapeDelay(target, curtainDuration * 0.28) * 2.4,
             ease: 'power2.out',
           },
           curtainStart,
@@ -154,7 +158,7 @@ export const initHeroToIntroScrollTransition = ({
             y: 0,
             visibility: 'visible',
           },
-          panelRevealStart,
+          panelVisibleStart,
         )
         .to(
           shapeGridCells,
@@ -201,7 +205,7 @@ export const initHeroToIntroScrollTransition = ({
       nextPanelBody: elements.nextPanelBody,
       nextPanelParagraphs: elements.nextPanelParagraphs,
       timeline: heroTimeline,
-      startAt: panelRevealStart + 0.02,
+      startAt: panelTextRevealStart,
     });
   };
 

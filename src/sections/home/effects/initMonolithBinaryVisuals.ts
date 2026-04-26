@@ -1,17 +1,17 @@
-const I_CHING_64_GUA =
-  '乾坤屯蒙需讼师比小畜履泰否同人大有谦豫随蛊临观噬嗑贲剥复无妄大畜颐大过坎离咸恒遁大壮晋明夷家人睽蹇解损益夬姤萃升困井革鼎震艮渐归妹丰旅巽兑涣节中孚小过既济未济';
+const I_CHING_8_GUA = '乾坤震巽坎离艮兑';
 const CODE_GARBLED =
   '{}[]()<>+=-*/%$#@!?&|^~;:,.`\'"\\_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 const BINARY_TEXT = '01';
 
-const PHASE_CHAR_POOLS = [BINARY_TEXT, CODE_GARBLED, I_CHING_64_GUA, ''] as const;
+const PHASE_CHAR_POOLS = [BINARY_TEXT, CODE_GARBLED, I_CHING_8_GUA, ''] as const;
 const PHASE_DURATIONS_MS = [25600, 33600, 25600, 14400] as const;
 const STREAM_HEIGHT_MULTIPLIER = 3.2;
 const EXTRA_TRAVEL_VIEWPORT_MULTIPLIER = 1;
 const LEFT_STATIC_REGION_RATIO = 0.25;
 const ACCELERATION_END_REGION_RATIO = 0.75;
-const MOVING_MIN_SPEED_MULTIPLIER = 0.15;
-const RIGHT_EDGE_MAX_SPEED_MULTIPLIER = 0.6;
+const LEFT_REGION_SPEED_MULTIPLIER = 0;
+const MOVING_MIN_SPEED_MULTIPLIER = 0;
+const RIGHT_EDGE_MAX_SPEED_MULTIPLIER = 1;
 const COLUMN_START_STAGGER_ROWS = 10;
 const BASE_COLUMN_DENSITY = 1.18;
 const MIN_COLUMNS = 14;
@@ -22,6 +22,20 @@ const CHAR_GRADIENT_COLORS = [
   'rgba(120, 118, 255, 0.92)',
   'rgba(210, 96, 255, 0.9)',
 ] as const;
+const FONT_SIZE_STEPS = {
+  reduced: [
+    { minWidth: 0, fontSize: 9, lineHeight: 11 },
+    { minWidth: 640, fontSize: 10, lineHeight: 12 },
+    { minWidth: 1024, fontSize: 11, lineHeight: 13 },
+  ],
+  normal: [
+    { minWidth: 0, fontSize: 11, lineHeight: 13 },
+    { minWidth: 720, fontSize: 12, lineHeight: 14 },
+    { minWidth: 960, fontSize: 13, lineHeight: 15 },
+    { minWidth: 1280, fontSize: 14, lineHeight: 16 },
+    { minWidth: 1600, fontSize: 15, lineHeight: 17 },
+  ],
+} as const;
 
 const randomCharFrom = (pool: string) => pool[Math.floor(Math.random() * pool.length)] ?? '0';
 
@@ -97,8 +111,8 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
 
     resizeCanvas();
 
-    const fontSize = prefersReducedMotion ? 10 : 14;
-    const lineHeight = prefersReducedMotion ? 12 : 16;
+    let fontSize = prefersReducedMotion ? 10 : 14;
+    let lineHeight = prefersReducedMotion ? 12 : 16;
     let streamRows = 0;
     let streamColumns = 0;
     let rowText: string[][] = [];
@@ -124,7 +138,7 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
       const leftBoundaryPx = window.innerWidth * LEFT_STATIC_REGION_RATIO;
       const accelerationEndPx = window.innerWidth * ACCELERATION_END_REGION_RATIO;
       if (event.clientX <= leftBoundaryPx) {
-        pointerSpeedMultiplier = 0;
+        pointerSpeedMultiplier = LEFT_REGION_SPEED_MULTIPLIER;
         return;
       }
 
@@ -160,12 +174,21 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
 
       return Math.max(1, Math.ceil(maxWidth) + extraPadding);
     };
-    ctx.font = `${fontSize}px SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
-    const phaseCharacterCellWidth = PHASE_CHAR_POOLS.map((pool, phaseIndex) => {
-      // Give the I-Ching phase a little extra spacing, keep others compact.
-      const extraPadding = phaseIndex === 2 ? 3 : 0;
-      return measureCharacterCellWidth(pool || BINARY_TEXT, extraPadding);
-    });
+    let phaseCharacterCellWidth: number[] = [];
+    const recomputeTypography = (viewportWidth: number) => {
+      const steps = prefersReducedMotion ? FONT_SIZE_STEPS.reduced : FONT_SIZE_STEPS.normal;
+      const matchedStep =
+        [...steps].reverse().find((step) => viewportWidth >= step.minWidth) ?? steps[0];
+      fontSize = matchedStep.fontSize;
+      lineHeight = matchedStep.lineHeight;
+      ctx.font = `${fontSize}px SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
+      phaseCharacterCellWidth = PHASE_CHAR_POOLS.map((pool, phaseIndex) => {
+        // Give the I-Ching phase a little extra spacing, keep others compact.
+        const extraPadding = phaseIndex === 2 ? 3 : 0;
+        return measureCharacterCellWidth(pool || BINARY_TEXT, extraPadding);
+      });
+    };
+    recomputeTypography(streamRoot.getBoundingClientRect().width);
     const getPhaseColumnCount = (phaseIndex: number, viewportWidth: number) => {
       const charWidth = phaseCharacterCellWidth[phaseIndex];
       const rawColumns = viewportWidth / (charWidth * BASE_COLUMN_DENSITY);
@@ -275,6 +298,7 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
 
     const resizeObserver = new ResizeObserver(() => {
       resizeCanvas();
+      recomputeTypography(streamRoot.getBoundingClientRect().width);
     });
     resizeObserver.observe(streamRoot);
 
