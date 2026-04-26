@@ -318,7 +318,7 @@ export const initLandingHeroInteractions = () => {
     knowMoreButton.addEventListener('click', () => {
       const heroTransitionRoot = document.querySelector('[data-hero-transition-root]');
       const nextPanel = document.querySelector('[data-next-panel]');
-      const transitionScrollDistance = window.innerWidth <= 720 ? 2100 : 3000;
+      const transitionScrollDistance = window.innerWidth <= 720 ? 2500 : 3600;
       const nextPanelTop = (() => {
         if (heroTransitionRoot instanceof HTMLElement) {
           return heroTransitionRoot.getBoundingClientRect().top + window.scrollY + transitionScrollDistance;

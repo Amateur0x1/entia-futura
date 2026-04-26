@@ -23,8 +23,8 @@ export const HERO_TO_INTRO_TIMING = {
   videoPlaybackStart: 0,
   videoPlaybackDuration: 4.1,
   panelRevealDelayAfterVideoEnd: 0.52,
-  transitionScrollDistanceDesktop: 3000,
-  transitionScrollDistanceMobile: 2100,
+  transitionScrollDistanceDesktop: 3600,
+  transitionScrollDistanceMobile: 2500,
   heroHideAtProgress: 0.985,
 } as const;
 
@@ -98,7 +98,7 @@ export const initHeroToIntroScrollTransition = ({
     const panelVisibleStart = curtainOpenStart - 0.02;
     const panelTextRevealStart = curtainOpenStart + curtainOpenDuration * 0.94 + 0.08;
     const curtainExpandScale = 1.16;
-    const curtainCloseDurationScale = 5;
+    const curtainCloseDurationScale = 2.2;
 
     if (!prefersReducedMotion && elements.shapeOverlay && shapeGridCells.length > 0) {
       gsap.set(shapeGridCells, {
@@ -128,7 +128,7 @@ export const initHeroToIntroScrollTransition = ({
             scaleY: curtainExpandScale,
             duration: (_index: number, target: Element) =>
               getShapeDuration(target, curtainDuration * 0.72) * curtainCloseDurationScale,
-            delay: (_index: number, target: Element) => getShapeDelay(target, curtainDuration * 0.28) * 2.4,
+            delay: (_index: number, target: Element) => getShapeDelay(target, curtainDuration * 0.28) * 1.2,
             ease: 'power2.out',
           },
           curtainStart,
