@@ -26,8 +26,10 @@ export const getOrCreateTransitionLayer = (attributeName: string, styles: Partia
     {
       position: 'fixed',
       inset: '0',
+      // Use opacity:0 only — never visibility:hidden — so the layer is always
+      // part of the render tree. This prevents the one-frame colour flash that
+      // happens when visibility jumps from hidden→visible on a scrub timeline.
       opacity: '0',
-      visibility: 'hidden',
       pointerEvents: 'none',
     },
     styles,
@@ -74,10 +76,10 @@ export const setPanelTransitionInitialState = ({
 }) => {
   gsap.set(outgoingPanel, {
     autoAlpha: 1,
-    visibility: 'visible',
     scale: 1,
     y: 0,
     yPercent: 0,
+    filter: 'blur(0px)',
     transformOrigin: '50% 0%',
     zIndex: 36,
     borderTopLeftRadius: 0,
@@ -85,13 +87,17 @@ export const setPanelTransitionInitialState = ({
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
   });
+  // Keep the incoming panel off-screen (yPercent:100) with opacity:0.
+  // We do NOT use visibility:hidden here — the element must remain in the render
+  // tree so there is no flash when it enters. Being below the viewport is enough
+  // to keep it invisible without the jump-to-visible frame.
   gsap.set(incomingPanel, {
-    autoAlpha: 0,
+    opacity: 0,
     yPercent: 100,
     y: 0,
     filter: 'blur(0px)',
     transformOrigin: '50% 50%',
-    visibility: 'hidden',
+    visibility: 'visible',
     pointerEvents: 'none',
     zIndex: 38,
     borderTopLeftRadius: 0,
@@ -114,11 +120,12 @@ export const addPanelPushTransitionSegment = ({
   timeline,
 }: AddPanelPushTransitionSegmentOptions) => {
   timeline
+    // Backplate: already visible in the render tree (opacity:0), just raise opacity.
+    // No visibility toggle needed — avoids the one-frame jump.
     .set(
       backplate,
       {
-        autoAlpha: 1,
-        visibility: 'visible',
+        opacity: 1,
         zIndex: 35,
       },
       startAt,
@@ -126,7 +133,6 @@ export const addPanelPushTransitionSegment = ({
     .set(
       shade,
       {
-        visibility: 'visible',
         zIndex: 37,
       },
       startAt,
@@ -134,7 +140,7 @@ export const addPanelPushTransitionSegment = ({
     .set(
       incomingPanel,
       {
-        autoAlpha: 1,
+        opacity: 1,
         yPercent: 100,
         y: 0,
         filter: 'blur(0px)',
@@ -156,7 +162,6 @@ export const addPanelPushTransitionSegment = ({
         scale: 1,
         y: 0,
         filter: 'blur(0px)',
-        visibility: 'visible',
         transformOrigin: '50% 0%',
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
@@ -181,11 +186,10 @@ export const addPanelPushTransitionSegment = ({
     .fromTo(
       shade,
       {
-        autoAlpha: 0,
-        visibility: 'visible',
+        opacity: 0,
       },
       {
-        autoAlpha: shadeOpacity,
+        opacity: shadeOpacity,
         duration,
         ease: 'none',
       },
@@ -195,7 +199,7 @@ export const addPanelPushTransitionSegment = ({
       incomingPanel,
       {
         immediateRender: false,
-        autoAlpha: 1,
+        opacity: 1,
         yPercent: 100,
         visibility: 'visible',
         pointerEvents: 'none',
@@ -205,7 +209,7 @@ export const addPanelPushTransitionSegment = ({
         borderBottomRightRadius: 0,
       },
       {
-        autoAlpha: 1,
+        opacity: 1,
         yPercent: 0,
         duration,
         ease: 'none',
@@ -215,23 +219,24 @@ export const addPanelPushTransitionSegment = ({
     .to(
       shade,
       {
-        autoAlpha: 0,
+        opacity: 0,
         duration: 0.08,
         ease: 'none',
       },
       startAt + duration,
     )
+    // Backplate: fade back to transparent (no visibility toggle).
     .set(
       backplate,
       {
-        autoAlpha: 0,
-        visibility: 'hidden',
+        opacity: 0,
       },
       startAt + duration,
     )
     .set(
       outgoingPanel,
       {
+        autoAlpha: 0,
         visibility: 'hidden',
         pointerEvents: 'none',
         scale: 1,
@@ -251,12 +256,5 @@ export const addPanelPushTransitionSegment = ({
         borderTopRightRadius: 0,
       },
       startAt + duration,
-    )
-    .set(
-      shade,
-      {
-        visibility: 'hidden',
-      },
-      startAt + duration + 0.08,
     );
 };

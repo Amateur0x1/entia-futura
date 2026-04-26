@@ -101,7 +101,9 @@ const initFullTransitions = ({
   const secondBackplate = createTransitionBackplate('data-second-panel-transition-backplate');
   const secondShade = createTransitionShade('data-second-panel-transition-shade');
 
-  gsap.set([heroBackplate, heroShade, secondBackplate, secondShade], { autoAlpha: 0 });
+  // Backplates and shades stay in the render tree (opacity:0 only, no visibility:hidden)
+  // so there is never a jump-to-visible frame when the scrub timeline activates them.
+  gsap.set([heroBackplate, heroShade, secondBackplate, secondShade], { opacity: 0 });
 
   // ── initial states ─────────────────────────────────────────────────────────
   const outgoingHeroPanel = heroTransitionFrame ?? heroTransitionRoot;
@@ -220,14 +222,16 @@ const initFullTransitions = ({
       scrub: 0.6,
       invalidateOnRefresh: true,
       onEnter: () => {
-        // Only ensure panels are in the correct initial state before scrub starts.
-        // DO NOT show backplate/shade here — they must stay in sync with the
-        // scrub timeline to avoid a one-frame background colour flash on fast scrolls.
+        // Reset panels to their pre-transition state so the scrub timeline starts
+        // from a clean slate. Do NOT touch backplate/shade here — their opacity
+        // is driven entirely by the scrub timeline to avoid any jump-frame flash.
         gsap.set(thirdPanel, {
-          autoAlpha: 0,
-          visibility: 'hidden',
+          opacity: 0,
+          visibility: 'visible',
           pointerEvents: 'none',
           yPercent: 100,
+          y: 0,
+          scale: 1,
           zIndex: 38,
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
@@ -237,26 +241,42 @@ const initFullTransitions = ({
         gsap.set(nextPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
       },
       onEnterBack: () => {
-        // Same rationale: let the scrub timeline control backplate/shade.
+        // Same rationale: scrub controls backplate/shade.
+        gsap.set(thirdPanel, {
+          opacity: 0,
+          visibility: 'visible',
+          pointerEvents: 'none',
+          yPercent: 100,
+          y: 0,
+          scale: 1,
+          zIndex: 38,
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
+        });
         gsap.set(nextPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
       },
       onLeave: () => {
+        // Transition complete: thirdPanel is now the active screen.
         gsap.set(thirdPanel, { pointerEvents: 'auto', zIndex: 35 });
         gsap.set(nextPanel, {
           autoAlpha: 0,
-          visibility: 'hidden',
           pointerEvents: 'none',
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
         });
-        gsap.set([secondBackplate, secondShade], { autoAlpha: 0, visibility: 'hidden' });
+        // Return backplate/shade to transparent — no visibility toggle.
+        gsap.set([secondBackplate, secondShade], { opacity: 0 });
       },
       onLeaveBack: () => {
+        // Scrolled back above the 2→3 zone: restore nextPanel, hide thirdPanel.
         gsap.set(thirdPanel, {
-          autoAlpha: 0,
-          yPercent: 100,
-          visibility: 'hidden',
+          opacity: 0,
+          visibility: 'visible',
           pointerEvents: 'none',
+          yPercent: 100,
+          y: 0,
           zIndex: 38,
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
@@ -273,7 +293,7 @@ const initFullTransitions = ({
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
         });
-        gsap.set([secondBackplate, secondShade], { autoAlpha: 0, visibility: 'hidden' });
+        gsap.set([secondBackplate, secondShade], { opacity: 0 });
       },
     },
   });
