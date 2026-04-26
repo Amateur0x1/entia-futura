@@ -192,8 +192,18 @@ const instituteIntro = pickByLocale(
     opacity: 0.9;
     overflow: hidden;
     mix-blend-mode: multiply;
-    /* Keep canvas texture on monolith side, avoid covering the figure. */
+  }
+
+  :global(.landing-next-panel__visual-binary--monolith) {
+    /* Keep canvas texture on monolith side. */
     clip-path: inset(0 0 0 34%);
+  }
+
+  :global(.landing-next-panel__visual-binary--human) {
+    /* Add a second stream layer on the figure side. */
+    clip-path: inset(0 56% 0 0);
+    opacity: 0.74;
+    mix-blend-mode: screen;
   }
 
   :global(.landing-next-panel__binary-canvas) {

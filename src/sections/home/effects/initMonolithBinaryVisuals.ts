@@ -1,27 +1,28 @@
-const I_CHING_8_GUA = '乾坤震巽坎离艮兑';
+const BINARY_TEXT = '01';
 const CODE_GARBLED =
   '{}[]()<>+=-*/%$#@!?&|^~;:,.`\'"\\_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-const BINARY_TEXT = '01';
+const STREAM_CHAR_POOLS = [BINARY_TEXT, CODE_GARBLED] as const;
 
-const PHASE_CHAR_POOLS = [BINARY_TEXT, CODE_GARBLED, I_CHING_8_GUA, ''] as const;
-const PHASE_DURATIONS_MS = [25600, 33600, 25600, 14400] as const;
-const STREAM_HEIGHT_MULTIPLIER = 3.2;
-const EXTRA_TRAVEL_VIEWPORT_MULTIPLIER = 1;
+const STREAM_MIN_SEGMENT_LENGTH = 20;
+const STREAM_MAX_SEGMENT_LENGTH = 24;
+// Keep columns nearly continuous without segment overlap.
+const STREAM_MIN_GAP_ROWS = 0;
+const STREAM_MAX_GAP_ROWS = 4;
+const STREAM_MIN_HEAD_ROW = -84;
+const STREAM_MAX_HEAD_ROW = 10;
 const LEFT_STATIC_REGION_RATIO = 0.25;
 const ACCELERATION_END_REGION_RATIO = 0.75;
 const LEFT_REGION_SPEED_MULTIPLIER = 0;
 const MOVING_MIN_SPEED_MULTIPLIER = 0;
 const RIGHT_EDGE_MAX_SPEED_MULTIPLIER = 1;
-const COLUMN_START_STAGGER_ROWS = 10;
-const BASE_COLUMN_DENSITY = 1.18;
+const BASE_COLUMN_DENSITY = 1.92;
 const MIN_COLUMNS = 14;
-const MAX_COLUMNS = 48;
-const PHASE_DENSITY_MULTIPLIER = [1.1, 1, 1.35, 1] as const;
-const CHAR_GRADIENT_COLORS = [
-  'rgba(72, 242, 255, 0.95)',
-  'rgba(120, 118, 255, 0.92)',
-  'rgba(210, 96, 255, 0.9)',
-] as const;
+const MAX_COLUMNS = 80;
+// Darker violet range aligned with the project's cosmic-violet semantic palette.
+const COLOR_BODY = 'rgba(86, 68, 168, 0.56)';
+const COLOR_TAIL = 'rgba(74, 56, 148, 0.86)';
+const COLOR_TAIL_GLOW = 'rgba(172, 142, 255, 0.56)';
+const COLOR_STREAM_GLOW = 'rgba(98, 72, 188, 0.28)';
 const FONT_SIZE_STEPS = {
   reduced: [
     { minWidth: 0, fontSize: 10, lineHeight: 12 },
@@ -37,50 +38,40 @@ const FONT_SIZE_STEPS = {
   ],
 } as const;
 
+const randomBetween = (min: number, max: number) => min + Math.random() * (max - min);
+const randomIntBetween = (min: number, max: number) => Math.floor(randomBetween(min, max + 1));
+
 const randomCharFrom = (pool: string) => pool[Math.floor(Math.random() * pool.length)] ?? '0';
 
-const randomGradientColor = () =>
-  CHAR_GRADIENT_COLORS[Math.floor(Math.random() * CHAR_GRADIENT_COLORS.length)];
-
-const createRowText = (length: number, pool: string) =>
-  Array.from({ length }, () => randomCharFrom(pool));
-
-const createCyanPurpleGradient = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  halfHeight: number,
-  topColor: string,
-  bottomColor: string,
-  reverse: boolean,
-) => {
-  const gradient = reverse
-    ? ctx.createLinearGradient(x, y + halfHeight, x, y - halfHeight)
-    : ctx.createLinearGradient(x, y - halfHeight, x, y + halfHeight);
-  gradient.addColorStop(0, topColor);
-  gradient.addColorStop(1, bottomColor);
-  return gradient;
+const buildRandomSegment = (length: number) => {
+  let output = '';
+  while (output.length < length) {
+    const pool = STREAM_CHAR_POOLS[Math.floor(Math.random() * STREAM_CHAR_POOLS.length)] ?? BINARY_TEXT;
+    output += randomCharFrom(pool);
+  }
+  return output.slice(0, length).split('');
 };
 
-const getPhaseByElapsed = (elapsedMs: number) => {
-  const cycleDurationMs = PHASE_DURATIONS_MS.reduce((sum, duration) => sum + duration, 0);
-  let timeInCycle = elapsedMs % cycleDurationMs;
-  for (let index = 0; index < PHASE_DURATIONS_MS.length; index += 1) {
-    const duration = PHASE_DURATIONS_MS[index];
-    if (timeInCycle < duration) {
-      return {
-        phaseIndex: index,
-        phaseElapsedMs: timeInCycle,
-        phaseDurationMs: duration,
-      };
-    }
-    timeInCycle -= duration;
-  }
-  return {
-    phaseIndex: 0,
-    phaseElapsedMs: 0,
-    phaseDurationMs: PHASE_DURATIONS_MS[0],
-  };
+interface StreamSegment {
+  chars: string[];
+  headRow: number;
+  speedRowsPerSecond: number;
+  gapRows: number;
+  mutationElapsedMs: number[];
+  mutationIntervalMs: number[];
+  repeatDistanceRows: number;
+}
+
+const randomCharFromPools = () =>
+  randomCharFrom(STREAM_CHAR_POOLS[Math.floor(Math.random() * STREAM_CHAR_POOLS.length)] ?? BINARY_TEXT);
+
+const getMutationIntervalMs = (depthRatio: number, prefersReducedMotion: boolean) => {
+  const fastMin = prefersReducedMotion ? 160 : 70;
+  const slowMax = prefersReducedMotion ? 640 : 360;
+  const base = fastMin + depthRatio * (slowMax - fastMin);
+  // Make the brightest tail mutate about 3x slower while keeping upper chars near current speed.
+  const tailSlowdownMultiplier = 1 + depthRatio * 2;
+  return base * tailSlowdownMultiplier * randomBetween(0.82, 1.24);
 };
 
 export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
@@ -113,21 +104,11 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
 
     let fontSize = prefersReducedMotion ? 10 : 14;
     let lineHeight = prefersReducedMotion ? 12 : 16;
-    let streamRows = 0;
     let streamColumns = 0;
-    let rowText: string[][] = [];
-    let rowCharTopColor: string[][] = [];
-    let rowCharBottomColor: string[][] = [];
-    let rowCharGradientReverse: boolean[][] = [];
-    let columnStartOffsetY: number[] = [];
-    let columnFallSpeedMultiplier: number[] = [];
-    let minColumnStartOffsetY = 0;
-    let maxColumnStartOffsetY = 0;
+    let streamSegments: StreamSegment[] = [];
+    let charCellWidth = 12;
 
     let rafId = 0;
-    let tick = 0;
-    let currentPhase = -1;
-    let phaseElapsedMs = 0;
     let lastFrameMs = performance.now();
     let pointerSpeedMultiplier = 1;
 
@@ -162,19 +143,18 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
     window.addEventListener('pointerleave', handlePointerCancel);
     window.addEventListener('blur', handlePointerCancel);
 
-    const measureCharacterCellWidth = (pool: string, extraPadding: number) => {
+    const measureCharacterCellWidth = () => {
       const sampleChars = new Set<string>();
-      for (const char of pool) {
-        sampleChars.add(char);
-      }
+      STREAM_CHAR_POOLS.forEach((pool) => {
+        for (const char of pool) sampleChars.add(char);
+      });
       let maxWidth = 0;
       sampleChars.forEach((char) => {
         maxWidth = Math.max(maxWidth, ctx.measureText(char).width);
       });
-
-      return Math.max(1, Math.ceil(maxWidth) + extraPadding);
+      return Math.max(1, Math.ceil(maxWidth));
     };
-    let phaseCharacterCellWidth: number[] = [];
+
     const recomputeTypography = (viewportWidth: number) => {
       const steps = prefersReducedMotion ? FONT_SIZE_STEPS.reduced : FONT_SIZE_STEPS.normal;
       const matchedStep =
@@ -182,115 +162,121 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
       fontSize = matchedStep.fontSize;
       lineHeight = matchedStep.lineHeight;
       ctx.font = `${fontSize}px SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
-      phaseCharacterCellWidth = PHASE_CHAR_POOLS.map((pool, phaseIndex) => {
-        // Give the I-Ching phase a little extra spacing, keep others compact.
-        const extraPadding = phaseIndex === 2 ? 3 : 0;
-        return measureCharacterCellWidth(pool || BINARY_TEXT, extraPadding);
-      });
+      charCellWidth = measureCharacterCellWidth();
     };
     recomputeTypography(streamRoot.getBoundingClientRect().width);
-    const getPhaseColumnCount = (phaseIndex: number, viewportWidth: number) => {
-      const charWidth = phaseCharacterCellWidth[phaseIndex];
-      const rawColumns = viewportWidth / (charWidth * BASE_COLUMN_DENSITY);
-      const scaledColumns = Math.round(rawColumns * PHASE_DENSITY_MULTIPLIER[phaseIndex]);
-      return Math.max(MIN_COLUMNS, Math.min(MAX_COLUMNS, scaledColumns));
+
+    const getColumnCount = (viewportWidth: number) => {
+      const rawColumns = viewportWidth / (charCellWidth * BASE_COLUMN_DENSITY);
+      return Math.max(MIN_COLUMNS, Math.min(MAX_COLUMNS, Math.round(rawColumns)));
     };
-    const rebuildStreamData = (activePool: string, viewportHeight: number, columnCount: number) => {
-      const effectivePool = activePool || BINARY_TEXT;
-      streamRows = Math.max(1, Math.ceil((viewportHeight / lineHeight) * STREAM_HEIGHT_MULTIPLIER));
+
+    const createSegment = (headRowOverride?: number): StreamSegment => {
+      const segmentLength = randomIntBetween(STREAM_MIN_SEGMENT_LENGTH, STREAM_MAX_SEGMENT_LENGTH);
+      const tailIndex = segmentLength - 1;
+      const mutationElapsedMs = Array.from({ length: segmentLength }, () => randomBetween(0, 160));
+      const mutationIntervalMs = Array.from({ length: segmentLength }, (_, index) => {
+        const depthRatio = index / Math.max(tailIndex, 1);
+        return getMutationIntervalMs(depthRatio, prefersReducedMotion);
+      });
+      return {
+        chars: buildRandomSegment(segmentLength),
+        headRow:
+          typeof headRowOverride === 'number'
+            ? headRowOverride
+            : randomBetween(STREAM_MIN_HEAD_ROW, STREAM_MAX_HEAD_ROW),
+        speedRowsPerSecond: prefersReducedMotion ? randomBetween(9, 11) : randomBetween(13, 19),
+        gapRows: randomIntBetween(STREAM_MIN_GAP_ROWS, STREAM_MAX_GAP_ROWS),
+        mutationElapsedMs,
+        mutationIntervalMs,
+        repeatDistanceRows: segmentLength + randomIntBetween(STREAM_MIN_GAP_ROWS, STREAM_MAX_GAP_ROWS),
+      };
+    };
+
+    const normalizeHeadRow = (segment: StreamSegment) => {
+      const wrap = Math.max(1, segment.repeatDistanceRows);
+      while (segment.headRow >= wrap) segment.headRow -= wrap;
+      while (segment.headRow < 0) segment.headRow += wrap;
+    };
+
+    const rebuildStreamData = (columnCount: number) => {
       streamColumns = columnCount;
-      rowText = Array.from({ length: streamRows }, () => createRowText(streamColumns, effectivePool));
-      rowCharTopColor = Array.from({ length: streamRows }, () =>
-        Array.from({ length: streamColumns }, randomGradientColor),
-      );
-      rowCharBottomColor = Array.from({ length: streamRows }, () =>
-        Array.from({ length: streamColumns }, randomGradientColor),
-      );
-      rowCharGradientReverse = Array.from({ length: streamRows }, () =>
-        Array.from({ length: streamColumns }, () => Math.random() > 0.5),
-      );
-      columnStartOffsetY = Array.from({ length: streamColumns }, () => {
-        const staggerRows = (Math.random() * 2 - 1) * COLUMN_START_STAGGER_ROWS;
-        return staggerRows * lineHeight;
+      const headRowSpan = STREAM_MAX_HEAD_ROW - STREAM_MIN_HEAD_ROW;
+      streamSegments = Array.from({ length: streamColumns }, (_, index) => {
+        // Uniformly spread initial segments per column, then add mild jitter.
+        const distributedHeadRow =
+          STREAM_MIN_HEAD_ROW +
+          (headRowSpan * (index + 0.5)) / Math.max(streamColumns, 1) +
+          randomBetween(-6, 6);
+        return createSegment(distributedHeadRow);
       });
-      columnFallSpeedMultiplier = Array.from({ length: streamColumns }, () => {
-        const minSpeed = prefersReducedMotion ? 0.92 : 0.8;
-        const maxSpeed = prefersReducedMotion ? 1.08 : 1.25;
-        return minSpeed + Math.random() * (maxSpeed - minSpeed);
-      });
-      minColumnStartOffsetY = columnStartOffsetY.reduce((minValue, offset) => Math.min(minValue, offset), 0);
-      maxColumnStartOffsetY = columnStartOffsetY.reduce((maxValue, offset) => Math.max(maxValue, offset), 0);
     };
 
     const render = () => {
       const rect = streamRoot.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
-      ctx.globalAlpha = prefersReducedMotion ? 0.66 : 0.84;
+      ctx.globalAlpha = prefersReducedMotion ? 0.74 : 0.9;
       ctx.font = `${fontSize}px SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
       ctx.textBaseline = 'middle';
       const now = performance.now();
       const deltaMs = Math.max(0, now - lastFrameMs);
       lastFrameMs = now;
-      phaseElapsedMs += deltaMs * pointerSpeedMultiplier;
-      const { phaseIndex, phaseElapsedMs: currentPhaseElapsedMs, phaseDurationMs } = getPhaseByElapsed(phaseElapsedMs);
-
-      const charWidth = phaseCharacterCellWidth[phaseIndex];
-      const charHalfHeight = lineHeight / 2;
-      const activePool = PHASE_CHAR_POOLS[phaseIndex];
-      const columnCount = getPhaseColumnCount(phaseIndex, rect.width);
-      const phaseProgress = Math.min(1, currentPhaseElapsedMs / phaseDurationMs);
-
-      if (phaseIndex !== currentPhase || streamRows === 0) {
-        currentPhase = phaseIndex;
-        rebuildStreamData(activePool, rect.height, columnCount);
+      const columnCount = getColumnCount(rect.width);
+      if (streamColumns !== columnCount || streamSegments.length === 0) {
+        rebuildStreamData(columnCount);
       }
 
-      const desiredStreamRows = Math.max(1, Math.ceil((rect.height / lineHeight) * STREAM_HEIGHT_MULTIPLIER));
-      if (desiredStreamRows !== streamRows || columnCount !== streamColumns) {
-        rebuildStreamData(activePool, rect.height, columnCount);
-      }
-
-      if (!activePool) {
-        tick += 1;
-        rafId = window.requestAnimationFrame(render);
-        return;
-      }
-
-      const streamHeight = streamRows * lineHeight;
-      // Start with full compensation so the earliest-entering column still begins above the viewport.
-      const startY = -streamHeight - lineHeight - maxColumnStartOffsetY;
-      // End with full compensation so the earliest-exiting column still passes below the viewport.
-      const endY =
-        rect.height +
-        lineHeight +
-        rect.height * EXTRA_TRAVEL_VIEWPORT_MULTIPLIER -
-        minColumnStartOffsetY;
-      const streamTop = startY + (endY - startY) * phaseProgress;
-      const streamTravelDistance = streamTop - startY;
       const columnStep = rect.width / streamColumns;
 
-      for (let row = 0; row < streamRows; row += 1) {
-        const y = streamTop + row * lineHeight + lineHeight / 2;
+      streamSegments.forEach((segment, col) => {
+        const movementRows = (segment.speedRowsPerSecond * deltaMs * pointerSpeedMultiplier) / 1000;
+        segment.headRow += movementRows;
+        normalizeHeadRow(segment);
 
-        for (let col = 0; col < streamColumns; col += 1) {
-          const x = col * columnStep + Math.max(0, (columnStep - charWidth) * 0.5);
-          const columnTravelAdjustment = streamTravelDistance * (columnFallSpeedMultiplier[col] - 1);
-          const yWithColumnOffset = y + columnStartOffsetY[col] + columnTravelAdjustment;
-          if (yWithColumnOffset < -lineHeight || yWithColumnOffset > rect.height + lineHeight) continue;
-          ctx.fillStyle = createCyanPurpleGradient(
-            ctx,
-            x,
-            yWithColumnOffset,
-            charHalfHeight,
-            rowCharTopColor[row][col],
-            rowCharBottomColor[row][col],
-            rowCharGradientReverse[row][col],
-          );
-          ctx.fillText(rowText[row][col], x, yWithColumnOffset);
-        }
-      }
+        const x = col * columnStep + Math.max(0, (columnStep - charCellWidth) * 0.5);
+        const tailIndex = segment.chars.length - 1;
 
-      tick += 1;
+        segment.chars.forEach((char, index) => {
+          segment.mutationElapsedMs[index] += deltaMs;
+          if (segment.mutationElapsedMs[index] >= segment.mutationIntervalMs[index]) {
+            segment.chars[index] = randomCharFromPools();
+            segment.mutationElapsedMs[index] %= segment.mutationIntervalMs[index];
+            const depthRatio = index / Math.max(tailIndex, 1);
+            segment.mutationIntervalMs[index] = getMutationIntervalMs(depthRatio, prefersReducedMotion);
+            char = segment.chars[index];
+          }
+
+          const baseRow = segment.headRow - (tailIndex - index);
+          const repeatDistance = Math.max(1, segment.repeatDistanceRows);
+          const firstVisibleRepeat = Math.floor((baseRow * lineHeight + lineHeight / 2) / (repeatDistance * lineHeight));
+          for (let repeat = firstVisibleRepeat + 2; repeat >= firstVisibleRepeat - 6; repeat -= 1) {
+            const row = baseRow - repeat * repeatDistance;
+            const y = row * lineHeight + lineHeight / 2;
+            if (y < -lineHeight || y > rect.height + lineHeight) continue;
+
+            const depthRatio = index / Math.max(tailIndex, 1);
+            const alpha = 0.28 + depthRatio * 0.52;
+            ctx.fillStyle = COLOR_BODY.replace(/[\d.]+\)$/, `${alpha.toFixed(3)})`);
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
+            ctx.fillText(char, x, y);
+
+            if (index === tailIndex) {
+              ctx.fillStyle = COLOR_TAIL;
+              ctx.shadowColor = COLOR_TAIL_GLOW;
+              ctx.shadowBlur = prefersReducedMotion ? 7 : 12;
+              ctx.fillText(char, x, y);
+
+              ctx.fillStyle = COLOR_STREAM_GLOW;
+              ctx.shadowBlur = prefersReducedMotion ? 4 : 7;
+              ctx.fillText(char, x, y);
+              ctx.shadowBlur = 0;
+              ctx.shadowColor = 'transparent';
+            }
+          }
+        });
+      });
+
       rafId = window.requestAnimationFrame(render);
     };
 
