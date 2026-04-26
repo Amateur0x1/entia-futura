@@ -316,11 +316,20 @@ export const initLandingHeroInteractions = () => {
 
   if (knowMoreButton instanceof HTMLElement) {
     knowMoreButton.addEventListener('click', () => {
+      const heroTransitionRoot = document.querySelector('[data-hero-transition-root]');
       const nextPanel = document.querySelector('[data-next-panel]');
-      const nextPanelTop =
-        nextPanel instanceof HTMLElement
-          ? nextPanel.getBoundingClientRect().top + window.scrollY
-          : window.innerHeight;
+      const transitionScrollDistance = window.innerWidth <= 720 ? 2100 : 3000;
+      const nextPanelTop = (() => {
+        if (heroTransitionRoot instanceof HTMLElement) {
+          return heroTransitionRoot.getBoundingClientRect().top + window.scrollY + transitionScrollDistance;
+        }
+
+        if (nextPanel instanceof HTMLElement) {
+          return nextPanel.getBoundingClientRect().top + window.scrollY;
+        }
+
+        return window.innerHeight;
+      })();
       const startY = window.scrollY;
       const distance = Math.max(nextPanelTop - startY, 0);
 
@@ -333,15 +342,14 @@ export const initLandingHeroInteractions = () => {
         return;
       }
 
-      const duration = Math.min(3200, Math.max(1800, distance * 0.9));
+      const scrollSpeedPxPerMs = 1.05;
+      const duration = Math.max(900, distance / scrollSpeedPxPerMs);
       const startTime = performance.now();
-      const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
       const step = (currentTime: number) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const eased = easeInOutCubic(progress);
-        const y = startY + distance * eased;
+        const y = startY + distance * progress;
 
         window.scrollTo({ top: y });
 

@@ -21,6 +21,7 @@ export const initHomeScrollEffects = ({
   initHeroKnowMoreInteractionEffects({
     knowMoreButton: homeHeroElements.knowMoreButton,
     nextPanel: homeHeroElements.nextPanel,
+    heroTransitionRoot: homeHeroElements.heroTransitionRoot,
   });
 
   initHeroToIntroScrollTransition({
