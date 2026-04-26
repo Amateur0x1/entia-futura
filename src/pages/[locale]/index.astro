@@ -113,6 +113,10 @@ const researchPracticeModules = [
     gap: 0;
   }
 
+  :global(body.theme-landing-dark) {
+    background: var(--color-secondary);
+  }
+
   .landing-scroll-spacer {
     height: 280svh;
     width: 100%;
@@ -130,6 +134,7 @@ const researchPracticeModules = [
     opacity: 0;
     pointer-events: none;
     overflow: clip;
+    border-radius: 0;
     transform: translateY(22px);
     filter: blur(8px);
   }

@@ -3,14 +3,13 @@ import gsap from 'gsap';
 import { addHeroMediaDriftSegment } from './addHeroMediaDriftSegment';
 import type { HomeHeroElements } from './getHomeHeroElements';
 import { addHeroVideoTransitionSegment } from './heroVideoEffects';
-import { setupNextPanelReveal } from './setupNextPanelReveal';
 import {
-  getShapeDelay,
-  getShapeDuration,
-  getShapeScaleX,
-  getShapeScaleY,
-  getShapeTransformOrigin,
-} from './shapeOverlayGrid';
+  addPanelPushTransitionSegment,
+  createTransitionBackplate,
+  createTransitionShade,
+  setPanelTransitionInitialState,
+} from './panelPushTransition';
+import { setupNextPanelReveal } from './setupNextPanelReveal';
 
 interface InitHeroToIntroScrollTransitionOptions {
   elements: HomeHeroElements;
@@ -31,10 +30,9 @@ export const HERO_TO_INTRO_TIMING = {
 export const initHeroToIntroScrollTransition = ({
   elements,
   prefersReducedMotion,
-  shapeGridCells,
   splitTextAvailable,
 }: InitHeroToIntroScrollTransitionOptions) => {
-  const { heroTransitionRoot, heroVideoShell, nextPanel, scrollVideo } = elements;
+  const { heroTransitionFrame, heroTransitionRoot, heroVideoShell, nextPanel, scrollVideo } = elements;
   if (!heroTransitionRoot || !nextPanel) {
     return;
   }
@@ -48,13 +46,15 @@ export const initHeroToIntroScrollTransition = ({
 
     initialized = true;
 
-    gsap.set(nextPanel, {
-      autoAlpha: 0,
-      y: 24,
-      filter: 'blur(8px)',
-      visibility: 'hidden',
-      pointerEvents: 'none',
+    const outgoingHeroPanel = heroTransitionFrame ?? heroTransitionRoot;
+
+    setPanelTransitionInitialState({
+      incomingPanel: nextPanel,
+      outgoingPanel: outgoingHeroPanel,
     });
+    const transitionBackplate = createTransitionBackplate('data-hero-panel-transition-backplate');
+    const transitionShade = createTransitionShade('data-hero-panel-transition-shade');
+    gsap.set([transitionBackplate, transitionShade], { autoAlpha: 0 });
 
     const transitionScrollDistance =
       window.innerWidth <= 720
@@ -72,7 +72,7 @@ export const initHeroToIntroScrollTransition = ({
         invalidateOnRefresh: true,
         onUpdate: ({ progress }) => {
           if (progress >= HERO_TO_INTRO_TIMING.heroHideAtProgress) {
-            gsap.set(heroTransitionRoot, { autoAlpha: 0, visibility: 'hidden' });
+            gsap.set(heroTransitionRoot, { visibility: 'hidden' });
             return;
           }
 
@@ -96,51 +96,16 @@ export const initHeroToIntroScrollTransition = ({
       videoPlaybackStart: HERO_TO_INTRO_TIMING.videoPlaybackStart,
     });
 
-    const curtainStart =
+    const heroPanelExitStart =
       HERO_TO_INTRO_TIMING.videoPlaybackStart +
       HERO_TO_INTRO_TIMING.videoPlaybackDuration +
       HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
-    const curtainDuration = 2.84;
-    const curtainOpenStart = curtainStart + curtainDuration + 0.02;
-    const curtainOpenDuration = 1.56;
-    const panelVisibleStart = curtainOpenStart - 0.02;
-    const panelTextRevealStart = curtainOpenStart + curtainOpenDuration * 0.94 + 0.08;
-    const curtainExpandScale = 1.16;
-    const curtainCloseDurationScale = 2.2;
+    const heroPanelPushDuration = 1.08;
+    const outgoingHeroLiftDistance = () => -Math.min(window.innerHeight * 0.12, 120);
+    const panelTextRevealStart = heroPanelExitStart + heroPanelPushDuration + 0.16;
 
-    if (!prefersReducedMotion && elements.shapeOverlay && shapeGridCells.length > 0) {
-      gsap.set(shapeGridCells, {
-        autoAlpha: 1,
-        scaleX: (_index: number, target: Element) => getShapeScaleX(target),
-        scaleY: (_index: number, target: Element) => getShapeScaleY(target),
-        transformOrigin: (_index: number, target: Element) => getShapeTransformOrigin(target),
-      });
-
+    if (!prefersReducedMotion) {
       heroTimeline
-        .set(
-          elements.shapeOverlay,
-          {
-            autoAlpha: 1,
-            visibility: 'visible',
-          },
-          curtainStart,
-        )
-        .fromTo(
-          shapeGridCells,
-          {
-            scaleX: (_index: number, target: Element) => getShapeScaleX(target),
-            scaleY: (_index: number, target: Element) => getShapeScaleY(target),
-          },
-          {
-            scaleX: curtainExpandScale,
-            scaleY: curtainExpandScale,
-            duration: (_index: number, target: Element) =>
-              getShapeDuration(target, curtainDuration * 0.72) * curtainCloseDurationScale,
-            delay: (_index: number, target: Element) => getShapeDelay(target, curtainDuration * 0.28) * 1.2,
-            ease: 'power2.out',
-          },
-          curtainStart,
-        )
         .to(
           elements.signalCards,
           {
@@ -149,57 +114,30 @@ export const initHeroToIntroScrollTransition = ({
             duration: 0.32,
             stagger: 0.02,
           },
-          curtainStart + 0.08,
-        )
-        .set(
-          heroTransitionRoot,
-          {
-            autoAlpha: 0,
-            visibility: 'hidden',
-          },
-          curtainOpenStart - 0.01,
-        )
-        .fromTo(
-          nextPanel,
-          {
-            autoAlpha: 0,
-            y: 22,
-            filter: 'blur(8px)',
-            pointerEvents: 'none',
-          },
-          {
-            autoAlpha: 1,
-            y: 0,
-            filter: 'blur(0px)',
-            visibility: 'visible',
-            pointerEvents: 'auto',
-            duration: 0.52,
-            ease: 'power2.out',
-          },
-          panelVisibleStart,
-        )
-        .to(
-          shapeGridCells,
-          {
-            scaleX: (_index: number, target: Element) => getShapeScaleX(target),
-            scaleY: (_index: number, target: Element) => getShapeScaleY(target),
-            duration: curtainOpenDuration * 0.86,
-            delay: 0,
-            ease: 'power2.in',
-          },
-          curtainOpenStart,
-        )
-        .to(
-          elements.shapeOverlay,
-          {
-            autoAlpha: 0,
-            visibility: 'hidden',
-            duration: 0.12,
-            ease: 'none',
-          },
-          curtainOpenStart + curtainOpenDuration * 0.9,
+          heroPanelExitStart,
         );
-    } else if (!prefersReducedMotion) {
+
+      addPanelPushTransitionSegment({
+        backplate: transitionBackplate,
+        duration: heroPanelPushDuration,
+        incomingPanel: nextPanel,
+        liftDistance: outgoingHeroLiftDistance,
+        outgoingPanel: outgoingHeroPanel,
+        outgoingScale: 0.72,
+        shade: transitionShade,
+        shadeOpacity: 0.58,
+        startAt: heroPanelExitStart,
+        timeline: heroTimeline,
+      });
+
+      heroTimeline.set(
+        heroTransitionRoot,
+        {
+          visibility: 'hidden',
+        },
+        heroPanelExitStart + heroPanelPushDuration,
+      );
+    } else {
       heroTimeline.fromTo(
         nextPanel,
         {
@@ -217,7 +155,7 @@ export const initHeroToIntroScrollTransition = ({
           duration: 0.42,
           ease: 'power3.out',
         },
-        curtainStart + 0.12,
+        heroPanelExitStart,
       );
     }
 

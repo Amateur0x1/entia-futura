@@ -260,6 +260,7 @@ small[data-brand-animated-text] {
   min-height: 340svh;
   margin-inline: calc(50% - 50vw);
   width: 100vw;
+  background: var(--color-background);
 }
 
 .hero-transition-frame {
@@ -267,6 +268,7 @@ small[data-brand-animated-text] {
   top: 0;
   height: 100svh;
   min-height: 100svh;
+  border-radius: 0;
   overflow: clip;
   isolation: isolate;
 }
@@ -278,6 +280,8 @@ small[data-brand-animated-text] {
   overflow: clip;
   background: var(--gradient-hero-stage);
   isolation: isolate;
+  transform: scale(1.08);
+  transform-origin: 50% 50%;
 }
 
 .hero-video {
