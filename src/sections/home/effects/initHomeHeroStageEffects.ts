@@ -21,7 +21,7 @@ const applyHomeHeroInitialStates = ({
   }
 
   gsap.set(primaryVisual, {
-    transformOrigin: '50% 50%',
+    transformOrigin: '50% 0%',
   });
 
   if (!prefersReducedMotion) {

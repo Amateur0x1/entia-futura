@@ -264,13 +264,14 @@ small[data-brand-animated-text] {
 }
 
 .hero-transition-frame {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  inset: 0;
   height: 100svh;
   min-height: 100svh;
   border-radius: 0;
   overflow: clip;
   isolation: isolate;
+  background: var(--color-background);
 }
 
 .hero-video-shell {

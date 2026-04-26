@@ -101,7 +101,7 @@ export const initHeroToIntroScrollTransition = ({
       HERO_TO_INTRO_TIMING.videoPlaybackDuration +
       HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
     const heroPanelPushDuration = 1.08;
-    const outgoingHeroLiftDistance = () => -Math.min(window.innerHeight * 0.12, 120);
+    const outgoingHeroLiftDistance = () => 0;
     const panelTextRevealStart = heroPanelExitStart + heroPanelPushDuration + 0.16;
 
     if (!prefersReducedMotion) {

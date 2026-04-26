@@ -15,7 +15,7 @@ export const addHeroMediaDriftSegment = ({
     .to(
       primaryVisual,
       {
-        yPercent: -2,
+        yPercent: 0,
         scale: 1.03,
         duration: 1.2,
       },

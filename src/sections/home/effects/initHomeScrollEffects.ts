@@ -81,7 +81,7 @@ const createPanelSlideTransition = ({
     fakeScrollDistance > 1 ? Math.min(Math.max(fakeScrollDistance / window.innerHeight, 0.45), 1.55) : 0;
   const panelPushStart = fakeScrollDuration;
   const panelPushDuration = 1.08;
-  const outgoingLiftDistance = () => -Math.min(window.innerHeight * 0.12, 120);
+  const outgoingLiftDistance = () => 0;
 
   const panelTransitionTimeline = gsap.timeline({
     defaults: {
@@ -97,8 +97,6 @@ const createPanelSlideTransition = ({
       onEnter: () => {
         gsap.set(transitionBackplate, { autoAlpha: 1, visibility: 'visible', zIndex: 35 });
         gsap.set(thirdPanel, {
-          autoAlpha: 1,
-          yPercent: 100,
           visibility: 'visible',
           pointerEvents: 'none',
           zIndex: 38,
