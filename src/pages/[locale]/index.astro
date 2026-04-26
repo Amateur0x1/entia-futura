@@ -124,33 +124,33 @@ const researchPracticeModules = [
   }
 
   .landing-next-panel {
-    position: fixed;
-    inset: 0;
+    /* sticky: stays in document flow but fixes to top when reached.
+       Height = 100svh so it fills the viewport exactly like the old fixed panel. */
+    position: sticky;
+    top: 0;
+    height: 100svh;
     z-index: 30;
     padding: clamp(3.6rem, 9vw, 6.4rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
     background: var(--color-background);
     color: var(--color-secondary-foreground);
-    visibility: hidden;
+    /* Initial hidden state is driven by GSAP (opacity:0, yPercent:100 via transform) */
     opacity: 0;
     pointer-events: none;
     overflow: clip;
     border-radius: 0;
-    transform: translateY(22px);
-    filter: blur(8px);
   }
 
   .landing-third-panel {
-    position: fixed;
-    inset: 0;
+    position: sticky;
+    top: 0;
+    height: 100svh;
     z-index: 35;
     padding: clamp(4rem, 10vw, 7rem) clamp(1.2rem, 4vw, 3rem) clamp(4rem, 8vw, 6rem);
     background: var(--color-background);
     color: var(--color-secondary-foreground);
-    visibility: hidden;
+    /* Initial hidden state is driven by GSAP (opacity:0, yPercent:100 via transform) */
     opacity: 0;
     pointer-events: none;
-    transform: translateY(22px);
-    filter: blur(8px);
     overflow: clip;
   }
 

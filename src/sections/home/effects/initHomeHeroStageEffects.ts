@@ -14,7 +14,7 @@ const applyHomeHeroInitialStates = ({
   elements: HomeHeroElements;
   prefersReducedMotion: boolean;
 }) => {
-  const { nextPanel, nextPanelDivider, primaryVisual, shapeOverlay } = elements;
+  const { nextPanelDivider, primaryVisual, shapeOverlay } = elements;
 
   if (!primaryVisual) {
     return;
@@ -25,13 +25,8 @@ const applyHomeHeroInitialStates = ({
   });
 
   if (!prefersReducedMotion) {
-    if (nextPanel) {
-      gsap.set(nextPanel, {
-        autoAlpha: 0,
-        y: 36,
-        visibility: 'hidden',
-      });
-    }
+    // nextPanel initial state is now set by setPanelTransitionInitialState
+    // inside initAllPanelTransitions — no need to set it here.
 
     if (nextPanelDivider) {
       gsap.set(nextPanelDivider, {

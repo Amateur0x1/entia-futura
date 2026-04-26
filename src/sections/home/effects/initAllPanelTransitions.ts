@@ -127,19 +127,16 @@ const initFullTransitions = ({
     const heroTimeline = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        trigger: heroTransitionRoot,
+        // Pin the frame (not the root) so the spacer is inserted at the right place.
+        // GSAP pin replaces the old CSS position:fixed + min-height:340svh approach.
+        trigger: heroTransitionFrame,
         start: 'top top',
         end: `+=${transitionScrollDistance}`,
+        pin: true,
+        pinSpacing: true,
         scrub: 0.35,
         anticipatePin: 1,
         invalidateOnRefresh: true,
-        onUpdate: ({ progress }) => {
-          // Mirror the hero root's visibility to the frame's animated state.
-          // We only touch `visibility` (not opacity/autoAlpha) so we don't
-          // interfere with the timeline's own fade tweens.
-          const hidden = progress >= HERO_TO_INTRO_TIMING.heroHideAtProgress;
-          gsap.set(heroTransitionRoot, { visibility: hidden ? 'hidden' : 'visible' });
-        },
       },
     });
 
@@ -184,7 +181,7 @@ const initFullTransitions = ({
       timeline: heroTimeline,
     });
 
-    heroTimeline.set(heroTransitionRoot, { visibility: 'hidden' }, heroPanelExitStart + heroPanelPushDuration);
+    // No need to manually hide heroTransitionRoot — GSAP pin unpin handles it.
 
     setupNextPanelReveal({
       prefersReducedMotion: false,

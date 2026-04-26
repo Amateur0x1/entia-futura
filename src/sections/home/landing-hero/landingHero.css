@@ -256,16 +256,17 @@ small[data-brand-animated-text] {
 }
 
 .hero-transition-stage {
+  /* min-height removed: GSAP pin adds its own spacer for the scroll distance */
   position: relative;
-  min-height: 340svh;
   margin-inline: calc(50% - 50vw);
   width: 100vw;
   background: var(--color-background);
 }
 
 .hero-transition-frame {
-  position: fixed;
-  inset: 0;
+  /* position is now managed by GSAP pin — no CSS fixed */
+  position: relative;
+  width: 100%;
   height: 100svh;
   min-height: 100svh;
   border-radius: 0;
