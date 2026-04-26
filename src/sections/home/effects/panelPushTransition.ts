@@ -73,6 +73,11 @@ export const setPanelTransitionInitialState = ({
   outgoingPanel: HTMLElement;
 }) => {
   gsap.set(outgoingPanel, {
+    autoAlpha: 1,
+    visibility: 'visible',
+    scale: 1,
+    y: 0,
+    yPercent: 0,
     transformOrigin: '50% 0%',
     zIndex: 36,
     borderTopLeftRadius: 0,
@@ -146,6 +151,7 @@ export const addPanelPushTransitionSegment = ({
     .fromTo(
       outgoingPanel,
       {
+        immediateRender: false,
         autoAlpha: 1,
         scale: 1,
         y: 0,
@@ -158,7 +164,6 @@ export const addPanelPushTransitionSegment = ({
         borderBottomRightRadius: 0,
       },
       {
-        immediateRender: false,
         autoAlpha: 1,
         scale: outgoingScale,
         y: 0,
@@ -189,6 +194,7 @@ export const addPanelPushTransitionSegment = ({
     .fromTo(
       incomingPanel,
       {
+        immediateRender: false,
         autoAlpha: 1,
         yPercent: 100,
         visibility: 'visible',
@@ -228,6 +234,7 @@ export const addPanelPushTransitionSegment = ({
       {
         visibility: 'hidden',
         pointerEvents: 'none',
+        scale: 1,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
       },
@@ -236,6 +243,8 @@ export const addPanelPushTransitionSegment = ({
     .set(
       incomingPanel,
       {
+        autoAlpha: 1,
+        visibility: 'visible',
         pointerEvents: 'auto',
         zIndex: 35,
         borderTopLeftRadius: 0,
