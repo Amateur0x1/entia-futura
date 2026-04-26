@@ -25,12 +25,44 @@ const instituteIntro = pickByLocale(
   '未来人研究所是一个围绕“未来我们将如何存在？”这一核心问题展开工作的独立研究机构。我们以高等研究为基础，同时强调研究向现实问题、合作机制、未来项目与社会实验的持续转化。\n我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。',
   'Entia Futura Institut is an independent institute organized around the question: “How shall we exist in the future?” Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, future ventures, and social experimentation.\nWe are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life.',
 );
+const researchPracticeEyebrow = pickByLocale(locale, '6. 研究转化', '6. RESEARCH IN PRACTICE');
+const researchPracticeLabel = pickByLocale(locale, 'RESEARCH IN PRACTICE', 'RESEARCH IN PRACTICE');
+const researchPracticeTitle = pickByLocale(locale, '研究转化', 'Research in Practice');
+const researchPracticeIntro = pickByLocale(
+  locale,
+  '未来人研究所相信，研究不应停留在理论层面，也不应被压缩成单纯的策略包装。我们强调研究转化：让高等研究进入现实问题、组织实践、品牌叙事、空间场景与协作机制之中。',
+  'Entia Futura Institut believes that research should not remain at the level of theory alone, nor be reduced to strategic packaging. We emphasize research in practice: bringing advanced inquiry into real-world problems, organizational practice, narrative work, spatial settings, and collaborative mechanisms.',
+);
+const researchPracticeModules = [
+  {
+    zhTitle: '应用研究',
+    enTitle: 'Applied Research',
+    zhBody: '围绕企业、品牌、地方或空间的现实问题开展专题调研、案例分析、访谈、观察与研究输出。',
+    enBody:
+      'Thematic inquiry, case analysis, interviews, observation, and public outputs developed around real-world questions faced by enterprises, brands, localities, and spaces.',
+  },
+  {
+    zhTitle: '策略与叙事支持',
+    enTitle: 'Strategy and Narrative Support',
+    zhBody: '将研究成果转化为品牌叙事、组织语言、公共表达与未来议题框架。',
+    enBody:
+      'Translating research into brand narratives, organizational language, public expression, and frameworks for future-oriented questions.',
+  },
+  {
+    zhTitle: '组织与社群设计',
+    enTitle: 'Organizational and Community Design',
+    zhBody: '协助团队设计长期协作结构、学习路径与社群机制，让研究成为可持续的行动系统。',
+    enBody:
+      'Designing long-term collaboration structures, learning pathways, and community mechanisms so research can evolve into sustained action.',
+  },
+] as const;
 ---
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
   <main class="landing-main">
     <HomeHeroScreen locale={locale} />
     <section class={`landing-next-panel ${locale === 'en' ? 'landing-next-panel--en' : ''}`} data-next-panel>
+      <canvas class="landing-next-panel__nebula" data-next-panel-nebula aria-hidden="true"></canvas>
       <div class="landing-next-panel__inner" data-next-panel-inner>
         <article class="landing-next-panel__block landing-next-panel__block--top-right">
           <p class="landing-next-panel__label">{coreQuestionLabel}</p>
@@ -45,7 +77,26 @@ const instituteIntro = pickByLocale(
         <HomeMonolithVisual />
       </div>
     </section>
-    <div class="landing-scroll-spacer" aria-hidden="true"></div>
+    <div class="landing-scroll-spacer" data-landing-scroll-spacer aria-hidden="true"></div>
+    <section class={`landing-third-panel ${locale === 'en' ? 'landing-third-panel--en' : ''}`} data-third-panel>
+      <canvas class="landing-third-panel__nebula" data-next-panel-nebula aria-hidden="true"></canvas>
+      <div class="landing-third-panel__inner">
+        <header class="section-heading landing-third-panel__heading">
+          <p class="eyebrow landing-third-panel__eyebrow">{researchPracticeEyebrow}</p>
+          <p class="landing-third-panel__label">{researchPracticeLabel}</p>
+          <h2>{researchPracticeTitle}</h2>
+          <p>{researchPracticeIntro}</p>
+        </header>
+        <div class="landing-third-panel__grid">
+          {researchPracticeModules.map((item) => (
+            <article class="field-card landing-third-panel__card">
+              <h3>{pickByLocale(locale, item.zhTitle, item.enTitle)}</h3>
+              <p>{pickByLocale(locale, item.zhBody, item.enBody)}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   </main>
   <svg
     class="shape-overlays landing-shape-overlays"
@@ -63,7 +114,7 @@ const instituteIntro = pickByLocale(
   }
 
   .landing-scroll-spacer {
-    height: 180svh;
+    height: 280svh;
     width: 100%;
     pointer-events: none;
   }
@@ -76,9 +127,125 @@ const instituteIntro = pickByLocale(
     background: var(--color-background);
     color: var(--color-secondary-foreground);
     visibility: hidden;
+    opacity: 0;
     pointer-events: none;
     overflow: clip;
+    transform: translateY(22px);
+    filter: blur(8px);
   }
+
+  .landing-third-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.2rem, 4vw, 3rem) clamp(4rem, 8vw, 6rem);
+    background: var(--color-background);
+    color: var(--color-secondary-foreground);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(22px);
+    filter: blur(8px);
+    overflow: clip;
+  }
+
+  .landing-next-panel__nebula {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.76;
+  }
+
+  .landing-third-panel__nebula {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.88;
+  }
+
+  .landing-third-panel__inner {
+    position: relative;
+    z-index: 1;
+    max-width: min(1200px, 100%);
+    margin: 0 auto;
+    display: grid;
+    gap: clamp(1.8rem, 4vw, 3rem);
+  }
+
+  .landing-third-panel__heading {
+    display: grid;
+    gap: 0.9rem;
+    max-width: 76ch;
+  }
+
+  .landing-third-panel__eyebrow {
+    margin: 0;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 66%, transparent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+  }
+
+  .landing-third-panel__label {
+    margin: 0;
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 74%, transparent);
+  }
+
+  .landing-third-panel__heading h2 {
+    margin: 0;
+    font-size: clamp(2rem, 4.6vw, 4.2rem);
+    letter-spacing: -0.03em;
+    line-height: 1.06;
+    font-weight: 520;
+  }
+
+  .landing-third-panel__heading > p:last-child {
+    margin: 0;
+    font-size: clamp(1rem, 1.36vw, 1.24rem);
+    line-height: 1.8;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 82%, transparent);
+  }
+
+  .landing-third-panel__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.9rem, 2vw, 1.2rem);
+  }
+
+  .landing-third-panel__card {
+    margin: 0;
+    border: 1px solid color-mix(in srgb, var(--color-secondary-foreground) 12%, transparent);
+    background: color-mix(in srgb, #0a111d 86%, transparent);
+    backdrop-filter: blur(3px);
+    border-radius: 14px;
+    padding: clamp(1rem, 1.6vw, 1.3rem);
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .landing-third-panel__card h3 {
+    margin: 0;
+    font-size: clamp(1.2rem, 2vw, 1.48rem);
+    line-height: 1.25;
+    font-weight: 500;
+  }
+
+  .landing-third-panel__card p {
+    margin: 0;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 80%, transparent);
+    line-height: 1.72;
+    font-size: 0.98rem;
+  }
+
   .landing-next-panel__inner {
     position: relative;
     z-index: 1;
@@ -276,7 +443,7 @@ const instituteIntro = pickByLocale(
 
   @media (max-width: 720px) {
     .landing-scroll-spacer {
-      height: 120svh;
+      height: 220svh;
     }
 
     .landing-next-panel {
@@ -313,6 +480,17 @@ const instituteIntro = pickByLocale(
 
     .landing-next-panel__title {
       max-width: 11ch;
+    }
+
+    .landing-third-panel {
+      padding-top: max(4rem, calc(env(safe-area-inset-top) + 2.8rem));
+      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
+        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
+      padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
+    }
+
+    .landing-third-panel__grid {
+      grid-template-columns: 1fr;
     }
 
   }

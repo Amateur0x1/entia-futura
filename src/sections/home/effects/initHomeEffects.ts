@@ -8,6 +8,7 @@ import { initHomeHeroStageEffects } from './initHomeHeroStageEffects';
 import { initHomeScrollEffects } from './initHomeScrollEffects';
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
+import { initThirdPanelNebulaBackground } from './initThirdPanelNebulaBackground';
 import { setupShapeOverlayGrid } from './shapeOverlayGrid';
 
 const initSmoothScrolling = () => {
@@ -53,6 +54,16 @@ export const initHomeEffects = () => {
   });
 
   initMonolithBinaryVisuals(prefersReducedMotion);
+  initThirdPanelNebulaBackground({
+    panel: homeHeroElements.nextPanel,
+    prefersReducedMotion,
+  });
+
+  const thirdPanel = document.querySelector<HTMLElement>('[data-third-panel]');
+  initThirdPanelNebulaBackground({
+    panel: thirdPanel,
+    prefersReducedMotion,
+  });
 
   initHomeScrollEffects({
     homeHeroElements,

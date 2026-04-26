@@ -48,6 +48,14 @@ export const initHeroToIntroScrollTransition = ({
 
     initialized = true;
 
+    gsap.set(nextPanel, {
+      autoAlpha: 0,
+      y: 24,
+      filter: 'blur(8px)',
+      visibility: 'hidden',
+      pointerEvents: 'none',
+    });
+
     const transitionScrollDistance =
       window.innerWidth <= 720
         ? HERO_TO_INTRO_TIMING.transitionScrollDistanceMobile
@@ -151,12 +159,22 @@ export const initHeroToIntroScrollTransition = ({
           },
           curtainOpenStart - 0.01,
         )
-        .set(
+        .fromTo(
           nextPanel,
+          {
+            autoAlpha: 0,
+            y: 22,
+            filter: 'blur(8px)',
+            pointerEvents: 'none',
+          },
           {
             autoAlpha: 1,
             y: 0,
+            filter: 'blur(0px)',
             visibility: 'visible',
+            pointerEvents: 'auto',
+            duration: 0.52,
+            ease: 'power2.out',
           },
           panelVisibleStart,
         )
@@ -182,12 +200,20 @@ export const initHeroToIntroScrollTransition = ({
           curtainOpenStart + curtainOpenDuration * 0.9,
         );
     } else if (!prefersReducedMotion) {
-      heroTimeline.to(
+      heroTimeline.fromTo(
         nextPanel,
+        {
+          autoAlpha: 0,
+          y: 22,
+          filter: 'blur(8px)',
+          pointerEvents: 'none',
+        },
         {
           autoAlpha: 1,
           y: 0,
+          filter: 'blur(0px)',
           visibility: 'visible',
+          pointerEvents: 'auto',
           duration: 0.42,
           ease: 'power3.out',
         },
