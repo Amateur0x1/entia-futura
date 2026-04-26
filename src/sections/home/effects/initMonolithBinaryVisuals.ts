@@ -24,16 +24,16 @@ const CHAR_GRADIENT_COLORS = [
 ] as const;
 const FONT_SIZE_STEPS = {
   reduced: [
-    { minWidth: 0, fontSize: 9, lineHeight: 11 },
-    { minWidth: 640, fontSize: 10, lineHeight: 12 },
-    { minWidth: 1024, fontSize: 11, lineHeight: 13 },
+    { minWidth: 0, fontSize: 10, lineHeight: 12 },
+    { minWidth: 640, fontSize: 11, lineHeight: 13 },
+    { minWidth: 1024, fontSize: 12, lineHeight: 14 },
   ],
   normal: [
-    { minWidth: 0, fontSize: 11, lineHeight: 13 },
-    { minWidth: 720, fontSize: 12, lineHeight: 14 },
-    { minWidth: 960, fontSize: 13, lineHeight: 15 },
-    { minWidth: 1280, fontSize: 14, lineHeight: 16 },
-    { minWidth: 1600, fontSize: 15, lineHeight: 17 },
+    { minWidth: 0, fontSize: 12, lineHeight: 14 },
+    { minWidth: 720, fontSize: 13, lineHeight: 15 },
+    { minWidth: 960, fontSize: 14, lineHeight: 16 },
+    { minWidth: 1280, fontSize: 15, lineHeight: 17 },
+    { minWidth: 1600, fontSize: 16, lineHeight: 18 },
   ],
 } as const;
 
