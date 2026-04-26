@@ -12,12 +12,12 @@ const getShapeDirection = (target: Element): ShapeDirection => {
 
 export const getShapeScaleX = (target: Element) => {
   const direction = getShapeDirection(target);
-  return direction === 'left' || direction === 'right' ? 0 : 1.05;
+  return direction === 'left' || direction === 'right' ? 0 : 1;
 };
 
 export const getShapeScaleY = (target: Element) => {
   const direction = getShapeDirection(target);
-  return direction === 'top' || direction === 'bottom' ? 0 : 1.05;
+  return direction === 'top' || direction === 'bottom' ? 0 : 1;
 };
 
 export const getShapeTransformOrigin = (target: Element) => {

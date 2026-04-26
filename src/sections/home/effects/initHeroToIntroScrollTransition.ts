@@ -93,7 +93,9 @@ export const initHeroToIntroScrollTransition = ({
       HERO_TO_INTRO_TIMING.videoPlaybackDuration +
       HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
     const curtainDuration = 1.08;
-    const panelRevealStart = curtainStart + curtainDuration * 0.58;
+    const curtainOpenStart = curtainStart + curtainDuration + 0.02;
+    const curtainOpenDuration = 0.46;
+    const panelRevealStart = curtainOpenStart - 0.02;
 
     if (!prefersReducedMotion && elements.shapeOverlay && shapeGridCells.length > 0) {
       gsap.set(shapeGridCells, {
@@ -120,7 +122,7 @@ export const initHeroToIntroScrollTransition = ({
           },
           {
             scaleX: 1,
-            scaleY: 1.05,
+            scaleY: 1,
             duration: (_index: number, target: Element) => getShapeDuration(target, curtainDuration * 0.72),
             delay: (_index: number, target: Element) => getShapeDelay(target, curtainDuration * 0.28),
             ease: 'power2.out',
@@ -137,6 +139,34 @@ export const initHeroToIntroScrollTransition = ({
           },
           curtainStart + 0.08,
         )
+        .set(
+          heroTransitionRoot,
+          {
+            autoAlpha: 0,
+            visibility: 'hidden',
+          },
+          curtainOpenStart - 0.01,
+        )
+        .set(
+          nextPanel,
+          {
+            autoAlpha: 1,
+            y: 0,
+            visibility: 'visible',
+          },
+          panelRevealStart,
+        )
+        .to(
+          shapeGridCells,
+          {
+            scaleX: (_index: number, target: Element) => getShapeScaleX(target),
+            scaleY: (_index: number, target: Element) => getShapeScaleY(target),
+            duration: curtainOpenDuration * 0.86,
+            delay: 0,
+            ease: 'power2.in',
+          },
+          curtainOpenStart,
+        )
         .to(
           elements.shapeOverlay,
           {
@@ -145,18 +175,7 @@ export const initHeroToIntroScrollTransition = ({
             duration: 0.12,
             ease: 'none',
           },
-          curtainStart + curtainDuration * 0.84,
-        )
-        .to(
-          nextPanel,
-          {
-            autoAlpha: 1,
-            y: 0,
-            visibility: 'visible',
-            duration: 0.46,
-            ease: 'power3.out',
-          },
-          panelRevealStart,
+          curtainOpenStart + curtainOpenDuration * 0.9,
         );
     } else if (!prefersReducedMotion) {
       heroTimeline.to(
