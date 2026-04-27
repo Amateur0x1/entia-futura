@@ -99,7 +99,10 @@ const initFullTransitions = ({
   gsap.set([heroShade, secondShade], { opacity: 0 });
 
   // ── initial states ─────────────────────────────────────────────────────────
-  const outgoingHeroPanel = heroTransitionFrame ?? heroTransitionRoot;
+  // Use the full section as the outgoing panel so the entire element (including
+  // its background) is scaled — this lets the body polka-dot background show
+  // through during the 1→2 push transition instead of a solid colour fill.
+  const outgoingHeroPanel = heroTransitionRoot;
 
   // Set thirdPanel to its incoming (hidden) state for the 2→3 transition.
   // We only call setPanelTransitionInitialState for the outgoing sides here;
@@ -126,7 +129,7 @@ const initFullTransitions = ({
     y: 0,
     yPercent: 0,
     filter: 'blur(0px)',
-    transformOrigin: '50% 0%',
+    transformOrigin: '50% 50%',
     zIndex: 36,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
@@ -140,7 +143,7 @@ const initFullTransitions = ({
     y: 0,
     yPercent: 0,
     filter: 'blur(0px)',
-    transformOrigin: '50% 0%',
+    transformOrigin: '50% 50%',
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 0,
