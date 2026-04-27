@@ -93,8 +93,10 @@ const initFullTransitions = ({
   if (!heroTransitionRoot || !secondPanel) return;
 
   // ── shared layers ──────────────────────────────────────────────────────────
-  const heroShade = createTransitionShade('data-hero-panel-transition-shade');
-  const secondShade = createTransitionShade('data-second-panel-transition-shade');
+  // Shades are positioned *inside* their respective outgoing panels (absolute)
+  // so they only darken the outgoing panel — not the incoming panel sliding up.
+  const heroShade = createTransitionShade('data-hero-panel-transition-shade', heroTransitionRoot);
+  const secondShade = createTransitionShade('data-second-panel-transition-shade', secondPanel);
 
   gsap.set([heroShade, secondShade], { opacity: 0 });
 

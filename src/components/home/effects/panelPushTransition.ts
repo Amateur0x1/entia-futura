@@ -42,11 +42,43 @@ export const getOrCreateTransitionLayer = (attributeName: string, styles: Partia
   return layer;
 };
 
-export const createTransitionShade = (attributeName: string) =>
-  getOrCreateTransitionLayer(attributeName, {
-    zIndex: '37',
+/**
+ * Creates a shade overlay that is positioned *inside* the given outgoingPanel
+ * (position: absolute; inset: 0) so that it only darkens that panel's area.
+ * This prevents the shade from covering the incoming panel as it slides up
+ * from the bottom of the viewport.
+ */
+export const createTransitionShade = (attributeName: string, outgoingPanel: HTMLElement) => {
+  // Ensure the outgoing panel establishes a stacking context so the absolutely-
+  // positioned shade clips to its bounds.
+  const currentPosition = window.getComputedStyle(outgoingPanel).position;
+  if (currentPosition === 'static') {
+    outgoingPanel.style.position = 'relative';
+  }
+
+  const existingLayer = outgoingPanel.querySelector<HTMLElement>(`[${attributeName}]`);
+  const layer = existingLayer ?? document.createElement('div');
+
+  layer.setAttribute(attributeName, '');
+  layer.setAttribute('aria-hidden', 'true');
+  Object.assign(layer.style, {
+    position: 'absolute',
+    inset: '0',
+    opacity: '0',
+    pointerEvents: 'none',
+    zIndex: '9',
     background: '#000',
+    // Inherit parent's border-radius so the shade follows the panel's rounded corners
+    // during the push transition.
+    borderRadius: 'inherit',
   });
+
+  if (!existingLayer) {
+    outgoingPanel.appendChild(layer);
+  }
+
+  return layer;
+};
 
 interface AddPanelPushTransitionSegmentOptions {
   duration: number;
@@ -59,6 +91,9 @@ interface AddPanelPushTransitionSegmentOptions {
   startAt: number;
   timeline: gsap.core.Timeline;
 }
+
+// Re-export createTransitionShade signature remains unchanged externally;
+// callers must now pass the outgoingPanel as second argument.
 
 export const setPanelTransitionInitialState = ({
   incomingPanel,
@@ -112,13 +147,6 @@ export const addPanelPushTransitionSegment = ({
   timeline,
 }: AddPanelPushTransitionSegmentOptions) => {
   timeline
-    .set(
-      shade,
-      {
-        zIndex: 37,
-      },
-      startAt,
-    )
     .set(
       incomingPanel,
       {
