@@ -18,6 +18,8 @@ const { locale, title, intro, modules } = Astro.props;
 
 <section class={`landing-third-panel ${locale === 'en' ? 'landing-third-panel--en' : ''}`} data-third-panel>
   <canvas class="landing-third-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
+  <!-- Pop-art violet dots — mouse-repulsive -->
+  <canvas class="landing-third-panel__dots" data-dots-canvas aria-hidden="true"></canvas>
   <!-- Atmosphere veil: top-left cyan, bottom-right violet -->
   <div class="landing-third-panel__veil" aria-hidden="true"></div>
   <div class="landing-third-panel__inner">
@@ -62,11 +64,21 @@ const { locale, title, intro, modules } = Astro.props;
     opacity: 0.88;
   }
 
+  /* Pop-art dots canvas — left half, above nebula, below veil */
+  .landing-third-panel__dots {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
   /* ── Atmosphere veil: top-left cyan, bottom-right violet ── */
   .landing-third-panel__veil {
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: 2;
     pointer-events: none;
     background:
       radial-gradient(
@@ -86,7 +98,7 @@ const { locale, title, intro, modules } = Astro.props;
   /* ── Inner: right half only ── */
   .landing-third-panel__inner {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     width: 50%;
     height: 100%;
     margin-left: auto;
@@ -194,6 +206,13 @@ const { locale, title, intro, modules } = Astro.props;
     }
   }
 
+  /* ── Mobile: hide dots too ── */
+  @media (max-width: 720px) {
+    .landing-third-panel__dots {
+      display: none;
+    }
+  }
+
   /* ── Mobile: full width, no veil ── */
   @media (max-width: 720px) {
     .landing-third-panel__veil {
@@ -234,3 +253,236 @@ const { locale, title, intro, modules } = Astro.props;
     }
   }
 </style>
+
+<script>
+  // ── Binary flower: 0/1 characters forming petal + pistil shapes ──
+  (function initThirdPanelFlower() {
+    const panelEl  = document.querySelector<HTMLElement>('[data-third-panel]');
+    const canvasEl = panelEl?.querySelector<HTMLCanvasElement>('[data-dots-canvas]');
+    if (!panelEl || !canvasEl) return;
+    const context = canvasEl.getContext('2d');
+    if (!context) return;
+
+    const panel : HTMLElement            = panelEl;
+    const canvas: HTMLCanvasElement      = canvasEl;
+    const ctx   : CanvasRenderingContext2D = context;
+
+    // ── layout ──
+    let W = 0, H = 0;
+    let headX = 0, headY = 0;
+
+    // sizing (resolved in resize)
+    let PETAL_LEN  = 0;   // half-length of petal ellipse
+    let PETAL_W    = 0;   // half-width of petal ellipse
+    let PETAL_DIST = 0;   // distance: flower centre → petal centre
+    let CORE_R     = 0;   // pistil cluster radius
+    let FONT_SIZE  = 0;   // px for the 0/1 characters
+    let STEP       = 0;   // grid spacing for petal chars
+
+    const PETAL_COUNT = 7;
+
+    // ── sway ──
+    const SWAY_FREQ  = 0.00040;
+    const SWAY_AMP   = 20;
+    let swayOff = 0, swayV = 0;
+    const MOUSE_SWAY = 0.038;
+
+    // ── breath / spin / bright ──
+    const BREATH_FREQ = 0.00055;
+    const BREATH_AMP  = 0.08;
+    const SPIN_FREQ   = 0.00016;
+    const BRIGHT_FREQ = 0.00036;
+    const BRIGHT_AMP  = 10;
+
+    let mouseX = -9999, mouseY = -9999;
+    let raf = 0, active = false, startTime = 0;
+
+    // ── Pre-built char grids for each petal (local coords, unrotated) ──
+    // One "petal" is an ellipse. We sample a grid of points inside it
+    // and tag each with '0' or '1'.
+    type CharPoint = { lx: number; ly: number; ch: string; };
+    let petalPoints: CharPoint[] = [];  // points for ONE canonical upward petal
+    let pistilPoints: CharPoint[] = []; // points for pistil circle
+
+    function buildGrids() {
+      petalPoints  = [];
+      pistilPoints = [];
+      const step = STEP;
+
+      // ── petal: ellipse centred at (0,0), pointing UP (−y) ──
+      // semi-axes: PETAL_LEN along y, PETAL_W along x
+      const px0 = -PETAL_W  - step;
+      const py0 = -PETAL_LEN - step;
+      for (let ly = py0; ly <= PETAL_LEN + step; ly += step) {
+        for (let lx = px0; lx <= PETAL_W + step; lx += step) {
+          const ex = lx / PETAL_W;
+          const ey = ly / PETAL_LEN;
+          if (ex * ex + ey * ey > 1.02) continue;
+          // alternate 0/1 in a checkerboard pattern
+          const col = Math.round((lx - px0) / step);
+          const row = Math.round((ly - py0) / step);
+          petalPoints.push({ lx, ly, ch: (col + row) % 2 === 0 ? '0' : '1' });
+        }
+      }
+
+      // ── pistil: filled circle radius CORE_R ──
+      for (let ly = -CORE_R; ly <= CORE_R; ly += step * 0.9) {
+        for (let lx = -CORE_R; lx <= CORE_R; lx += step * 0.9) {
+          if (lx * lx + ly * ly > CORE_R * CORE_R * 1.05) continue;
+          const col = Math.round((lx + CORE_R) / step);
+          const row = Math.round((ly + CORE_R) / step);
+          pistilPoints.push({ lx, ly, ch: (col + row) % 2 === 0 ? '1' : '0' });
+        }
+      }
+    }
+
+    function resize() {
+      const dpr  = window.devicePixelRatio || 1;
+      const rect = panel.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width  = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+      ctx.scale(dpr, dpr);
+
+      // flower head: left ~22%, vertical centre ~48% (lower half)
+      headX = W * 0.22;
+      headY = H * 0.46;
+
+      const sc = Math.min(W, H);
+      PETAL_LEN  = sc * 0.175;
+      PETAL_W    = sc * 0.068;
+      PETAL_DIST = sc * 0.065;
+      CORE_R     = sc * 0.052;
+      FONT_SIZE  = sc * 0.018;
+      STEP       = FONT_SIZE * 1.15;
+
+      buildGrids();
+    }
+
+    // Draw one petal's worth of 0/1 chars.
+    // `cx,cy` = flower centre. `angle` = direction petal points (0=right, -π/2=up).
+    // The canonical petal points upward (−y), so we rotate by (angle + π/2).
+    function drawPetalChars(
+      cx: number, cy: number,
+      angle: number,
+      petalDist: number,
+      breathScale: number,
+      hue: number, lightness: number, alpha: number,
+      fontSize: number,
+    ) {
+      // centre of this petal in world coords
+      const pcx = cx + Math.cos(angle) * (petalDist + PETAL_LEN * breathScale);
+      const pcy = cy + Math.sin(angle) * (petalDist + PETAL_LEN * breathScale);
+      const rot = angle + Math.PI * 0.5; // canonical petal points up (−y)
+
+      ctx.save();
+      ctx.translate(pcx, pcy);
+      ctx.rotate(rot);
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font         = `${fontSize}px monospace`;
+
+      for (const pt of petalPoints) {
+        const lx = pt.lx * breathScale;
+        const ly = pt.ly * breathScale;
+        // distance from petal centre as fraction [0,1] — brighter at centre
+        const df  = Math.sqrt((pt.lx / PETAL_W) ** 2 + (pt.ly / PETAL_LEN) ** 2);
+        const lit = Math.min(90, lightness + (1 - df) * 12);
+        const a   = alpha * (0.55 + (1 - df) * 0.45);
+        // 语义青色 hue=189（cosmic-cyan #00e5ff），花瓣内侧偏白更亮
+        ctx.fillStyle = `hsla(${hue}, 95%, ${lit}%, ${a})`;
+        ctx.fillText(pt.ch, lx, ly);
+      }
+      ctx.restore();
+    }
+
+    // Draw pistil chars at flower centre
+    function drawPistilChars(
+      cx: number, cy: number,
+      breathScale: number,
+      lightness: number, alpha: number,
+      fontSize: number,
+    ) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font         = `bold ${fontSize * 1.05}px monospace`;
+
+      for (const pt of pistilPoints) {
+        const lx = pt.lx * breathScale;
+        const ly = pt.ly * breathScale;
+        const df  = Math.sqrt(pt.lx ** 2 + pt.ly ** 2) / CORE_R;
+        const lit = Math.min(92, lightness + (1 - df) * 18);
+        ctx.fillStyle = `hsla(189, 95%, ${lit}%, ${alpha})`;
+        ctx.fillText(pt.ch, lx, ly);
+      }
+      ctx.restore();
+    }
+
+    function draw(ts: number) {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+      ctx.clearRect(0, 0, W, H);
+
+      // ── sway ──
+      const baseSway = Math.sin(elapsed * SWAY_FREQ) * SWAY_AMP;
+      if (mouseX > 0 && mouseX < W * 0.55) {
+        swayV += ((mouseX - headX) * MOUSE_SWAY - swayOff) * 0.016;
+      } else {
+        swayV += (0 - swayOff) * 0.010;
+      }
+      swayV   *= 0.87;
+      swayOff += swayV;
+      const totalSway = baseSway + swayOff;
+      const hx  = headX + totalSway;
+      const hy  = headY + Math.abs(totalSway) * 0.04;
+
+      // ── oscillators ──
+      const breath  = 1 + Math.sin(elapsed * BREATH_FREQ) * BREATH_AMP;
+      const bright  = Math.sin(elapsed * BRIGHT_FREQ);
+      const baseLit = 58 + bright * BRIGHT_AMP;
+      const spin    = elapsed * SPIN_FREQ;
+
+      const fs = FONT_SIZE * breath;
+
+      // ── outer petals ──
+      // ── outer petals (cosmic-cyan hue=189) ──
+      for (let p = 0; p < PETAL_COUNT; p++) {
+        const a = spin + (p / PETAL_COUNT) * Math.PI * 2;
+        drawPetalChars(hx, hy, a, PETAL_DIST, breath, 189, baseLit, 0.70, fs);
+      }
+      // ── inner petals (slightly cooler teal hue=178) ──
+      for (let p = 0; p < PETAL_COUNT; p++) {
+        const a = spin + ((p + 0.5) / PETAL_COUNT) * Math.PI * 2;
+        drawPetalChars(hx, hy, a, PETAL_DIST * 0.45, breath * 0.68, 178, baseLit + 6, 0.55, fs * 0.80);
+      }
+
+      // ── pistil ──
+      drawPistilChars(hx, hy, breath, baseLit + 8, 0.88, fs * 1.1);
+
+      if (active) raf = requestAnimationFrame(draw);
+    }
+
+    function onMouseMove(e: MouseEvent) {
+      const r = panel.getBoundingClientRect();
+      mouseX = e.clientX - r.left;
+      mouseY = e.clientY - r.top;
+    }
+    function onMouseLeave() { mouseX = -9999; mouseY = -9999; }
+
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (e.isIntersecting) { if (!active) { active = true; raf = requestAnimationFrame(draw); } }
+        else { active = false; cancelAnimationFrame(raf); }
+      }
+    }, { threshold: 0.01 });
+
+    io.observe(panel);
+    document.addEventListener('mousemove', onMouseMove, { passive: true });
+    panel.addEventListener('mouseleave', onMouseLeave, { passive: true });
+
+    resize();
+    new ResizeObserver(resize).observe(panel);
+  })();
+</script>
