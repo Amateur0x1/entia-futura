@@ -9,7 +9,7 @@ import './landing-hero/landingHero.css';
       <video
         class="hero-video hero-video-scroll"
         data-scroll-video
-        src="/videos/portal-scroll.mp4"
+        src="https://pub-5dd2e73aff1641778217be6e323fce48.r2.dev/root/portal-scroll.mp4"
         muted
         playsinline
         preload="auto"
@@ -34,4 +34,57 @@ import './landing-hero/landingHero.css';
   import { initLandingHeroInteractions } from './landing-hero/landingHeroInteractions';
 
   initLandingHeroInteractions();
+
+  // Watch video.buffered and drive loader progress with real download percentage.
+  // Dispatches:
+  //   scrollvideo:bufferupdate  { detail: { pct: number } }  — every 200ms while loading
+  //   scrollvideo:bufferready                                 — when buffered >= READY_THRESHOLD
+  const scrollVideo = document.querySelector<HTMLVideoElement>('[data-scroll-video]');
+  if (scrollVideo) {
+    const READY_THRESHOLD = 0.95; // 95% buffered before releasing the loader
+    let readyDispatched = false;
+
+    const getBufferedPct = (): number => {
+      const buf = scrollVideo.buffered;
+      const dur = scrollVideo.duration;
+      if (!dur || !isFinite(dur) || buf.length === 0) return 0;
+      return buf.end(buf.length - 1) / dur;
+    };
+
+    const checkBuffer = () => {
+      const pct = getBufferedPct();
+
+      // Always broadcast current buffer percentage so PageLoader can mirror it.
+      document.dispatchEvent(new CustomEvent('scrollvideo:bufferupdate', { detail: { pct } }));
+
+      if (!readyDispatched && pct >= READY_THRESHOLD) {
+        readyDispatched = true;
+        document.dispatchEvent(new CustomEvent('scrollvideo:bufferready'));
+        return; // stop polling
+      }
+
+      if (!readyDispatched) {
+        setTimeout(checkBuffer, 200);
+      }
+    };
+
+    // Start polling once metadata is available (we need duration to compute pct).
+    const startPolling = () => {
+      checkBuffer();
+    };
+
+    if (scrollVideo.readyState >= 1) {
+      startPolling();
+    } else {
+      scrollVideo.addEventListener('loadedmetadata', startPolling, { once: true });
+    }
+
+    // Hard fallback: if video errors or never reaches threshold, release after 12s.
+    setTimeout(() => {
+      if (!readyDispatched) {
+        readyDispatched = true;
+        document.dispatchEvent(new CustomEvent('scrollvideo:bufferready'));
+      }
+    }, 12000);
+  }
 </script>

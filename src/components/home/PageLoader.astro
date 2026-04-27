@@ -83,98 +83,85 @@
 
     if (!loader || !percentEl || !barEl) return;
 
+    // Lock scroll during loading
+    document.body.style.overflow = 'hidden';
+
+    // ── Config ────────────────────────────────────────────────────────────────
+    const MIN_DISPLAY_MS = 1800;  // always show loader for at least this long
+
+    // ── State ─────────────────────────────────────────────────────────────────
     let displayed = 0;
     let target = 0;
+    let windowLoaded = false;
+    let minTimeReached = false;
+    let videoBufferReady = false;
     let raf: number;
 
-    const setProgress = (pct: number) => {
-      target = Math.min(100, Math.max(target, pct));
-    };
-
-    // Smoothly animate displayed value toward target
+    // ── Display tick — smoothly eases displayed toward target ─────────────────
     const tick = () => {
       if (displayed < target) {
-        const step = Math.max(0.4, (target - displayed) * 0.08);
+        const step = Math.max(0.25, (target - displayed) * 0.055);
         displayed = Math.min(target, displayed + step);
-        const v = Math.round(displayed);
-        percentEl.textContent = `${v}%`;
+        percentEl.textContent = `${Math.round(displayed)}%`;
         barEl.style.width = `${displayed}%`;
       }
-      if (displayed < 100) {
-        raf = requestAnimationFrame(tick);
-      }
+      raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
 
-    // ── Resource tracking ────────────────────────────────────────────────────
-    // Track images + videos in the document
-    const images = Array.from(document.images);
-    const videos = Array.from(document.querySelectorAll<HTMLVideoElement>('video[src], video > source'));
+    // ── Completion logic ──────────────────────────────────────────────────────
+    const tryFinish = () => {
+      if (!windowLoaded || !minTimeReached || !videoBufferReady) return;
 
-    // Weight: videos count heavier than images
-    const imageWeight = 1;
-    const videoWeight = 8;
-    const totalWeight =
-      images.length * imageWeight + videos.length * videoWeight + 10; // +10 for DOMContentLoaded baseline
-
-    let loadedWeight = 0;
-
-    const advance = (w: number) => {
-      loadedWeight += w;
-      // Reserve last 8% for window.onload
-      const pct = Math.round((loadedWeight / totalWeight) * 92);
-      setProgress(pct);
-    };
-
-    // DOMContentLoaded base progress
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => advance(10), { once: true });
-    } else {
-      advance(10);
-    }
-
-    // Track images
-    images.forEach((img) => {
-      if (img.complete) {
-        advance(imageWeight);
-      } else {
-        img.addEventListener('load', () => advance(imageWeight), { once: true });
-        img.addEventListener('error', () => advance(imageWeight), { once: true });
-      }
-    });
-
-    // Track videos (just wait for metadata)
-    Array.from(document.querySelectorAll<HTMLVideoElement>('video')).forEach((vid) => {
-      if (vid.readyState >= 1) {
-        advance(videoWeight);
-      } else {
-        vid.addEventListener('loadedmetadata', () => advance(videoWeight), { once: true });
-        vid.addEventListener('error', () => advance(videoWeight), { once: true });
-      }
-    });
-
-    // window.load → jump to 100 and fade out
-    const finish = () => {
       cancelAnimationFrame(raf);
-      setProgress(100);
+      target = 100;
       displayed = 100;
       percentEl.textContent = '100%';
       barEl.style.width = '100%';
 
-      // Brief pause at 100% before fading
       setTimeout(() => {
         loader.classList.add('is-done');
-        // Reveal hero stage elements in sync with loader fade-out
+        document.body.style.overflow = '';
         document.querySelectorAll('[data-hero-stage]').forEach((el) => {
           el.classList.add('is-revealed');
         });
+        // Signal that loading is fully done — effects init listens for this
+        document.dispatchEvent(new CustomEvent('loader:done'));
       }, 320);
     };
 
+    // Minimum display time gate
+    setTimeout(() => {
+      minTimeReached = true;
+      tryFinish();
+    }, MIN_DISPLAY_MS);
+
+    // window.load gate
+    const onLoad = () => {
+      windowLoaded = true;
+      tryFinish();
+    };
+
     if (document.readyState === 'complete') {
-      finish();
+      setTimeout(onLoad, 0);
     } else {
-      window.addEventListener('load', finish, { once: true });
+      window.addEventListener('load', onLoad, { once: true });
     }
+
+    // Real buffer progress gate — HomeHeroScreen polls video.buffered every 200ms
+    // and dispatches scrollvideo:bufferupdate with the current fraction (0–1).
+    // The progress bar directly mirrors the real download: buffer 0→1 = loader 0→99.
+    // When buffered >= 95%, scrollvideo:bufferready is dispatched and we can finish.
+    document.addEventListener('scrollvideo:bufferupdate', (e: Event) => {
+      const pct = (e as CustomEvent<{ pct: number }>).detail?.pct ?? 0;
+      // buffer 0–1 → loader 0–99 (100 is reserved for the final "done" snap)
+      const loaderTarget = Math.round(pct * 99);
+      if (loaderTarget > target) target = loaderTarget;
+    });
+
+    document.addEventListener('scrollvideo:bufferready', () => {
+      videoBufferReady = true;
+      tryFinish();
+    }, { once: true });
   })();
 </script>

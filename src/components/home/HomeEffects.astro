@@ -1,5 +1,10 @@
 <script>
   import { initHomeEffects } from './effects/initHomeEffects';
 
-  initHomeEffects();
+  // Wait for the page loader to finish before initialising effects.
+  // This ensures video metadata (including duration) is available when
+  // the scroll timeline is created, so scrub-based frame control works correctly.
+  document.addEventListener('loader:done', () => {
+    initHomeEffects();
+  }, { once: true });
 </script>

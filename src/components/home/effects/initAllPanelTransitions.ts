@@ -200,13 +200,6 @@ const initFullTransitions = ({
       });
     }
 
-    addHeroVideoTransitionSegment({
-      elements,
-      heroTimeline,
-      videoPlaybackDuration: HERO_TO_INTRO_TIMING.videoPlaybackDuration,
-      videoPlaybackStart: HERO_TO_INTRO_TIMING.videoPlaybackStart,
-    });
-
     const heroPanelExitStart =
       HERO_TO_INTRO_TIMING.videoPlaybackStart +
       HERO_TO_INTRO_TIMING.videoPlaybackDuration +
@@ -246,11 +239,32 @@ const initFullTransitions = ({
       timeline: heroTimeline,
       startAt: panelTextRevealStart,
     });
+
+    // Add the video scrub LAST, after all other tweens have been added to heroTimeline.
+    // We pass heroPanelExitStart as videoPlaybackEnd: the video currentTime tween spans
+    // timeline positions [0, heroPanelExitStart], which is exactly the same slot as the
+    // panel-push and text-reveal tweens that start at heroPanelExitStart.
+    // This means the video always fills 100% of "its" scroll region, regardless of
+    // how long heroTimeline.totalDuration() turns out to be.
+    addHeroVideoTransitionSegment({
+      elements,
+      heroTimeline,
+      videoPlaybackEnd: heroPanelExitStart,
+    });
   };
 
-  // Defer hero timeline until video metadata is ready (same as before)
+  // By the time this runs, loader:done has already fired, so video metadata
+  // should be available. If readyState is still < 1 for any reason, wait for
+  // the event (no forced timeout — the loader gate is the timeout).
   if (heroVideoShell && scrollVideo && scrollVideo.readyState < 1) {
-    scrollVideo.addEventListener('loadedmetadata', createHeroTimeline, { once: true });
+    let timelineCreated = false;
+    const initOnce = () => {
+      if (timelineCreated) return;
+      timelineCreated = true;
+      createHeroTimeline();
+    };
+    scrollVideo.addEventListener('loadedmetadata', initOnce, { once: true });
+    scrollVideo.addEventListener('error', initOnce, { once: true });
   } else {
     createHeroTimeline();
   }
