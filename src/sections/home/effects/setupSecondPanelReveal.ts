@@ -1,117 +1,117 @@
 import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 
-interface SetupNextPanelRevealArgs {
+interface SetupSecondPanelRevealArgs {
   prefersReducedMotion: boolean;
   splitTextAvailable: boolean;
-  nextPanel: Element | null;
-  nextPanelLabel: Element | null | undefined;
-  nextPanelHeading: Element | null | undefined;
-  nextPanelDivider: Element | null | undefined;
-  nextPanelBody: Element | null | undefined;
-  nextPanelParagraphs: HTMLElement[];
+  secondPanel: Element | null;
+  secondPanelLabel: Element | null | undefined;
+  secondPanelHeading: Element | null | undefined;
+  secondPanelDivider: Element | null | undefined;
+  secondPanelBody: Element | null | undefined;
+  secondPanelParagraphs: HTMLElement[];
   timeline?: gsap.core.Timeline;
   startAt?: number;
 }
 
-export const setupNextPanelReveal = ({
+export const setupSecondPanelReveal = ({
   prefersReducedMotion,
   splitTextAvailable,
-  nextPanel,
-  nextPanelLabel,
-  nextPanelHeading,
-  nextPanelDivider,
-  nextPanelBody,
-  nextPanelParagraphs,
+  secondPanel,
+  secondPanelLabel,
+  secondPanelHeading,
+  secondPanelDivider,
+  secondPanelBody,
+  secondPanelParagraphs,
   timeline,
   startAt = 0,
-}: SetupNextPanelRevealArgs) => {
+}: SetupSecondPanelRevealArgs) => {
   if (
     prefersReducedMotion ||
-    !(nextPanel instanceof HTMLElement) ||
-    !(nextPanelHeading instanceof HTMLElement) ||
-    !(nextPanelDivider instanceof HTMLElement) ||
-    !(nextPanelBody instanceof HTMLElement)
+    !(secondPanel instanceof HTMLElement) ||
+    !(secondPanelHeading instanceof HTMLElement) ||
+    !(secondPanelDivider instanceof HTMLElement) ||
+    !(secondPanelBody instanceof HTMLElement)
   ) {
     return;
   }
 
-  const nextPanelLabelSplit =
-    splitTextAvailable && nextPanelLabel instanceof HTMLElement ? SplitText.create(nextPanelLabel, { type: 'words' }) : null;
-  const nextPanelHeadingSplit = splitTextAvailable ? SplitText.create(nextPanelHeading, { type: 'words' }) : null;
-  const nextPanelParagraphSplits =
+  const secondPanelLabelSplit =
+    splitTextAvailable && secondPanelLabel instanceof HTMLElement ? SplitText.create(secondPanelLabel, { type: 'words' }) : null;
+  const secondPanelHeadingSplit = splitTextAvailable ? SplitText.create(secondPanelHeading, { type: 'words' }) : null;
+  const secondPanelParagraphSplits =
     splitTextAvailable
-      ? nextPanelParagraphs.map((paragraph) =>
+      ? secondPanelParagraphs.map((paragraph) =>
           SplitText.create(paragraph, {
             type: 'words',
           }),
         )
       : [];
-  const nextPanelBodyWords = nextPanelParagraphSplits.flatMap((split) => split.words);
+  const secondPanelBodyWords = secondPanelParagraphSplits.flatMap((split) => split.words);
 
-  if (nextPanelLabelSplit) {
-    gsap.set(nextPanelLabelSplit.words, {
+  if (secondPanelLabelSplit) {
+    gsap.set(secondPanelLabelSplit.words, {
       willChange: 'transform, opacity',
       autoAlpha: 0,
       xPercent: -42,
       yPercent: 42,
     });
   }
-  if (nextPanelHeadingSplit) {
-    gsap.set(nextPanelHeadingSplit.words, {
+  if (secondPanelHeadingSplit) {
+    gsap.set(secondPanelHeadingSplit.words, {
       willChange: 'transform, opacity',
       autoAlpha: 0,
       xPercent: -56,
       yPercent: 58,
     });
   }
-  if (!nextPanelLabelSplit && nextPanelLabel instanceof HTMLElement) {
-    gsap.set(nextPanelLabel, {
+  if (!secondPanelLabelSplit && secondPanelLabel instanceof HTMLElement) {
+    gsap.set(secondPanelLabel, {
       autoAlpha: 0,
       xPercent: -42,
       yPercent: 42,
     });
   }
-  if (!nextPanelHeadingSplit) {
-    gsap.set(nextPanelHeading, {
+  if (!secondPanelHeadingSplit) {
+    gsap.set(secondPanelHeading, {
       autoAlpha: 0,
       xPercent: -56,
       yPercent: 58,
     });
   }
-  gsap.set(nextPanelBodyWords, {
+  gsap.set(secondPanelBodyWords, {
     willChange: 'transform, opacity',
     autoAlpha: 0,
     xPercent: 26,
     yPercent: 90,
   });
-  if (nextPanelBodyWords.length === 0 && nextPanelParagraphs.length > 0) {
-    gsap.set(nextPanelParagraphs, {
+  if (secondPanelBodyWords.length === 0 && secondPanelParagraphs.length > 0) {
+    gsap.set(secondPanelParagraphs, {
       autoAlpha: 0,
       xPercent: 26,
       yPercent: 90,
     });
   }
-  gsap.set(nextPanelBody, {
+  gsap.set(secondPanelBody, {
     autoAlpha: 0,
   });
 
-  const nextPanelTextTimeline =
+  const secondPanelTextTimeline =
     timeline ??
     gsap.timeline({
       defaults: {
         ease: 'power3.out',
       },
       scrollTrigger: {
-        trigger: nextPanel,
+        trigger: secondPanel,
         start: 'top 72%',
         once: true,
       },
     });
 
-  nextPanelTextTimeline
+  secondPanelTextTimeline
     .fromTo(
-      nextPanelLabelSplit?.words ?? (nextPanelLabel ?? nextPanelHeading),
+      secondPanelLabelSplit?.words ?? (secondPanelLabel ?? secondPanelHeading),
       {
         immediateRender: false,
         autoAlpha: 0,
@@ -129,7 +129,7 @@ export const setupNextPanelReveal = ({
       startAt,
     )
     .fromTo(
-      nextPanelHeadingSplit?.words ?? nextPanelHeading,
+      secondPanelHeadingSplit?.words ?? secondPanelHeading,
       {
         immediateRender: false,
         autoAlpha: 0,
@@ -147,7 +147,7 @@ export const setupNextPanelReveal = ({
       startAt + 0.08,
     )
     .to(
-      nextPanelDivider,
+      secondPanelDivider,
       {
         autoAlpha: 1,
         x: 0,
@@ -158,7 +158,7 @@ export const setupNextPanelReveal = ({
       startAt + 0.12,
     )
     .to(
-      nextPanelDivider,
+      secondPanelDivider,
       {
         scaleX: 1,
         duration: 0.6,
@@ -167,7 +167,7 @@ export const setupNextPanelReveal = ({
       startAt + 0.12,
     )
     .to(
-      nextPanelBody,
+      secondPanelBody,
       {
         autoAlpha: 1,
         x: 0,
@@ -178,9 +178,9 @@ export const setupNextPanelReveal = ({
       startAt + 0.74,
     );
 
-  if (nextPanelParagraphs.length > 0) {
-    nextPanelTextTimeline.fromTo(
-      nextPanelBodyWords.length > 0 ? nextPanelBodyWords : nextPanelParagraphs,
+  if (secondPanelParagraphs.length > 0) {
+    secondPanelTextTimeline.fromTo(
+      secondPanelBodyWords.length > 0 ? secondPanelBodyWords : secondPanelParagraphs,
       {
         immediateRender: false,
         autoAlpha: 0,

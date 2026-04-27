@@ -60,7 +60,7 @@ export const initThirdPanelNebulaBackground = ({
     return;
   }
 
-  const canvas = panel.querySelector<HTMLCanvasElement>('[data-next-panel-nebula]');
+  const canvas = panel.querySelector<HTMLCanvasElement>('[data-nebula-canvas]');
   if (!(canvas instanceof HTMLCanvasElement)) {
     return;
   }

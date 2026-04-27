@@ -3,16 +3,16 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 interface InitHeroKnowMoreInteractionEffectsOptions {
   knowMoreButton: HTMLElement | null;
-  nextPanel: HTMLElement | null;
+  secondPanel: HTMLElement | null;
   heroTransitionRoot: HTMLElement | null;
 }
 
 export const initHeroKnowMoreInteractionEffects = ({
   knowMoreButton,
-  nextPanel,
+  secondPanel,
   heroTransitionRoot,
 }: InitHeroKnowMoreInteractionEffectsOptions) => {
-  if (!knowMoreButton || !nextPanel || !heroTransitionRoot) {
+  if (!knowMoreButton || !secondPanel || !heroTransitionRoot) {
     return null;
   }
 

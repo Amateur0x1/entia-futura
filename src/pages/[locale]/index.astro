@@ -61,16 +61,16 @@ const researchPracticeModules = [
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
   <main class="landing-main">
     <HomeHeroScreen locale={locale} />
-    <section class={`landing-next-panel ${locale === 'en' ? 'landing-next-panel--en' : ''}`} data-next-panel>
-      <canvas class="landing-next-panel__nebula" data-next-panel-nebula aria-hidden="true"></canvas>
-      <div class="landing-next-panel__inner" data-next-panel-inner>
-        <article class="landing-next-panel__block landing-next-panel__block--top-right">
-          <p class="landing-next-panel__label">{coreQuestionLabel}</p>
-          <h2 class="landing-next-panel__title" data-next-panel-heading>{coreQuestion}</h2>
-          <div class="landing-next-panel__divider" data-next-panel-divider aria-hidden="true"></div>
-          <div class="landing-next-panel__body" data-next-panel-body>
+    <section class={`landing-second-panel ${locale === 'en' ? 'landing-second-panel--en' : ''}`} data-second-panel>
+      <canvas class="landing-second-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
+      <div class="landing-second-panel__inner" data-second-panel-inner>
+        <article class="landing-second-panel__block landing-second-panel__block--top-right">
+          <p class="landing-second-panel__label">{coreQuestionLabel}</p>
+          <h2 class="landing-second-panel__title" data-second-panel-heading>{coreQuestion}</h2>
+          <div class="landing-second-panel__divider" data-second-panel-divider aria-hidden="true"></div>
+          <div class="landing-second-panel__body" data-second-panel-body>
             {instituteIntro.split('\n').map((paragraph) => (
-              <p class="landing-next-panel__paragraph">{paragraph}</p>
+              <p class="landing-second-panel__paragraph">{paragraph}</p>
             ))}
           </div>
         </article>
@@ -79,7 +79,7 @@ const researchPracticeModules = [
     </section>
     <div class="landing-scroll-spacer" data-landing-scroll-spacer aria-hidden="true"></div>
     <section class={`landing-third-panel ${locale === 'en' ? 'landing-third-panel--en' : ''}`} data-third-panel>
-      <canvas class="landing-third-panel__nebula" data-next-panel-nebula aria-hidden="true"></canvas>
+      <canvas class="landing-third-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
       <div class="landing-third-panel__inner">
         <header class="section-heading landing-third-panel__heading">
           <p class="eyebrow landing-third-panel__eyebrow">{researchPracticeEyebrow}</p>
@@ -109,9 +109,6 @@ const researchPracticeModules = [
 </Layout>
 
 <style>
-  .landing-main {
-    gap: 0;
-  }
 
   :global(body.theme-landing-dark) {
     background: var(--color-secondary);
@@ -123,12 +120,9 @@ const researchPracticeModules = [
     pointer-events: none;
   }
 
-  .landing-next-panel {
-    /* sticky: stays in document flow but fixes to top when reached.
-       Height = 100svh so it fills the viewport exactly like the old fixed panel. */
-    position: sticky;
-    top: 0;
-    height: 100svh;
+  .landing-second-panel {
+    position: fixed;
+    inset: 0;
     z-index: 30;
     padding: clamp(3.6rem, 9vw, 6.4rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
     background: var(--color-background);
@@ -141,9 +135,8 @@ const researchPracticeModules = [
   }
 
   .landing-third-panel {
-    position: sticky;
-    top: 0;
-    height: 100svh;
+    position: fixed;
+    inset: 0;
     z-index: 35;
     padding: clamp(4rem, 10vw, 7rem) clamp(1.2rem, 4vw, 3rem) clamp(4rem, 8vw, 6rem);
     background: var(--color-background);
@@ -154,7 +147,7 @@ const researchPracticeModules = [
     overflow: clip;
   }
 
-  .landing-next-panel__nebula {
+  .landing-second-panel__nebula {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -251,7 +244,7 @@ const researchPracticeModules = [
     font-size: 0.98rem;
   }
 
-  .landing-next-panel__inner {
+  .landing-second-panel__inner {
     position: relative;
     z-index: 1;
     display: grid;
@@ -261,7 +254,7 @@ const researchPracticeModules = [
     min-height: min(74svh, 760px);
   }
 
-  .landing-next-panel__title {
+  .landing-second-panel__title {
     margin: 0;
     max-width: 18ch;
     font-size: clamp(2.6rem, 6.4vw, 5.6rem);
@@ -270,7 +263,7 @@ const researchPracticeModules = [
     font-weight: 500;
   }
 
-  .landing-next-panel__label {
+  .landing-second-panel__label {
     margin: 0;
     font-size: clamp(2.6rem, 6.4vw, 5.6rem);
     line-height: 1.05;
@@ -279,7 +272,7 @@ const researchPracticeModules = [
     color: var(--color-secondary-foreground);
   }
 
-  .landing-next-panel__body {
+  .landing-second-panel__body {
     margin: 0;
     max-width: calc(42rem + 20px);
     display: grid;
@@ -289,19 +282,19 @@ const researchPracticeModules = [
     color: color-mix(in srgb, var(--color-secondary-foreground) 84%, transparent);
   }
 
-  .landing-next-panel__paragraph {
+  .landing-second-panel__paragraph {
     margin: 0;
   }
 
-  .landing-next-panel--en .landing-next-panel__body {
+  .landing-second-panel--en .landing-second-panel__body {
     gap: 30px;
   }
 
-  .landing-next-panel__body::before {
+  .landing-second-panel__body::before {
     content: none;
   }
 
-  .landing-next-panel__divider {
+  .landing-second-panel__divider {
     width: min(10rem, 28vw);
     height: 1px;
     margin-top: 20px;
@@ -309,19 +302,19 @@ const researchPracticeModules = [
     background: var(--color-border-inverse-strong);
   }
 
-  .landing-next-panel__block {
+  .landing-second-panel__block {
     display: grid;
     gap: 0.95rem;
   }
 
-  .landing-next-panel__block--top-right {
+  .landing-second-panel__block--top-right {
     width: min(48rem, 100%);
     text-align: left;
     justify-items: start;
     padding-left: clamp(1.5rem, 3.2vw, 3.125rem);
   }
 
-  :global(.landing-next-panel__visual-column) {
+  :global(.landing-second-panel__visual-column) {
     width: 100%;
     display: flex;
     justify-content: flex-end;
@@ -330,16 +323,16 @@ const researchPracticeModules = [
     pointer-events: none;
   }
 
-  :global(.landing-next-panel__visual-shell) {
+  :global(.landing-second-panel__visual-shell) {
     position: relative;
     width: min(100%, clamp(15rem, 28vw, 22rem));
     aspect-ratio: 642 / 1281;
   }
 
-  :global(.landing-next-panel__visual-base),
-  :global(.landing-next-panel__visual-binary),
-  :global(.landing-next-panel__visual-glow),
-  :global(.landing-next-panel__visual-scan) {
+  :global(.landing-second-panel__visual-base),
+  :global(.landing-second-panel__visual-binary),
+  :global(.landing-second-panel__visual-glow),
+  :global(.landing-second-panel__visual-scan) {
     position: absolute;
     inset: 0;
     -webkit-mask-image: url('/images/home-monolith-mask.png');
@@ -352,13 +345,13 @@ const researchPracticeModules = [
     mask-size: contain;
   }
 
-  :global(.landing-next-panel__visual-base) {
+  :global(.landing-second-panel__visual-base) {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.95) 58%, rgba(255, 255, 255, 0.89) 100%);
     filter: drop-shadow(0 0 16px color-mix(in srgb, white 72%, transparent));
   }
 
-  :global(.landing-next-panel__visual-binary) {
+  :global(.landing-second-panel__visual-binary) {
     display: grid;
     place-items: stretch;
     opacity: 0.9;
@@ -366,29 +359,29 @@ const researchPracticeModules = [
     mix-blend-mode: multiply;
   }
 
-  :global(.landing-next-panel__visual-binary--monolith) {
+  :global(.landing-second-panel__visual-binary--monolith) {
     /* Keep canvas texture on monolith side. */
     clip-path: inset(0 0 0 34%);
   }
 
-  :global(.landing-next-panel__visual-binary--human) {
+  :global(.landing-second-panel__visual-binary--human) {
     /* Add a second stream layer on the figure side. */
     clip-path: inset(0 56% 0 0);
     opacity: 0.74;
     mix-blend-mode: screen;
   }
 
-  :global(.landing-next-panel__binary-canvas) {
+  :global(.landing-second-panel__binary-canvas) {
     display: block;
     width: 100%;
     height: 100%;
   }
 
-  :global(.landing-next-panel__visual-glow) {
+  :global(.landing-second-panel__visual-glow) {
     display: none;
   }
 
-  :global(.landing-next-panel__visual-scan) {
+  :global(.landing-second-panel__visual-scan) {
     display: none;
   }
 
@@ -438,9 +431,9 @@ const researchPracticeModules = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.landing-next-panel__visual-glow),
-    :global(.landing-next-panel__visual-scan),
-    :global(.landing-next-panel__binary-canvas) {
+    :global(.landing-second-panel__visual-glow),
+    :global(.landing-second-panel__visual-scan),
+    :global(.landing-second-panel__binary-canvas) {
       animation: none;
       transform: none;
     }
@@ -451,39 +444,39 @@ const researchPracticeModules = [
       height: 220svh;
     }
 
-    .landing-next-panel {
+    .landing-second-panel {
       padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
       padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
         max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
       padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
     }
 
-    .landing-next-panel__inner {
+    .landing-second-panel__inner {
       min-height: auto;
       display: grid;
       grid-template-columns: 1fr;
       gap: 2rem;
     }
 
-    .landing-next-panel__block {
+    .landing-second-panel__block {
       position: static;
       width: 100%;
     }
 
-    .landing-next-panel__block--top-right {
+    .landing-second-panel__block--top-right {
       padding-left: 0;
     }
 
-    :global(.landing-next-panel__visual-column) {
+    :global(.landing-second-panel__visual-column) {
       justify-content: center;
       padding-right: 0;
     }
 
-    :global(.landing-next-panel__visual-shell) {
+    :global(.landing-second-panel__visual-shell) {
       width: min(52vw, 15rem);
     }
 
-    .landing-next-panel__title {
+    .landing-second-panel__title {
       max-width: 11ch;
     }
 

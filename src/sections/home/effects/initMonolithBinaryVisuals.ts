@@ -84,7 +84,7 @@ export const initMonolithBinaryVisuals = (prefersReducedMotion: boolean) => {
 
     streamRoot.dataset.binaryReady = 'true';
     const canvas = document.createElement('canvas');
-    canvas.className = 'landing-next-panel__binary-canvas';
+    canvas.className = 'landing-second-panel__binary-canvas';
     streamRoot.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');

@@ -7,13 +7,13 @@ export interface HomeHeroElements {
   heroVideoLoading: HTMLElement | null;
   portalShell: HTMLElement | null;
   signalCards: HTMLElement[];
-  nextPanel: HTMLElement | null;
-  nextPanelInner: HTMLElement | null;
-  nextPanelLabel: HTMLElement | null;
-  nextPanelHeading: HTMLElement | null;
-  nextPanelDivider: HTMLElement | null;
-  nextPanelBody: HTMLElement | null;
-  nextPanelParagraphs: HTMLElement[];
+  secondPanel: HTMLElement | null;
+  secondPanelInner: HTMLElement | null;
+  secondPanelLabel: HTMLElement | null;
+  secondPanelHeading: HTMLElement | null;
+  secondPanelDivider: HTMLElement | null;
+  secondPanelBody: HTMLElement | null;
+  secondPanelParagraphs: HTMLElement[];
   knowMoreButton: HTMLElement | null;
   shapeOverlay: SVGSVGElement | null;
   primaryVisual: HTMLElement | null;
@@ -35,7 +35,7 @@ const getSVGElement = (root: ParentNode | null, selector: string) => {
 };
 
 const getParagraphs = (root: HTMLElement | null) =>
-  root ? Array.from(root.querySelectorAll<HTMLElement>('.landing-next-panel__paragraph')) : [];
+  root ? Array.from(root.querySelectorAll<HTMLElement>('.landing-second-panel__paragraph')) : [];
 
 export const getHomeHeroElements = (): HomeHeroElements => {
   const heroTransitionRoot = getHTMLElement(document, '[data-hero-transition-root]');
@@ -48,12 +48,12 @@ export const getHomeHeroElements = (): HomeHeroElements => {
   const signalCards = heroTransitionRoot
     ? Array.from(heroTransitionRoot.querySelectorAll<HTMLElement>('[data-signal-note]'))
     : [];
-  const nextPanel = getHTMLElement(document, '[data-next-panel]');
-  const nextPanelInner = getHTMLElement(nextPanel, '[data-next-panel-inner]');
-  const nextPanelLabel = getHTMLElement(nextPanel, '.landing-next-panel__label');
-  const nextPanelHeading = getHTMLElement(nextPanel, '[data-next-panel-heading]');
-  const nextPanelDivider = getHTMLElement(nextPanel, '[data-next-panel-divider]');
-  const nextPanelBody = getHTMLElement(nextPanel, '[data-next-panel-body]');
+  const secondPanel = getHTMLElement(document, '[data-second-panel]');
+  const secondPanelInner = getHTMLElement(secondPanel, '[data-second-panel-inner]');
+  const secondPanelLabel = getHTMLElement(secondPanel, '.landing-second-panel__label');
+  const secondPanelHeading = getHTMLElement(secondPanel, '[data-second-panel-heading]');
+  const secondPanelDivider = getHTMLElement(secondPanel, '[data-second-panel-divider]');
+  const secondPanelBody = getHTMLElement(secondPanel, '[data-second-panel-body]');
   const shapeOverlay = getSVGElement(document, '[data-shape-overlay]');
 
   return {
@@ -65,13 +65,13 @@ export const getHomeHeroElements = (): HomeHeroElements => {
     heroVideoLoading,
     portalShell,
     signalCards,
-    nextPanel,
-    nextPanelInner,
-    nextPanelLabel,
-    nextPanelHeading,
-    nextPanelDivider,
-    nextPanelBody,
-    nextPanelParagraphs: getParagraphs(nextPanelBody),
+    secondPanel,
+    secondPanelInner,
+    secondPanelLabel,
+    secondPanelHeading,
+    secondPanelDivider,
+    secondPanelBody,
+    secondPanelParagraphs: getParagraphs(secondPanelBody),
     knowMoreButton: getHTMLElement(document, '[data-know-more-button]'),
     shapeOverlay,
     primaryVisual: portalShell ?? heroVideoShell,

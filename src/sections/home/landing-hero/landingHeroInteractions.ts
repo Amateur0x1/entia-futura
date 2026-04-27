@@ -317,28 +317,28 @@ export const initLandingHeroInteractions = () => {
   if (knowMoreButton instanceof HTMLElement) {
     knowMoreButton.addEventListener('click', () => {
       const heroTransitionRoot = document.querySelector('[data-hero-transition-root]');
-      const nextPanel = document.querySelector('[data-next-panel]');
+      const secondPanel = document.querySelector('[data-second-panel]');
       const transitionScrollDistance = window.innerWidth <= 720 ? 2500 : 3600;
-      const nextPanelTop = (() => {
+      const scrollTargetTop = (() => {
         if (heroTransitionRoot instanceof HTMLElement) {
           return heroTransitionRoot.getBoundingClientRect().top + window.scrollY + transitionScrollDistance;
         }
 
-        if (nextPanel instanceof HTMLElement) {
-          return nextPanel.getBoundingClientRect().top + window.scrollY;
+        if (secondPanel instanceof HTMLElement) {
+          return secondPanel.getBoundingClientRect().top + window.scrollY;
         }
 
         return window.innerHeight;
       })();
       const startY = window.scrollY;
-      const distance = Math.max(nextPanelTop - startY, 0);
+      const distance = Math.max(scrollTargetTop - startY, 0);
 
       if (distance < 4) {
         return;
       }
 
       if (prefersReducedMotion) {
-        window.scrollTo({ top: nextPanelTop });
+        window.scrollTo({ top: scrollTargetTop });
         return;
       }
 

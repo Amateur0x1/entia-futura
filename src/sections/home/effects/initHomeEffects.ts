@@ -55,7 +55,7 @@ export const initHomeEffects = () => {
 
   initMonolithBinaryVisuals(prefersReducedMotion);
   initThirdPanelNebulaBackground({
-    panel: homeHeroElements.nextPanel,
+    panel: homeHeroElements.secondPanel,
     prefersReducedMotion,
   });
 

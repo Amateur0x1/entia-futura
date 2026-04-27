@@ -8,10 +8,8 @@ import {
   createTransitionBackplate,
   createTransitionShade,
   getPanelFakeScrollDistance,
-  PANEL_TRANSITION_RADIUS,
-  setPanelTransitionInitialState,
 } from './panelPushTransition';
-import { setupNextPanelReveal } from './setupNextPanelReveal';
+import { setupSecondPanelReveal } from './setupSecondPanelReveal';
 
 // ---------------------------------------------------------------------------
 // Timing constants (desktop scroll distance for the 1→2 transition)
@@ -44,10 +42,10 @@ const initReducedMotionTransitions = ({
   thirdPanel,
   scrollSpacer,
 }: Pick<InitAllPanelTransitionsOptions, 'elements' | 'thirdPanel' | 'scrollSpacer'>) => {
-  const { heroTransitionRoot, nextPanel } = elements;
-  if (!heroTransitionRoot || !nextPanel) return;
+  const { heroTransitionRoot, secondPanel } = elements;
+  if (!heroTransitionRoot || !secondPanel) return;
 
-  // 1→2: fade in nextPanel when hero scrolls out
+  // 1→2: fade in secondPanel when hero scrolls out
   gsap.timeline({
     scrollTrigger: {
       trigger: heroTransitionRoot,
@@ -57,7 +55,7 @@ const initReducedMotionTransitions = ({
     },
   })
     .fromTo(
-      nextPanel,
+      secondPanel,
       { autoAlpha: 0, y: 22, filter: 'blur(8px)', pointerEvents: 'none' },
       { autoAlpha: 1, y: 0, filter: 'blur(0px)', visibility: 'visible', pointerEvents: 'auto', duration: 0.42, ease: 'power3.out' },
     );
@@ -71,7 +69,7 @@ const initReducedMotionTransitions = ({
       toggleActions: 'play none reverse reverse',
     },
   })
-    .to(nextPanel, { autoAlpha: 0, visibility: 'hidden', pointerEvents: 'none', duration: 0.01, ease: 'none' })
+    .to(secondPanel, { autoAlpha: 0, visibility: 'hidden', pointerEvents: 'none', duration: 0.01, ease: 'none' })
     .to(thirdPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.01, ease: 'none' }, 0);
 };
 
@@ -88,12 +86,12 @@ const initFullTransitions = ({
     heroTransitionFrame,
     heroTransitionRoot,
     heroVideoShell,
-    nextPanel,
-    nextPanelInner,
+    secondPanel,
+    secondPanelInner,
     scrollVideo,
   } = elements;
 
-  if (!heroTransitionRoot || !nextPanel) return;
+  if (!heroTransitionRoot || !secondPanel) return;
 
   // ── shared layers ──────────────────────────────────────────────────────────
   const heroBackplate = createTransitionBackplate('data-hero-panel-transition-backplate');
@@ -108,14 +106,69 @@ const initFullTransitions = ({
   // ── initial states ─────────────────────────────────────────────────────────
   const outgoingHeroPanel = heroTransitionFrame ?? heroTransitionRoot;
 
-  // 1→2: hero panel is outgoing, nextPanel is incoming
-  setPanelTransitionInitialState({ incomingPanel: nextPanel, outgoingPanel: outgoingHeroPanel });
-  // 2→3: nextPanel is outgoing, thirdPanel is incoming
-  // This call runs after the one above, so it overwrites nextPanel's state
-  // to "outgoing" (autoAlpha:1, visible, yPercent:0) — the correct default.
-  setPanelTransitionInitialState({ incomingPanel: thirdPanel, outgoingPanel: nextPanel });
+  // Set thirdPanel to its incoming (hidden) state for the 2→3 transition.
+  // We only call setPanelTransitionInitialState for the outgoing sides here;
+  // secondPanel's incoming state (opacity:0, yPercent:100) is set explicitly
+  // below so it isn't accidentally overwritten by the secondPanel-as-outgoing call.
+  gsap.set(thirdPanel, {
+    opacity: 0,
+    yPercent: 100,
+    y: 0,
+    filter: 'blur(0px)',
+    transformOrigin: '50% 50%',
+    visibility: 'visible',
+    pointerEvents: 'none',
+    zIndex: 38,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  });
+  // secondPanel is outgoing for 2→3 — full visible/reset state.
+  gsap.set(secondPanel, {
+    autoAlpha: 1,
+    scale: 1,
+    y: 0,
+    yPercent: 0,
+    filter: 'blur(0px)',
+    transformOrigin: '50% 0%',
+    zIndex: 36,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  });
+  // outgoingHeroPanel is outgoing for 1→2.
+  gsap.set(outgoingHeroPanel, {
+    autoAlpha: 1,
+    scale: 1,
+    y: 0,
+    yPercent: 0,
+    filter: 'blur(0px)',
+    transformOrigin: '50% 0%',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  });
+  // secondPanel is ALSO incoming for 1→2 — this must come LAST so it wins.
+  // opacity:0 + yPercent:100 hides it below the viewport until the 1→2 transition.
+  gsap.set(secondPanel, {
+    opacity: 0,
+    yPercent: 100,
+    y: 0,
+    filter: 'blur(0px)',
+    transformOrigin: '50% 50%',
+    visibility: 'visible',
+    pointerEvents: 'none',
+    zIndex: 38,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  });
 
-  gsap.set(nextPanelInner, { y: 0, willChange: 'transform' });
+  gsap.set(secondPanelInner, { y: 0, willChange: 'transform' });
 
   // ── 1→2 scrub timeline ────────────────────────────────────────────────────
   const createHeroTimeline = () => {
@@ -127,9 +180,10 @@ const initFullTransitions = ({
     const heroTimeline = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        // Pin the frame (not the root) so the spacer is inserted at the right place.
-        // GSAP pin replaces the old CSS position:fixed + min-height:340svh approach.
-        trigger: heroTransitionFrame,
+        // heroTransitionRoot is now a top-level sibling in <main> (not nested inside
+        // .landing-system), so GSAP pin can safely fixed-position it without collapsing
+        // a parent container.
+        trigger: heroTransitionRoot,
         start: 'top top',
         end: `+=${transitionScrollDistance}`,
         pin: true,
@@ -171,7 +225,7 @@ const initFullTransitions = ({
     addPanelPushTransitionSegment({
       backplate: heroBackplate,
       duration: heroPanelPushDuration,
-      incomingPanel: nextPanel,
+      incomingPanel: secondPanel,
       liftDistance: () => 0,
       outgoingPanel: outgoingHeroPanel,
       outgoingScale: 0.72,
@@ -183,15 +237,15 @@ const initFullTransitions = ({
 
     // No need to manually hide heroTransitionRoot — GSAP pin unpin handles it.
 
-    setupNextPanelReveal({
+    setupSecondPanelReveal({
       prefersReducedMotion: false,
       splitTextAvailable,
-      nextPanel,
-      nextPanelLabel: elements.nextPanelLabel,
-      nextPanelHeading: elements.nextPanelHeading,
-      nextPanelDivider: elements.nextPanelDivider,
-      nextPanelBody: elements.nextPanelBody,
-      nextPanelParagraphs: elements.nextPanelParagraphs,
+      secondPanel,
+      secondPanelLabel: elements.secondPanelLabel,
+      secondPanelHeading: elements.secondPanelHeading,
+      secondPanelDivider: elements.secondPanelDivider,
+      secondPanelBody: elements.secondPanelBody,
+      secondPanelParagraphs: elements.secondPanelParagraphs,
       timeline: heroTimeline,
       startAt: panelTextRevealStart,
     });
@@ -205,7 +259,7 @@ const initFullTransitions = ({
   }
 
   // ── 2→3 scrub timeline ────────────────────────────────────────────────────
-  const fakeScrollDistance = getPanelFakeScrollDistance(nextPanel, nextPanelInner);
+  const fakeScrollDistance = getPanelFakeScrollDistance(secondPanel, secondPanelInner);
   const fakeScrollDuration =
     fakeScrollDistance > 1 ? Math.min(Math.max(fakeScrollDistance / window.innerHeight, 0.45), 1.55) : 0;
   const panelPushStart = fakeScrollDuration;
@@ -215,7 +269,7 @@ const initFullTransitions = ({
     scrollTrigger: {
       trigger: scrollSpacer,
       start: 'top -52%',
-      end: () => `+=${Math.round(window.innerHeight + getPanelFakeScrollDistance(nextPanel, nextPanelInner))}`,
+      end: () => `+=${Math.round(window.innerHeight + getPanelFakeScrollDistance(secondPanel, secondPanelInner))}`,
       scrub: 0.6,
       invalidateOnRefresh: true,
       onEnter: () => {
@@ -235,7 +289,7 @@ const initFullTransitions = ({
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
         });
-        gsap.set(nextPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
+        gsap.set(secondPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
       },
       onEnterBack: () => {
         // Same rationale: scrub controls backplate/shade.
@@ -252,14 +306,16 @@ const initFullTransitions = ({
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
         });
-        gsap.set(nextPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
+        gsap.set(secondPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
       },
       onLeave: () => {
         // Transition complete: thirdPanel is now the active screen.
-        gsap.set(thirdPanel, { pointerEvents: 'auto', zIndex: 35 });
-        gsap.set(nextPanel, {
+        // Drop secondPanel below thirdPanel so it can't bleed through if opacity briefly non-zero.
+        gsap.set(thirdPanel, { pointerEvents: 'auto', zIndex: 36 });
+        gsap.set(secondPanel, {
           autoAlpha: 0,
           pointerEvents: 'none',
+          zIndex: 30,
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
         });
@@ -267,24 +323,25 @@ const initFullTransitions = ({
         gsap.set([secondBackplate, secondShade], { opacity: 0 });
       },
       onLeaveBack: () => {
-        // Scrolled back above the 2→3 zone: restore nextPanel, hide thirdPanel.
+        // Scrolled back above the 2→3 zone: secondPanel is active, thirdPanel goes back below.
         gsap.set(thirdPanel, {
           opacity: 0,
           visibility: 'visible',
           pointerEvents: 'none',
           yPercent: 100,
           y: 0,
-          zIndex: 38,
+          zIndex: 30,   // below secondPanel
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
         });
-        gsap.set(nextPanel, {
+        gsap.set(secondPanel, {
           autoAlpha: 1,
           visibility: 'visible',
           pointerEvents: 'auto',
           scale: 1,
           y: 0,
           yPercent: 0,
+          zIndex: 36,   // active layer
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
           borderBottomLeftRadius: 0,
@@ -295,10 +352,10 @@ const initFullTransitions = ({
     },
   });
 
-  if (fakeScrollDistance > 1 && nextPanelInner) {
+  if (fakeScrollDistance > 1 && secondPanelInner) {
     secondTimeline.to(
-      nextPanelInner,
-      { y: () => -getPanelFakeScrollDistance(nextPanel, nextPanelInner), duration: fakeScrollDuration, ease: 'none' },
+      secondPanelInner,
+      { y: () => -getPanelFakeScrollDistance(secondPanel, secondPanelInner), duration: fakeScrollDuration, ease: 'none' },
       0,
     );
   }
@@ -308,7 +365,7 @@ const initFullTransitions = ({
     duration: panelPushDuration,
     incomingPanel: thirdPanel,
     liftDistance: () => 0,
-    outgoingPanel: nextPanel,
+    outgoingPanel: secondPanel,
     outgoingScale: 0.72,
     shade: secondShade,
     shadeOpacity: 0.58,
