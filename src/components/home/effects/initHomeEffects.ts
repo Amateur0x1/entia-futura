@@ -9,7 +9,6 @@ import { initHomeScrollEffects } from './initHomeScrollEffects';
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
 import { initThirdPanelNebulaBackground } from './initThirdPanelNebulaBackground';
-import { setupShapeOverlayGrid } from './shapeOverlayGrid';
 
 const initSmoothScrolling = () => {
   const lenis = new Lenis({
@@ -39,8 +38,6 @@ export const initHomeEffects = () => {
   }
 
   const homeHeroElements = getHomeHeroElements();
-  const shapeGridCells = setupShapeOverlayGrid(homeHeroElements.shapeOverlay);
-
   initHeroVideoEffects({
     heroVideoShell: homeHeroElements.heroVideoShell,
     scrollVideo: homeHeroElements.scrollVideo,
@@ -68,7 +65,6 @@ export const initHomeEffects = () => {
   initHomeScrollEffects({
     homeHeroElements,
     prefersReducedMotion,
-    shapeGridCells,
     splitTextAvailable,
   });
 

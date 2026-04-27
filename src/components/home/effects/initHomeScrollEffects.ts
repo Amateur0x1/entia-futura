@@ -7,7 +7,6 @@ import gsap from 'gsap';
 interface InitHomeScrollEffectsOptions {
   homeHeroElements: HomeHeroElements;
   prefersReducedMotion: boolean;
-  shapeGridCells: SVGRectElement[];
   splitTextAvailable: boolean;
 }
 

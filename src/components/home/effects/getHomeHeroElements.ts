@@ -15,7 +15,6 @@ export interface HomeHeroElements {
   secondPanelBody: HTMLElement | null;
   secondPanelParagraphs: HTMLElement[];
   knowMoreButton: HTMLElement | null;
-  shapeOverlay: SVGSVGElement | null;
   primaryVisual: HTMLElement | null;
 }
 
@@ -27,11 +26,6 @@ const getHTMLElement = (root: ParentNode | null, selector: string) => {
 const getVideoElement = (root: ParentNode | null, selector: string) => {
   const element = root?.querySelector(selector);
   return element instanceof HTMLVideoElement ? element : null;
-};
-
-const getSVGElement = (root: ParentNode | null, selector: string) => {
-  const element = root?.querySelector(selector);
-  return element instanceof SVGSVGElement ? element : null;
 };
 
 const getParagraphs = (root: HTMLElement | null) =>
@@ -54,8 +48,6 @@ export const getHomeHeroElements = (): HomeHeroElements => {
   const secondPanelHeading = getHTMLElement(secondPanel, '[data-second-panel-heading]');
   const secondPanelDivider = getHTMLElement(secondPanel, '[data-second-panel-divider]');
   const secondPanelBody = getHTMLElement(secondPanel, '[data-second-panel-body]');
-  const shapeOverlay = getSVGElement(document, '[data-shape-overlay]');
-
   return {
     heroTransitionRoot,
     heroTransitionFrame,
@@ -73,7 +65,6 @@ export const getHomeHeroElements = (): HomeHeroElements => {
     secondPanelBody,
     secondPanelParagraphs: getParagraphs(secondPanelBody),
     knowMoreButton: getHTMLElement(document, '[data-know-more-button]'),
-    shapeOverlay,
     primaryVisual: portalShell ?? heroVideoShell,
   };
 };

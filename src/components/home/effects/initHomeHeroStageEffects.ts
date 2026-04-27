@@ -14,7 +14,7 @@ const applyHomeHeroInitialStates = ({
   elements: HomeHeroElements;
   prefersReducedMotion: boolean;
 }) => {
-  const { secondPanelDivider, primaryVisual, shapeOverlay } = elements;
+  const { secondPanelDivider, primaryVisual } = elements;
 
   if (!primaryVisual) {
     return;
@@ -36,12 +36,6 @@ const applyHomeHeroInitialStates = ({
       });
     }
 
-    if (shapeOverlay) {
-      gsap.set(shapeOverlay, {
-        autoAlpha: 0,
-        visibility: 'hidden',
-      });
-    }
   }
 
 };

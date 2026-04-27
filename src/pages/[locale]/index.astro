@@ -78,13 +78,6 @@ const researchPracticeModules = [
       modules={researchPracticeModules}
     />
   </main>
-  <svg
-    class="shape-overlays landing-shape-overlays"
-    data-shape-overlay
-    viewBox="0 0 100 100"
-    preserveAspectRatio="none"
-    aria-hidden="true"
-  ></svg>
   <section class="landing-system">
     <div class="floating-brand-cluster" data-brand-cluster>
       <!-- Logo buttons intentionally avoid sheen classes; motion is GSAP-only for now. -->
@@ -125,16 +118,6 @@ const researchPracticeModules = [
     height: 280svh;
     width: 100%;
     pointer-events: none;
-  }
-
-  .landing-shape-overlays {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    visibility: hidden;
   }
 
   @media (max-width: 720px) {
