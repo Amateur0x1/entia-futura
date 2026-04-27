@@ -10,6 +10,7 @@ interface SetupSecondPanelRevealArgs {
   secondPanelDivider: Element | null | undefined;
   secondPanelBody: Element | null | undefined;
   secondPanelParagraphs: HTMLElement[];
+  secondPanelKnowMore?: HTMLElement | null;
   timeline?: gsap.core.Timeline;
   startAt?: number;
 }
@@ -22,6 +23,7 @@ export const setupSecondPanelReveal = ({
   secondPanelDivider,
   secondPanelBody,
   secondPanelParagraphs,
+  secondPanelKnowMore,
   timeline,
   startAt = 0,
 }: SetupSecondPanelRevealArgs) => {
@@ -110,4 +112,13 @@ export const setupSecondPanelReveal = ({
     );
     paragraphOffset += text.length * 0.018 + 0.12;
   });
+
+  // Know More button — appears after all paragraphs are typed.
+  if (secondPanelKnowMore instanceof HTMLElement) {
+    tl.call(
+      () => { secondPanelKnowMore.classList.add('is-visible'); },
+      [],
+      paragraphOffset + 0.2,
+    );
+  }
 };

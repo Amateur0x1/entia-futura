@@ -1,4 +1,5 @@
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { addHeroMediaDriftSegment } from './addHeroMediaDriftSegment';
 import type { HomeHeroElements } from './getHomeHeroElements';
@@ -10,6 +11,7 @@ import {
   getPanelFakeScrollDistance,
 } from './panelPushTransition';
 import { setupSecondPanelReveal } from './setupSecondPanelReveal';
+import { setupThirdPanelReveal } from './setupThirdPanelReveal';
 
 // ---------------------------------------------------------------------------
 // Timing constants (desktop scroll distance for the 1→2 transition)
@@ -71,6 +73,23 @@ const initReducedMotionTransitions = ({
   })
     .to(secondPanel, { autoAlpha: 0, visibility: 'hidden', pointerEvents: 'none', duration: 0.01, ease: 'none' })
     .to(thirdPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.01, ease: 'none' }, 0);
+
+  // Reduced-motion: show third panel content immediately — no animation.
+  setupThirdPanelReveal({
+    prefersReducedMotion: true,
+    thirdPanel,
+    timeline: gsap.timeline(),
+    startAt: 0,
+  });
+
+  // Know More button — show immediately in reduced-motion, bind click.
+  if (elements.secondPanelKnowMore) {
+    elements.secondPanelKnowMore.classList.add('is-visible');
+    elements.secondPanelKnowMore.addEventListener('click', () => {
+      const target = scrollSpacer.offsetTop + scrollSpacer.offsetHeight;
+      window.scrollTo({ top: target, behavior: 'smooth' });
+    });
+  }
 };
 
 // ---------------------------------------------------------------------------
@@ -82,6 +101,7 @@ const initFullTransitions = ({
   scrollSpacer,
   splitTextAvailable,
 }: Omit<InitAllPanelTransitionsOptions, 'prefersReducedMotion'>) => {
+  const secondPanelKnowMore = elements.secondPanelKnowMore;
   const {
     heroTransitionFrame,
     heroTransitionRoot,
@@ -260,6 +280,7 @@ const initFullTransitions = ({
       secondPanelDivider: elements.secondPanelDivider,
       secondPanelBody: elements.secondPanelBody,
       secondPanelParagraphs: elements.secondPanelParagraphs,
+      secondPanelKnowMore: elements.secondPanelKnowMore,
       timeline: heroTimeline,
       startAt: panelTextRevealStart,
     });
@@ -304,17 +325,24 @@ const initFullTransitions = ({
   // Cancelled if the user re-enters the 2→3 zone before the delay fires.
   let secondPanelResetCall: gsap.core.Tween | null = null;
 
+  // Extra scroll distance for third-panel content reveal (typewriter + cards).
+  // Starts as a reasonable default; dynamically updated after tweens are added
+  // so ScrollTrigger.end() can return the precise pixel count.
+  let thirdPanelRevealScrollExtra = Math.round(window.innerHeight * 1.5);
+
   const secondTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: scrollSpacer,
       start: 'top -52%',
-      end: () => `+=${Math.round(window.innerHeight + getPanelFakeScrollDistance(secondPanel, secondPanelInner))}`,
-      scrub: 0.6,
+      end: () => `+=${Math.round(window.innerHeight + getPanelFakeScrollDistance(secondPanel, secondPanelInner) + thirdPanelRevealScrollExtra)}`,
       invalidateOnRefresh: true,
+      scrub: 0.35,
       onEnter: () => {
         // Cancel any pending post-LeaveBack reset so it doesn't fire mid-transition.
         secondPanelResetCall?.kill();
         secondPanelResetCall = null;
+        // Hide second panel know more when 2→3 push begins.
+        secondPanelKnowMore?.classList.remove('is-visible');
         // Reset panels to their pre-transition state so the scrub timeline starts
         // from a clean slate. Do NOT touch backplate/shade here — their opacity
         // is driven entirely by the scrub timeline to avoid any jump-frame flash.
@@ -358,6 +386,8 @@ const initFullTransitions = ({
       },
       onLeaveBack: () => {
         // Scrolled back above the 2→3 zone: secondPanel is active, thirdPanel goes back below.
+        // Restore second panel know more button.
+        secondPanelKnowMore?.classList.add('is-visible');
         // thirdPanel is safe to reset immediately — it's the incoming panel (not driven by scrub
         // at this point, scrub was reversing it back to yPercent:100).
         gsap.set(thirdPanel, {
@@ -414,6 +444,57 @@ const initFullTransitions = ({
     startAt: panelPushStart,
     timeline: secondTimeline,
   });
+
+  // Third panel content reveal — 挂到 secondTimeline 上，push 完成后自动 scrub 出来
+  const thirdPanelRevealStart = panelPushStart + panelPushDuration + 0.2;
+  setupThirdPanelReveal({
+    prefersReducedMotion: false,
+    thirdPanel,
+    timeline: secondTimeline,
+    startAt: thirdPanelRevealStart,
+  });
+
+  // ── Dynamic scroll-runway calibration ─────────────────────────────────────
+  // We want every 1 unit of timeline time to consume exactly 1 × window.innerHeight
+  // pixels of scroll distance. This gives a consistent, predictable scrub speed:
+  //   totalScrollPixels = totalDuration × vh
+  //
+  // The `end` callback already reads thirdPanelRevealScrollExtra from the closure,
+  // so we update it here (before ScrollTrigger has finalised its geometry) and then
+  // call ScrollTrigger.refresh() on the next tick so it re-evaluates end().
+  {
+    const vh = window.innerHeight;
+    const totalDuration = secondTimeline.totalDuration();
+    // Total pixels the ScrollTrigger range must span for the scrub to complete.
+    const totalScrollPixels = Math.ceil(totalDuration * vh);
+    // basePixels is what `end` already contributes without thirdPanelRevealScrollExtra.
+    const basePixels = vh + getPanelFakeScrollDistance(secondPanel, secondPanelInner);
+    // Extra pixels needed on top of basePixels (clamped to 0 minimum).
+    thirdPanelRevealScrollExtra = Math.max(0, totalScrollPixels - basePixels);
+
+    // scrollSpacer must be tall enough that the entire secondTimeline pixel range
+    // [start … end] falls within the spacer's scroll extent.
+    // start fires at 'top -52%', i.e. 52 vh into the spacer.
+    // We add a generous 100 vh buffer so the spacer never runs out before end.
+    const neededSvh = Math.ceil((totalScrollPixels / vh) * 100) + 160;
+    scrollSpacer.style.height = `${neededSvh}svh`;
+
+    // Refresh on the next GSAP tick so ScrollTrigger picks up the new end() value
+    // and the updated spacer height before it finalises scroll positions.
+    gsap.ticker.add(function refresh() {
+      ScrollTrigger.refresh();
+      gsap.ticker.remove(refresh);
+    });
+  }
+
+  // Know More button click — scrolls to the end of scrollSpacer
+  // (= full 2→3 transition + third panel content reveal all done).
+  if (elements.secondPanelKnowMore) {
+    elements.secondPanelKnowMore.addEventListener('click', () => {
+      const target = scrollSpacer.offsetTop + scrollSpacer.offsetHeight;
+      window.scrollTo({ top: target, behavior: 'smooth' });
+    });
+  }
 };
 
 // ---------------------------------------------------------------------------

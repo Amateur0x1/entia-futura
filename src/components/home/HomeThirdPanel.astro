@@ -25,13 +25,13 @@ const { locale, title, intro, modules } = Astro.props;
   <div class="landing-third-panel__inner">
     <div class="landing-third-panel__content">
       <header class="landing-third-panel__heading">
-        <h2>{title}</h2>
-        <p class="landing-third-panel__intro">{intro}</p>
-        <div class="landing-third-panel__divider" aria-hidden="true"></div>
+        <h2 data-tp-heading>{title}</h2>
+        <p class="landing-third-panel__intro" data-tp-intro>{intro}</p>
+        <div class="landing-third-panel__divider" aria-hidden="true" data-tp-divider></div>
       </header>
       <div class="landing-third-panel__grid">
         {modules.map((item) => (
-          <article class="field-card landing-third-panel__card">
+          <article class="field-card landing-third-panel__card" data-tp-card>
             <h3>{pickByLocale(locale, item.zhTitle, item.enTitle)}</h3>
             <p>{pickByLocale(locale, item.zhBody, item.enBody)}</p>
           </article>
