@@ -1,6 +1,5 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
 
 import { getHomeHeroElements } from './getHomeHeroElements';
@@ -28,9 +27,8 @@ const initSmoothScrolling = () => {
 };
 
 export const initHomeEffects = () => {
-  gsap.registerPlugin(ScrollTrigger, SplitText);
+  gsap.registerPlugin(ScrollTrigger);
 
-  const splitTextAvailable = typeof SplitText !== 'undefined' && typeof SplitText.create === 'function';
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (!prefersReducedMotion) {
@@ -65,7 +63,7 @@ export const initHomeEffects = () => {
   initHomeScrollEffects({
     homeHeroElements,
     prefersReducedMotion,
-    splitTextAvailable,
+    splitTextAvailable: false,
   });
 
   window.addEventListener(
