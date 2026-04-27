@@ -67,7 +67,7 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
   .landing-second-panel__title {
     margin: 0;
     max-width: 18ch;
-    font-size: clamp(2.6rem, 6.4vw, 5.6rem);
+    font-size: clamp(2rem, 3.8vw + 0.4rem, 5.6rem);
     line-height: 1.05;
     letter-spacing: -0.04em;
     font-weight: 500;
@@ -75,7 +75,7 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
 
   .landing-second-panel__label {
     margin: 0;
-    font-size: clamp(2.6rem, 6.4vw, 5.6rem);
+    font-size: clamp(2rem, 3.8vw + 0.4rem, 5.6rem);
     line-height: 1.05;
     letter-spacing: -0.04em;
     font-weight: 500;
@@ -87,7 +87,7 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
     max-width: calc(42rem + 20px);
     display: grid;
     gap: 24px;
-    font-size: clamp(1.22rem, 1.75vw, 1.44rem);
+    font-size: clamp(1rem, 0.8vw + 0.56rem, 1.44rem);
     line-height: 1.74;
     color: color-mix(in srgb, var(--color-secondary-foreground) 84%, transparent);
   }
@@ -236,6 +236,17 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
     }
   }
 
+  @media (max-width: 1024px) {
+    .landing-second-panel__title,
+    .landing-second-panel__label {
+      font-size: clamp(1.8rem, 3.2vw + 0.4rem, 3.6rem);
+    }
+
+    .landing-second-panel__body {
+      font-size: clamp(0.96rem, 0.7vw + 0.54rem, 1.28rem);
+    }
+  }
+
   @media (max-width: 720px) {
     .landing-second-panel {
       padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
@@ -269,8 +280,14 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
       width: min(52vw, 15rem);
     }
 
-    .landing-second-panel__title {
+    .landing-second-panel__title,
+    .landing-second-panel__label {
+      font-size: clamp(1.6rem, 5.6vw, 2.4rem);
       max-width: 11ch;
+    }
+
+    .landing-second-panel__body {
+      font-size: clamp(0.9rem, 3.2vw, 1.08rem);
     }
   }
 </style>

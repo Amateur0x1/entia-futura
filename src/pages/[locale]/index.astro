@@ -3,6 +3,7 @@ import HomeEffects from '../../components/home/HomeEffects.astro';
 import HomeHeroScreen from '../../components/home/HomeHeroScreen.astro';
 import HomeSecondPanel from '../../components/home/HomeSecondPanel.astro';
 import HomeThirdPanel from '../../components/home/HomeThirdPanel.astro';
+import PageLoader from '../../components/home/PageLoader.astro';
 import Layout from '../../layouts/Layout.astro';
 import { siteMeta } from '../../content/site';
 import { isLocale, pickByLocale, toLocalePath } from '../../i18n/config';
@@ -60,6 +61,7 @@ const researchPracticeModules = [
 ---
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
+  <PageLoader />
   <main class="landing-main">
     <HomeHeroScreen />
     <HomeSecondPanel

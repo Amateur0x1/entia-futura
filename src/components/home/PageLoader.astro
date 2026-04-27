@@ -1,0 +1,176 @@
+---
+---
+
+<div class="page-loader" id="page-loader" aria-hidden="true">
+  <div class="page-loader__label">Loading</div>
+  <div class="page-loader__percent" id="loader-percent">0%</div>
+  <div class="page-loader__bar-track" aria-hidden="true">
+    <div class="page-loader__bar-fill" id="loader-bar"></div>
+  </div>
+</div>
+
+<style>
+  .page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: transparent;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: max(2rem, calc(env(safe-area-inset-bottom) + 2rem))
+      max(2.4rem, calc(env(safe-area-inset-right) + 2rem))
+      max(2rem, calc(env(safe-area-inset-bottom) + 2rem))
+      max(2.4rem, calc(env(safe-area-inset-left) + 2rem));
+    pointer-events: all;
+    transition: opacity 0.72s cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0.72s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .page-loader.is-done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .page-loader__label {
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(3.2rem, 8vw, 8rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--color-primary-foreground);
+    line-height: 1;
+    align-self: flex-end;
+  }
+
+  .page-loader__percent {
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(3.2rem, 8vw, 8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-primary-foreground);
+    line-height: 1;
+    align-self: flex-end;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Thin horizontal progress bar at the very bottom */
+  .page-loader__bar-track {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: color-mix(in srgb, var(--color-primary-foreground) 18%, transparent);
+  }
+
+  .page-loader__bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-secondary);
+    box-shadow: 0 0 8px var(--effect-glow-secondary);
+    transition: width 0.18s ease-out;
+  }
+</style>
+
+<script>
+  (() => {
+    const loader = document.getElementById('page-loader');
+    const percentEl = document.getElementById('loader-percent');
+    const barEl = document.getElementById('loader-bar');
+
+    if (!loader || !percentEl || !barEl) return;
+
+    let displayed = 0;
+    let target = 0;
+    let raf: number;
+
+    const setProgress = (pct: number) => {
+      target = Math.min(100, Math.max(target, pct));
+    };
+
+    // Smoothly animate displayed value toward target
+    const tick = () => {
+      if (displayed < target) {
+        const step = Math.max(0.4, (target - displayed) * 0.08);
+        displayed = Math.min(target, displayed + step);
+        const v = Math.round(displayed);
+        percentEl.textContent = `${v}%`;
+        barEl.style.width = `${displayed}%`;
+      }
+      if (displayed < 100) {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+
+    // ── Resource tracking ────────────────────────────────────────────────────
+    // Track images + videos in the document
+    const images = Array.from(document.images);
+    const videos = Array.from(document.querySelectorAll<HTMLVideoElement>('video[src], video > source'));
+
+    // Weight: videos count heavier than images
+    const imageWeight = 1;
+    const videoWeight = 8;
+    const totalWeight =
+      images.length * imageWeight + videos.length * videoWeight + 10; // +10 for DOMContentLoaded baseline
+
+    let loadedWeight = 0;
+
+    const advance = (w: number) => {
+      loadedWeight += w;
+      // Reserve last 8% for window.onload
+      const pct = Math.round((loadedWeight / totalWeight) * 92);
+      setProgress(pct);
+    };
+
+    // DOMContentLoaded base progress
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => advance(10), { once: true });
+    } else {
+      advance(10);
+    }
+
+    // Track images
+    images.forEach((img) => {
+      if (img.complete) {
+        advance(imageWeight);
+      } else {
+        img.addEventListener('load', () => advance(imageWeight), { once: true });
+        img.addEventListener('error', () => advance(imageWeight), { once: true });
+      }
+    });
+
+    // Track videos (just wait for metadata)
+    Array.from(document.querySelectorAll<HTMLVideoElement>('video')).forEach((vid) => {
+      if (vid.readyState >= 1) {
+        advance(videoWeight);
+      } else {
+        vid.addEventListener('loadedmetadata', () => advance(videoWeight), { once: true });
+        vid.addEventListener('error', () => advance(videoWeight), { once: true });
+      }
+    });
+
+    // window.load → jump to 100 and fade out
+    const finish = () => {
+      cancelAnimationFrame(raf);
+      setProgress(100);
+      displayed = 100;
+      percentEl.textContent = '100%';
+      barEl.style.width = '100%';
+
+      // Brief pause at 100% before fading
+      setTimeout(() => {
+        loader.classList.add('is-done');
+      }, 320);
+    };
+
+    if (document.readyState === 'complete') {
+      finish();
+    } else {
+      window.addEventListener('load', finish, { once: true });
+    }
+  })();
+</script>
