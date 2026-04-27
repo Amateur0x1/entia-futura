@@ -1,5 +1,8 @@
 ---
 import HomeEffects from '../../components/home/HomeEffects.astro';
+import HomeFourthPanel from '../../components/home/HomeFourthPanel.astro';
+import HomeFifthPanel from '../../components/home/HomeFifthPanel.astro';
+import HomeSixthPanel from '../../components/home/HomeSixthPanel.astro';
 import HomeHeroScreen from '../../components/home/HomeHeroScreen.astro';
 import HomeSecondPanel from '../../components/home/HomeSecondPanel.astro';
 import HomeThirdPanel from '../../components/home/HomeThirdPanel.astro';
@@ -82,6 +85,13 @@ const whatWeDoModules = [
       intro={whatWeDoIntro}
       modules={whatWeDoModules}
     />
+    <!-- Additional scroll spacers for panels 4–6 -->
+    <div class="landing-scroll-spacer-extra" data-landing-scroll-spacer-4 aria-hidden="true"></div>
+    <HomeFourthPanel locale={locale} />
+    <div class="landing-scroll-spacer-extra" data-landing-scroll-spacer-5 aria-hidden="true"></div>
+    <HomeFifthPanel locale={locale} />
+    <div class="landing-scroll-spacer-extra" data-landing-scroll-spacer-6 aria-hidden="true"></div>
+    <HomeSixthPanel locale={locale} />
   </main>
   <section class="landing-system" data-hero-stage>
     <div class="floating-brand-cluster" data-brand-cluster>
@@ -142,6 +152,13 @@ const whatWeDoModules = [
     pointer-events: none;
   }
 
+  /* Spacers for panels 4–6 — each triggers one panel transition */
+  .landing-scroll-spacer-extra {
+    height: 100svh;
+    width: 100%;
+    pointer-events: none;
+  }
+
   /* Second-panel Know More button: same pill as screen 1 but sits above
      second panel (z-index 31), hidden until JS adds .is-visible */
   :global(.second-panel-know-more) {
@@ -156,9 +173,22 @@ const whatWeDoModules = [
     pointer-events: auto;
   }
 
+  /* Panels 4–6: initial state — GSAP scrub timelines own all visual properties.
+     No CSS transition here; transitions would fight the scrub and cause jumps. */
+  :global([data-fourth-panel]),
+  :global([data-fifth-panel]),
+  :global([data-sixth-panel]) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   @media (max-width: 720px) {
     .landing-scroll-spacer {
       height: 320svh;
+    }
+
+    .landing-scroll-spacer-extra {
+      height: 80svh;
     }
   }
 </style>

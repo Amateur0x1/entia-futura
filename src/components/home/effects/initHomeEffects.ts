@@ -64,6 +64,12 @@ export const initHomeEffects = () => {
     prefersReducedMotion,
   });
 
+  const fourthPanel = document.querySelector<HTMLElement>('[data-fourth-panel]');
+  initThirdPanelNebulaBackground({
+    panel: fourthPanel,
+    prefersReducedMotion,
+  });
+
   // initHomeEffects is called after loader:done. Refresh ScrollTrigger and
   // create all scroll timelines immediately — layout is stable at this point
   // since the loader has been covering the page. Unlock scroll after pin is set.
@@ -74,4 +80,8 @@ export const initHomeEffects = () => {
     splitTextAvailable: false,
   });
   document.body.style.overflow = '';
+
+  // Panels 4–6 transitions are now managed by initAllPanelTransitions
+  // (scrub-based push timelines, matching the 2→3 pattern) — no extra
+  // ScrollTrigger.create loops needed here.
 };
