@@ -39,9 +39,8 @@ import './landing-hero/landingHero.css';
   // Dispatches:
   //   scrollvideo:bufferupdate  { detail: { pct: number } }  — every 200ms while loading
   //   scrollvideo:bufferready                                 — when buffered >= READY_THRESHOLD
-  const scrollVideo = document.querySelector<HTMLVideoElement>('[data-scroll-video]');
+    const scrollVideo = document.querySelector<HTMLVideoElement>('[data-scroll-video]');
   if (scrollVideo) {
-    const READY_THRESHOLD = 0.95; // 95% buffered before releasing the loader
     let readyDispatched = false;
 
     const getBufferedPct = (): number => {
@@ -51,26 +50,38 @@ import './landing-hero/landingHero.css';
       return buf.end(buf.length - 1) / dur;
     };
 
-    const checkBuffer = () => {
-      const pct = getBufferedPct();
-
-      // Always broadcast current buffer percentage so PageLoader can mirror it.
-      document.dispatchEvent(new CustomEvent('scrollvideo:bufferupdate', { detail: { pct } }));
-
-      if (!readyDispatched && pct >= READY_THRESHOLD) {
-        readyDispatched = true;
-        document.dispatchEvent(new CustomEvent('scrollvideo:bufferready'));
-        return; // stop polling
-      }
-
-      if (!readyDispatched) {
-        setTimeout(checkBuffer, 200);
-      }
+    const dispatchReady = () => {
+      if (readyDispatched) return;
+      readyDispatched = true;
+      document.dispatchEvent(new CustomEvent('scrollvideo:bufferupdate', { detail: { pct: 1 } }));
+      document.dispatchEvent(new CustomEvent('scrollvideo:bufferready'));
     };
 
-    // Start polling once metadata is available (we need duration to compute pct).
+    // Poll buffered progress and update loader bar every 200ms.
+    const checkBuffer = () => {
+      const pct = getBufferedPct();
+      document.dispatchEvent(new CustomEvent('scrollvideo:bufferupdate', { detail: { pct } }));
+      if (!readyDispatched) setTimeout(checkBuffer, 200);
+    };
+
+    // Fire ready only when the browser confirms the entire file is buffered.
+    // 'canplaythrough' + buffered reaching duration is the most reliable signal.
+    scrollVideo.addEventListener('canplaythrough', () => {
+      const pct = getBufferedPct();
+      if (pct >= 1) {
+        dispatchReady();
+      }
+      // If not fully buffered yet, keep polling until it is.
+    }, { once: true });
+
     const startPolling = () => {
       checkBuffer();
+      // Also watch for the progress event to catch buffered updates.
+      scrollVideo.addEventListener('progress', () => {
+        const pct = getBufferedPct();
+        document.dispatchEvent(new CustomEvent('scrollvideo:bufferupdate', { detail: { pct } }));
+        if (!readyDispatched && pct >= 1) dispatchReady();
+      });
     };
 
     if (scrollVideo.readyState >= 1) {
@@ -78,13 +89,5 @@ import './landing-hero/landingHero.css';
     } else {
       scrollVideo.addEventListener('loadedmetadata', startPolling, { once: true });
     }
-
-    // Hard fallback: if video errors or never reaches threshold, release after 12s.
-    setTimeout(() => {
-      if (!readyDispatched) {
-        readyDispatched = true;
-        document.dispatchEvent(new CustomEvent('scrollvideo:bufferready'));
-      }
-    }, 12000);
   }
 </script>
