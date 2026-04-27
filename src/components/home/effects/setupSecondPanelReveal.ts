@@ -37,15 +37,15 @@ export const setupSecondPanelReveal = ({
     return;
   }
 
-  // Store original text content and clear elements for typewriter reveal
+  // Store original text content and clear elements for typewriter reveal.
+  // The heading (core question) is kept as-is — it stays visible at all times
+  // and fades in together with the panel rather than being typed out.
   const labelText = secondPanelLabel instanceof HTMLElement ? secondPanelLabel.textContent ?? '' : '';
-  const headingText = secondPanelHeading.textContent ?? '';
   const paragraphTexts = secondPanelParagraphs.map((p) => p.textContent ?? '');
 
   if (secondPanelLabel instanceof HTMLElement) {
     secondPanelLabel.textContent = '';
   }
-  secondPanelHeading.textContent = '';
   secondPanelParagraphs.forEach((p) => { p.textContent = ''; });
 
   // Hide body container until typewriter starts
@@ -76,14 +76,11 @@ export const setupSecondPanelReveal = ({
     );
   }
 
-  // Heading typewriter
-  tl.to(
+  // Heading: always visible, no typewriter — just a quick fade in.
+  tl.fromTo(
     secondPanelHeading,
-    {
-      duration: headingText.length * 0.038,
-      text: { value: headingText, delimiter: '' },
-      ease: 'none',
-    },
+    { autoAlpha: 0 },
+    { autoAlpha: 1, duration: 0.32, ease: 'power2.out' },
     startAt + 0.08,
   );
 
