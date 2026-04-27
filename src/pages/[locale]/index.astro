@@ -62,7 +62,7 @@ const researchPracticeModules = [
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
   <PageLoader />
-  <main class="landing-main">
+  <main class="landing-main" data-hero-stage>
     <HomeHeroScreen />
     <HomeSecondPanel
       locale={locale}
@@ -80,7 +80,7 @@ const researchPracticeModules = [
       modules={researchPracticeModules}
     />
   </main>
-  <section class="landing-system">
+  <section class="landing-system" data-hero-stage>
     <div class="floating-brand-cluster" data-brand-cluster>
       <!-- Logo buttons intentionally avoid sheen classes; motion is GSAP-only for now. -->
       <a
@@ -110,6 +110,15 @@ const researchPracticeModules = [
 <style>
   :global(body.theme-landing-dark .page-shell-landing) {
     padding: 0;
+  }
+
+  [data-hero-stage] {
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  [data-hero-stage].is-revealed {
+    opacity: 1;
   }
 
   .landing-scroll-spacer {

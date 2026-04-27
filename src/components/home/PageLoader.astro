@@ -164,6 +164,10 @@
       // Brief pause at 100% before fading
       setTimeout(() => {
         loader.classList.add('is-done');
+        // Reveal hero stage elements in sync with loader fade-out
+        document.querySelectorAll('[data-hero-stage]').forEach((el) => {
+          el.classList.add('is-revealed');
+        });
       }, 320);
     };
 
