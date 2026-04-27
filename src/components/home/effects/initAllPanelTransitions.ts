@@ -303,21 +303,19 @@ const initFullTransitions = ({
         gsap.set(secondPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
       },
       onEnterBack: () => {
-        // Same rationale: scrub controls backplate/shade.
+        // Re-entering the 2→3 zone from below (scrolling back up from 3rd screen).
+        // thirdPanel slides back down — restore it to its incoming position.
+        // Do NOT touch secondPanel here: scrub already has it at progress=1 state
+        // (scaled down, shade fading). Resetting autoAlpha would cause a 1-frame
+        // flash of secondPanel at full size before scrub can re-apply transforms.
         gsap.set(thirdPanel, {
-          opacity: 0,
           visibility: 'visible',
           pointerEvents: 'none',
-          yPercent: 100,
-          y: 0,
-          scale: 1,
           zIndex: 38,
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
-          borderBottomLeftRadius: 0,
-          borderBottomRightRadius: 0,
         });
-        gsap.set(secondPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
+        // Restore secondPanel's z-ordering and pointer events so scrub can drive it,
+        // but do NOT override opacity/scale/y — scrub owns those values.
+        gsap.set(secondPanel, { visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
       },
       onLeave: () => {
         // Transition complete: thirdPanel is now the active screen.
