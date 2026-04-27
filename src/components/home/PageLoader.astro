@@ -39,7 +39,7 @@
     font-weight: 700;
     letter-spacing: -0.01em;
     text-transform: uppercase;
-    color: var(--color-primary-foreground);
+    color: var(--color-primary);
     line-height: 1;
     align-self: flex-end;
   }
@@ -49,7 +49,7 @@
     font-size: clamp(3.2rem, 8vw, 8rem);
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--color-primary-foreground);
+    color: var(--color-primary);
     line-height: 1;
     align-self: flex-end;
     text-align: right;
@@ -63,14 +63,14 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: color-mix(in srgb, var(--color-primary-foreground) 18%, transparent);
+    background: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
   }
 
   .page-loader__bar-fill {
     height: 100%;
     width: 0%;
-    background: var(--color-secondary);
-    box-shadow: 0 0 8px var(--effect-glow-secondary);
+    background: var(--color-text-primary);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-text-primary) 40%, transparent);
     transition: width 0.18s ease-out;
   }
 </style>
