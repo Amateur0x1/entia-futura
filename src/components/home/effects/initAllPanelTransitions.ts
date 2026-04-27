@@ -5,7 +5,6 @@ import type { HomeHeroElements } from './getHomeHeroElements';
 import { addHeroVideoTransitionSegment } from './heroVideoEffects';
 import {
   addPanelPushTransitionSegment,
-  createTransitionBackplate,
   createTransitionShade,
   getPanelFakeScrollDistance,
 } from './panelPushTransition';
@@ -94,14 +93,10 @@ const initFullTransitions = ({
   if (!heroTransitionRoot || !secondPanel) return;
 
   // ── shared layers ──────────────────────────────────────────────────────────
-  const heroBackplate = createTransitionBackplate('data-hero-panel-transition-backplate');
   const heroShade = createTransitionShade('data-hero-panel-transition-shade');
-  const secondBackplate = createTransitionBackplate('data-second-panel-transition-backplate');
   const secondShade = createTransitionShade('data-second-panel-transition-shade');
 
-  // Backplates and shades stay in the render tree (opacity:0 only, no visibility:hidden)
-  // so there is never a jump-to-visible frame when the scrub timeline activates them.
-  gsap.set([heroBackplate, heroShade, secondBackplate, secondShade], { opacity: 0 });
+  gsap.set([heroShade, secondShade], { opacity: 0 });
 
   // ── initial states ─────────────────────────────────────────────────────────
   const outgoingHeroPanel = heroTransitionFrame ?? heroTransitionRoot;
@@ -223,7 +218,6 @@ const initFullTransitions = ({
     );
 
     addPanelPushTransitionSegment({
-      backplate: heroBackplate,
       duration: heroPanelPushDuration,
       incomingPanel: secondPanel,
       liftDistance: () => 0,
@@ -319,8 +313,7 @@ const initFullTransitions = ({
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
         });
-        // Return backplate/shade to transparent — no visibility toggle.
-        gsap.set([secondBackplate, secondShade], { opacity: 0 });
+          gsap.set(secondShade, { opacity: 0 });
       },
       onLeaveBack: () => {
         // Scrolled back above the 2→3 zone: secondPanel is active, thirdPanel goes back below.
@@ -347,7 +340,7 @@ const initFullTransitions = ({
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
         });
-        gsap.set([secondBackplate, secondShade], { opacity: 0 });
+        gsap.set(secondShade, { opacity: 0 });
       },
     },
   });
@@ -361,7 +354,6 @@ const initFullTransitions = ({
   }
 
   addPanelPushTransitionSegment({
-    backplate: secondBackplate,
     duration: panelPushDuration,
     incomingPanel: thirdPanel,
     liftDistance: () => 0,

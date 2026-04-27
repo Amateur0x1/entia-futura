@@ -270,7 +270,9 @@ const navLinks = [
   }
 
   body {
-    background: var(--gradient-page);
+    background-color: var(--color-background);
+    background-image: radial-gradient(circle, color-mix(in srgb, var(--color-primary) 22%, transparent) 40%, transparent 41%);
+    background-size: 28px 28px;
   }
 
   * {
@@ -1012,7 +1014,6 @@ const navLinks = [
 
   body.theme-landing-dark {
     color: var(--color-text-primary);
-    background: var(--color-background-subtle);
   }
 
   body.theme-landing-dark .page-shell-landing {

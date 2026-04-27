@@ -48,14 +48,7 @@ export const createTransitionShade = (attributeName: string) =>
     background: '#000',
   });
 
-export const createTransitionBackplate = (attributeName: string) =>
-  getOrCreateTransitionLayer(attributeName, {
-    zIndex: '35',
-    background: 'var(--color-secondary)',
-  });
-
 interface AddPanelPushTransitionSegmentOptions {
-  backplate: HTMLElement;
   duration: number;
   incomingPanel: HTMLElement;
   liftDistance: () => number;
@@ -108,7 +101,6 @@ export const setPanelTransitionInitialState = ({
 };
 
 export const addPanelPushTransitionSegment = ({
-  backplate,
   duration,
   incomingPanel,
   liftDistance,
@@ -120,16 +112,6 @@ export const addPanelPushTransitionSegment = ({
   timeline,
 }: AddPanelPushTransitionSegmentOptions) => {
   timeline
-    // Backplate: already visible in the render tree (opacity:0), just raise opacity.
-    // No visibility toggle needed — avoids the one-frame jump.
-    .set(
-      backplate,
-      {
-        opacity: 1,
-        zIndex: 35,
-      },
-      startAt,
-    )
     .set(
       shade,
       {
@@ -222,14 +204,6 @@ export const addPanelPushTransitionSegment = ({
         opacity: 0,
         duration: 0.08,
         ease: 'none',
-      },
-      startAt + duration,
-    )
-    // Backplate: fade back to transparent (no visibility toggle).
-    .set(
-      backplate,
-      {
-        opacity: 0,
       },
       startAt + duration,
     )
