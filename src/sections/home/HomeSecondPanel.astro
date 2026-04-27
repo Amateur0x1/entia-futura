@@ -1,0 +1,275 @@
+---
+import type { Locale } from '../../i18n/config';
+import HomeMonolithVisual from './HomeMonolithVisual.astro';
+
+interface Props {
+  locale: Locale;
+  coreQuestionLabel: string;
+  coreQuestion: string;
+  instituteIntro: string;
+}
+
+const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
+---
+
+<section class={`landing-second-panel ${locale === 'en' ? 'landing-second-panel--en' : ''}`} data-second-panel>
+  <canvas class="landing-second-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
+  <div class="landing-second-panel__inner" data-second-panel-inner>
+    <article class="landing-second-panel__block landing-second-panel__block--top-right">
+      <p class="landing-second-panel__label">{coreQuestionLabel}</p>
+      <h2 class="landing-second-panel__title" data-second-panel-heading>{coreQuestion}</h2>
+      <div class="landing-second-panel__divider" data-second-panel-divider aria-hidden="true"></div>
+      <div class="landing-second-panel__body" data-second-panel-body>
+        {instituteIntro.split('\n').map((paragraph) => (
+          <p class="landing-second-panel__paragraph">{paragraph}</p>
+        ))}
+      </div>
+    </article>
+    <HomeMonolithVisual />
+  </div>
+</section>
+
+<style>
+  .landing-second-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    padding: clamp(3.6rem, 9vw, 6.4rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
+    background: var(--color-background);
+    color: var(--color-secondary-foreground);
+    /* Initial hidden state is driven by GSAP (opacity:0, yPercent:100 via transform) */
+    opacity: 0;
+    pointer-events: none;
+    overflow: clip;
+    border-radius: 0;
+  }
+
+  .landing-second-panel__nebula {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.76;
+  }
+
+  .landing-second-panel__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(15rem, 0.95fr);
+    align-items: end;
+    gap: clamp(1.75rem, 4vw, 5rem);
+    min-height: min(74svh, 760px);
+  }
+
+  .landing-second-panel__title {
+    margin: 0;
+    max-width: 18ch;
+    font-size: clamp(2.6rem, 6.4vw, 5.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+  }
+
+  .landing-second-panel__label {
+    margin: 0;
+    font-size: clamp(2.6rem, 6.4vw, 5.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+    color: var(--color-secondary-foreground);
+  }
+
+  .landing-second-panel__body {
+    margin: 0;
+    max-width: calc(42rem + 20px);
+    display: grid;
+    gap: 24px;
+    font-size: clamp(1.22rem, 1.75vw, 1.44rem);
+    line-height: 1.74;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 84%, transparent);
+  }
+
+  .landing-second-panel__paragraph {
+    margin: 0;
+  }
+
+  .landing-second-panel--en .landing-second-panel__body {
+    gap: 30px;
+  }
+
+  .landing-second-panel__body::before {
+    content: none;
+  }
+
+  .landing-second-panel__divider {
+    width: min(10rem, 28vw);
+    height: 1px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    background: var(--color-border-inverse-strong);
+  }
+
+  .landing-second-panel__block {
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .landing-second-panel__block--top-right {
+    width: min(48rem, 100%);
+    text-align: left;
+    justify-items: start;
+    padding-left: clamp(1.5rem, 3.2vw, 3.125rem);
+  }
+
+  :global(.landing-second-panel__visual-column) {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-right: clamp(2rem, 25%, 24rem);
+    pointer-events: none;
+  }
+
+  :global(.landing-second-panel__visual-shell) {
+    position: relative;
+    width: min(100%, clamp(15rem, 28vw, 22rem));
+    aspect-ratio: 642 / 1281;
+  }
+
+  :global(.landing-second-panel__visual-base),
+  :global(.landing-second-panel__visual-binary),
+  :global(.landing-second-panel__visual-glow),
+  :global(.landing-second-panel__visual-scan) {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: url('/images/home-monolith-mask.png');
+    mask-image: url('/images/home-monolith-mask.png');
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  :global(.landing-second-panel__visual-base) {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.95) 58%, rgba(255, 255, 255, 0.89) 100%);
+    filter: drop-shadow(0 0 16px color-mix(in srgb, white 72%, transparent));
+  }
+
+  :global(.landing-second-panel__visual-binary) {
+    display: grid;
+    place-items: stretch;
+    opacity: 0.9;
+    overflow: hidden;
+    mix-blend-mode: multiply;
+  }
+
+  :global(.landing-second-panel__visual-binary--monolith) {
+    /* Keep canvas texture on monolith side. */
+    clip-path: inset(0 0 0 34%);
+  }
+
+  :global(.landing-second-panel__visual-binary--human) {
+    /* Add a second stream layer on the figure side. */
+    clip-path: inset(0 56% 0 0);
+    opacity: 0.74;
+    mix-blend-mode: screen;
+  }
+
+  :global(.landing-second-panel__binary-canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.landing-second-panel__visual-glow) {
+    display: none;
+  }
+
+  :global(.landing-second-panel__visual-scan) {
+    display: none;
+  }
+
+  @keyframes landing-monolith-scan {
+    0% {
+      transform: translateX(-36%);
+      opacity: 0.08;
+    }
+
+    20% {
+      opacity: 0.24;
+    }
+
+    50% {
+      opacity: 0.38;
+    }
+
+    100% {
+      transform: translateX(36%);
+      opacity: 0.08;
+    }
+  }
+
+  @keyframes landing-monolith-glow {
+    0%,
+    100% {
+      opacity: 0.16;
+    }
+
+    50% {
+      opacity: 0.32;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.landing-second-panel__visual-glow),
+    :global(.landing-second-panel__visual-scan),
+    :global(.landing-second-panel__binary-canvas) {
+      animation: none;
+      transform: none;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .landing-second-panel {
+      padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
+      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
+        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
+      padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
+    }
+
+    .landing-second-panel__inner {
+      min-height: auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .landing-second-panel__block {
+      position: static;
+      width: 100%;
+    }
+
+    .landing-second-panel__block--top-right {
+      padding-left: 0;
+    }
+
+    :global(.landing-second-panel__visual-column) {
+      justify-content: center;
+      padding-right: 0;
+    }
+
+    :global(.landing-second-panel__visual-shell) {
+      width: min(52vw, 15rem);
+    }
+
+    .landing-second-panel__title {
+      max-width: 11ch;
+    }
+  }
+</style>
