@@ -39,17 +39,13 @@ export const setupSecondPanelReveal = ({
     return;
   }
 
-  // Store original paragraph texts and clear them for typewriter reveal.
-  // Label and heading both fade in — no typewriter.
+  // Label and heading are always visible — no fade-in, no typewriter.
+  // Only the body paragraphs use typewriter reveal.
   const paragraphTexts = secondPanelParagraphs.map((p) => p.textContent ?? '');
 
   secondPanelParagraphs.forEach((p) => { p.textContent = ''; });
 
-  // Hide label, heading, divider, body until reveal
-  if (secondPanelLabel instanceof HTMLElement) {
-    gsap.set(secondPanelLabel, { autoAlpha: 0 });
-  }
-  gsap.set(secondPanelHeading, { autoAlpha: 0 });
+  // Hide only divider and body until reveal; label and heading stay visible.
   gsap.set(secondPanelBody, { autoAlpha: 0 });
   gsap.set(secondPanelDivider, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
 
@@ -64,40 +60,22 @@ export const setupSecondPanelReveal = ({
       },
     });
 
-  // Label fade-in (same style as heading)
-  if (secondPanelLabel instanceof HTMLElement) {
-    tl.fromTo(
-      secondPanelLabel,
-      { autoAlpha: 0 },
-      { autoAlpha: 1, duration: 0.32, ease: 'power2.out' },
-      startAt,
-    );
-  }
-
-  // Heading fade-in
-  tl.fromTo(
-    secondPanelHeading,
-    { autoAlpha: 0 },
-    { autoAlpha: 1, duration: 0.32, ease: 'power2.out' },
-    startAt + 0.1,
-  );
-
   // Divider reveal
   tl.to(
     secondPanelDivider,
     { autoAlpha: 1, scaleX: 1, duration: 0.5, ease: 'power2.out' },
-    startAt + 0.28,
+    startAt,
   );
 
   // Show body container
   tl.to(
     secondPanelBody,
     { autoAlpha: 1, duration: 0.1, ease: 'none' },
-    startAt + 0.44,
+    startAt + 0.16,
   );
 
   // Paragraphs typewriter — staggered one after another
-  let paragraphOffset = startAt + 0.48;
+  let paragraphOffset = startAt + 0.2;
   secondPanelParagraphs.forEach((p, i) => {
     const text = paragraphTexts[i] ?? '';
     if (!text) return;
@@ -113,12 +91,12 @@ export const setupSecondPanelReveal = ({
     paragraphOffset += text.length * 0.018 + 0.12;
   });
 
-  // Know More button — appears after all paragraphs are typed.
+  // Know More button — show immediately when panel slides in.
   if (secondPanelKnowMore instanceof HTMLElement) {
     tl.call(
       () => { secondPanelKnowMore.classList.add('is-visible'); },
       [],
-      paragraphOffset + 0.2,
+      startAt,
     );
   }
 };

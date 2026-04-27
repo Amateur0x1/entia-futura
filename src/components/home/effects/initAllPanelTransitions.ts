@@ -62,6 +62,8 @@ const initReducedMotionTransitions = ({
       { autoAlpha: 1, y: 0, filter: 'blur(0px)', visibility: 'visible', pointerEvents: 'auto', duration: 0.42, ease: 'power3.out' },
     );
 
+  const secondPanelKnowMoreRM = elements.secondPanelKnowMore;
+
   // 2→3: swap panels
   gsap.timeline({
     scrollTrigger: {
@@ -69,6 +71,8 @@ const initReducedMotionTransitions = ({
       start: 'top -56%',
       end: 'top -92%',
       toggleActions: 'play none reverse reverse',
+      onEnter: () => { secondPanelKnowMoreRM?.classList.remove('is-visible'); },
+      onLeaveBack: () => { secondPanelKnowMoreRM?.classList.add('is-visible'); },
     },
   })
     .to(secondPanel, { autoAlpha: 0, visibility: 'hidden', pointerEvents: 'none', duration: 0.01, ease: 'none' })
@@ -83,9 +87,9 @@ const initReducedMotionTransitions = ({
   });
 
   // Know More button — show immediately in reduced-motion, bind click.
-  if (elements.secondPanelKnowMore) {
-    elements.secondPanelKnowMore.classList.add('is-visible');
-    elements.secondPanelKnowMore.addEventListener('click', () => {
+  if (secondPanelKnowMoreRM) {
+    secondPanelKnowMoreRM.classList.add('is-visible');
+    secondPanelKnowMoreRM.addEventListener('click', () => {
       const target = scrollSpacer.offsetTop + scrollSpacer.offsetHeight;
       window.scrollTo({ top: target, behavior: 'smooth' });
     });
@@ -385,6 +389,8 @@ const initFullTransitions = ({
         // onEnterBack fires before scrub can re-apply its own values.
         gsap.set(thirdPanel, { pointerEvents: 'auto', zIndex: 36 });
         gsap.set(secondPanel, { pointerEvents: 'none', zIndex: 30 });
+        // Third panel is now active — hide the know-more button.
+        secondPanelKnowMore?.classList.remove('is-visible');
       },
       onLeaveBack: () => {
         // Scrolled back above the 2→3 zone: secondPanel is active, thirdPanel goes back below.
@@ -489,8 +495,8 @@ const initFullTransitions = ({
     });
   }
 
-  // Know More button click — scrolls to the end of scrollSpacer
-  // (= full 2→3 transition + third panel content reveal all done).
+  // Know More button click — scrolls to the start of scrollSpacer end
+  // (= triggers 2→3 transition, third panel slides in).
   if (elements.secondPanelKnowMore) {
     elements.secondPanelKnowMore.addEventListener('click', () => {
       const target = scrollSpacer.offsetTop + scrollSpacer.offsetHeight;

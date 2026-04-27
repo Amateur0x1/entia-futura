@@ -317,48 +317,22 @@ export const initLandingHeroInteractions = () => {
   if (knowMoreButton instanceof HTMLElement) {
     knowMoreButton.addEventListener('click', () => {
       const heroTransitionRoot = document.querySelector('[data-hero-transition-root]');
-      const secondPanel = document.querySelector('[data-second-panel]');
-      const transitionScrollDistance = window.innerWidth <= 720 ? 2500 : 3600;
+      const scrollSpacer = document.querySelector('[data-landing-scroll-spacer]');
+
+      // One-shot: scroll all the way to the bottom (end of scrollSpacer = third panel fully revealed).
       const scrollTargetTop = (() => {
-        if (heroTransitionRoot instanceof HTMLElement) {
-          return heroTransitionRoot.getBoundingClientRect().top + window.scrollY + transitionScrollDistance;
+        if (scrollSpacer instanceof HTMLElement) {
+          return scrollSpacer.offsetTop + scrollSpacer.offsetHeight;
         }
 
-        if (secondPanel instanceof HTMLElement) {
-          return secondPanel.getBoundingClientRect().top + window.scrollY;
+        if (heroTransitionRoot instanceof HTMLElement) {
+          const transitionScrollDistance = window.innerWidth <= 720 ? 2500 : 3600;
+          return heroTransitionRoot.getBoundingClientRect().top + window.scrollY + transitionScrollDistance;
         }
 
         return window.innerHeight;
       })();
-      const startY = window.scrollY;
-      const distance = Math.max(scrollTargetTop - startY, 0);
-
-      if (distance < 4) {
-        return;
-      }
-
-      if (prefersReducedMotion) {
-        window.scrollTo({ top: scrollTargetTop });
-        return;
-      }
-
-      const scrollSpeedPxPerMs = 1.05;
-      const duration = Math.max(900, distance / scrollSpeedPxPerMs);
-      const startTime = performance.now();
-
-      const step = (currentTime: number) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const y = startY + distance * progress;
-
-        window.scrollTo({ top: y });
-
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
-        }
-      };
-
-      window.requestAnimationFrame(step);
+      window.scrollTo({ top: scrollTargetTop, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     });
   }
 };
