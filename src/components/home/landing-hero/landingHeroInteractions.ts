@@ -319,20 +319,50 @@ export const initLandingHeroInteractions = () => {
       const heroTransitionRoot = document.querySelector('[data-hero-transition-root]');
       const scrollSpacer = document.querySelector('[data-landing-scroll-spacer]');
 
-      // One-shot: scroll all the way to the bottom (end of scrollSpacer = third panel fully revealed).
-      const scrollTargetTop = (() => {
-        if (scrollSpacer instanceof HTMLElement) {
-          return scrollSpacer.offsetTop + scrollSpacer.offsetHeight;
-        }
-
+      // Two-stage scroll:
+      //   1. Scroll to scrollSpacer start (second panel fully visible) in ~4 s
+      //   2. Pause 1 s so the user can see the second panel
+      //   3. Scroll to scrollSpacer end (third panel fully revealed) in ~4 s
+      const stage1Target = (() => {
+        if (scrollSpacer instanceof HTMLElement) return scrollSpacer.offsetTop;
         if (heroTransitionRoot instanceof HTMLElement) {
-          const transitionScrollDistance = window.innerWidth <= 720 ? 2500 : 3600;
-          return heroTransitionRoot.getBoundingClientRect().top + window.scrollY + transitionScrollDistance;
+          const dist = window.innerWidth <= 720 ? 2500 : 3600;
+          return heroTransitionRoot.getBoundingClientRect().top + window.scrollY + dist;
         }
-
         return window.innerHeight;
       })();
-      window.scrollTo({ top: scrollTargetTop, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      const stage2Target = scrollSpacer instanceof HTMLElement
+        ? scrollSpacer.offsetTop + scrollSpacer.offsetHeight
+        : stage1Target;
+
+      if (prefersReducedMotion) {
+        window.scrollTo({ top: stage2Target });
+        return;
+      }
+
+      const DURATION = 6000;
+      const PAUSE = 1000;
+      const easeInOut = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+      const smoothScroll = (from: number, to: number, onDone: () => void) => {
+        const dist = Math.max(to - from, 0);
+        if (dist < 4) { onDone(); return; }
+        const start = performance.now();
+        const step = (now: number) => {
+          const raw = Math.min((now - start) / DURATION, 1);
+          window.scrollTo({ top: from + dist * easeInOut(raw) });
+          if (raw < 1) window.requestAnimationFrame(step);
+          else onDone();
+        };
+        window.requestAnimationFrame(step);
+      };
+
+      // Stage 1 → pause → Stage 2
+      smoothScroll(window.scrollY, stage1Target, () => {
+        setTimeout(() => {
+          smoothScroll(window.scrollY, stage2Target, () => {});
+        }, PAUSE);
+      });
     });
   }
 };

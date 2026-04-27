@@ -495,12 +495,25 @@ const initFullTransitions = ({
     });
   }
 
-  // Know More button click — scrolls to the start of scrollSpacer end
-  // (= triggers 2→3 transition, third panel slides in).
+  // Know More button click — scrolls to bottom at a fixed, unhurried pace.
   if (elements.secondPanelKnowMore) {
     elements.secondPanelKnowMore.addEventListener('click', () => {
       const target = scrollSpacer.offsetTop + scrollSpacer.offsetHeight;
-      window.scrollTo({ top: target, behavior: 'smooth' });
+      const startY = window.scrollY;
+      const distance = Math.max(target - startY, 0);
+      if (distance < 4) return;
+
+      const DURATION = 6000;
+      const startTime = performance.now();
+      const easeInOut = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+      const step = (now: number) => {
+        const raw = Math.min((now - startTime) / DURATION, 1);
+        window.scrollTo({ top: startY + distance * easeInOut(raw) });
+        if (raw < 1) window.requestAnimationFrame(step);
+      };
+
+      window.requestAnimationFrame(step);
     });
   }
 };
