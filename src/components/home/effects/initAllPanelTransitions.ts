@@ -193,11 +193,6 @@ const initFullTransitions = ({
 
   // ── 1→2 scrub timeline ────────────────────────────────────────────────────
   const createHeroTimeline = () => {
-    const transitionScrollDistance =
-      window.innerWidth <= 720
-        ? HERO_TO_INTRO_TIMING.transitionScrollDistanceMobile
-        : HERO_TO_INTRO_TIMING.transitionScrollDistanceDesktop;
-
     const heroTimeline = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
@@ -206,7 +201,7 @@ const initFullTransitions = ({
         // a parent container.
         trigger: heroTransitionRoot,
         start: 'top top',
-        end: `+=${transitionScrollDistance}`,
+        end: () => `+=${Math.round(heroTimeline.totalDuration() * window.innerHeight)}`,
         pin: true,
         pinSpacing: true,
         scrub: 0.35,
@@ -296,6 +291,13 @@ const initFullTransitions = ({
       heroTimeline,
       videoPlaybackEnd: heroPanelExitStart,
     });
+
+    // Refresh ScrollTrigger on the next tick so the dynamic end() re-evaluates
+    // after all tweens (including the video tween) have been added.
+    gsap.ticker.add(function refreshHero() {
+      ScrollTrigger.refresh();
+      gsap.ticker.remove(refreshHero);
+    });
   };
 
   // By the time this runs, loader:done has already fired, so video metadata
@@ -333,7 +335,7 @@ const initFullTransitions = ({
   const secondTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: scrollSpacer,
-      start: 'top -52%',
+      start: 'top top',
       end: () => `+=${Math.round(window.innerHeight + getPanelFakeScrollDistance(secondPanel, secondPanelInner) + thirdPanelRevealScrollExtra)}`,
       invalidateOnRefresh: true,
       scrub: 0.35,
@@ -474,7 +476,7 @@ const initFullTransitions = ({
 
     // scrollSpacer must be tall enough that the entire secondTimeline pixel range
     // [start … end] falls within the spacer's scroll extent.
-    // start fires at 'top -52%', i.e. 52 vh into the spacer.
+    // start fires at 'top top', i.e. when spacer top reaches the viewport top.
     // We add a generous 100 vh buffer so the spacer never runs out before end.
     const neededSvh = Math.ceil((totalScrollPixels / vh) * 100) + 160;
     scrollSpacer.style.height = `${neededSvh}svh`;
