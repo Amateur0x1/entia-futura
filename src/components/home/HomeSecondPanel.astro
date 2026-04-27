@@ -59,7 +59,7 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
     z-index: 1;
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(15rem, 0.95fr);
-    align-items: end;
+    align-items: start;
     gap: clamp(1.75rem, 4vw, 5rem);
     min-height: min(74svh, 760px);
   }
@@ -129,6 +129,7 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
+    align-self: end;
     padding-right: clamp(2rem, 25%, 24rem);
     pointer-events: none;
   }
