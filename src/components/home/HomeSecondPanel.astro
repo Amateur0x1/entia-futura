@@ -14,6 +14,8 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
 
 <section class={`landing-second-panel ${locale === 'en' ? 'landing-second-panel--en' : ''}`} data-second-panel>
   <canvas class="landing-second-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
+  <!-- Diagonal atmosphere veil: top-left cyan, bottom-right violet -->
+  <div class="landing-second-panel__veil" aria-hidden="true"></div>
   <div class="landing-second-panel__inner" data-second-panel-inner>
     <article class="landing-second-panel__block landing-second-panel__block--top-right">
       <p class="landing-second-panel__label">{coreQuestionLabel}</p>
@@ -194,6 +196,33 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
 
   :global(.landing-second-panel__visual-scan) {
     display: none;
+  }
+
+  /* ── Diagonal atmosphere veil: top-left cyan, bottom-right violet ── */
+  .landing-second-panel__veil {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 90% 90% at -10% -10%,
+        color-mix(in srgb, var(--color-primary) 22%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary) 7%, transparent) 50%,
+        transparent 78%
+      ),
+      radial-gradient(
+        ellipse 90% 90% at 110% 110%,
+        color-mix(in srgb, var(--color-secondary) 22%, transparent) 0%,
+        color-mix(in srgb, var(--color-secondary) 7%, transparent) 50%,
+        transparent 78%
+      );
+  }
+
+  @media (max-width: 720px) {
+    .landing-second-panel__veil {
+      display: none;
+    }
   }
 
   @keyframes landing-monolith-scan {

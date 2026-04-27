@@ -3,8 +3,6 @@ import { pickByLocale, type Locale } from '../../i18n/config';
 
 interface Props {
   locale: Locale;
-  eyebrow: string;
-  label: string;
   title: string;
   intro: string;
   modules: readonly {
@@ -15,25 +13,28 @@ interface Props {
   }[];
 }
 
-const { locale, eyebrow, label, title, intro, modules } = Astro.props;
+const { locale, title, intro, modules } = Astro.props;
 ---
 
 <section class={`landing-third-panel ${locale === 'en' ? 'landing-third-panel--en' : ''}`} data-third-panel>
   <canvas class="landing-third-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
+  <!-- Atmosphere veil: top-left cyan, bottom-right violet -->
+  <div class="landing-third-panel__veil" aria-hidden="true"></div>
   <div class="landing-third-panel__inner">
-    <header class="section-heading landing-third-panel__heading">
-      <p class="eyebrow landing-third-panel__eyebrow">{eyebrow}</p>
-      <p class="landing-third-panel__label">{label}</p>
-      <h2>{title}</h2>
-      <p>{intro}</p>
-    </header>
-    <div class="landing-third-panel__grid">
-      {modules.map((item) => (
-        <article class="field-card landing-third-panel__card">
-          <h3>{pickByLocale(locale, item.zhTitle, item.enTitle)}</h3>
-          <p>{pickByLocale(locale, item.zhBody, item.enBody)}</p>
-        </article>
-      ))}
+    <div class="landing-third-panel__content">
+      <header class="landing-third-panel__heading">
+        <h2>{title}</h2>
+        <p class="landing-third-panel__intro">{intro}</p>
+        <div class="landing-third-panel__divider" aria-hidden="true"></div>
+      </header>
+      <div class="landing-third-panel__grid">
+        {modules.map((item) => (
+          <article class="field-card landing-third-panel__card">
+            <h3>{pickByLocale(locale, item.zhTitle, item.enTitle)}</h3>
+            <p>{pickByLocale(locale, item.zhBody, item.enBody)}</p>
+          </article>
+        ))}
+      </div>
     </div>
   </div>
 </section>
@@ -43,7 +44,6 @@ const { locale, eyebrow, label, title, intro, modules } = Astro.props;
     position: fixed;
     inset: 0;
     z-index: 35;
-    padding: clamp(4rem, 10vw, 7rem) clamp(1.2rem, 4vw, 3rem) clamp(4rem, 8vw, 6rem);
     background: var(--color-background);
     color: var(--color-secondary-foreground);
     /* Initial hidden state is driven by GSAP (opacity:0, yPercent:100 via transform) */
@@ -62,56 +62,79 @@ const { locale, eyebrow, label, title, intro, modules } = Astro.props;
     opacity: 0.88;
   }
 
+  /* ── Atmosphere veil: top-left cyan, bottom-right violet ── */
+  .landing-third-panel__veil {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 90% 90% at -10% -10%,
+        color-mix(in srgb, var(--color-primary) 18%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary) 6%, transparent) 50%,
+        transparent 78%
+      ),
+      radial-gradient(
+        ellipse 90% 90% at 110% 110%,
+        color-mix(in srgb, var(--color-secondary) 18%, transparent) 0%,
+        color-mix(in srgb, var(--color-secondary) 6%, transparent) 50%,
+        transparent 78%
+      );
+  }
+
+  /* ── Inner: right half only ── */
   .landing-third-panel__inner {
     position: relative;
-    z-index: 1;
-    max-width: min(1200px, 100%);
-    margin: 0 auto;
-    display: grid;
-    gap: clamp(1.8rem, 4vw, 3rem);
+    z-index: 2;
+    width: 50%;
+    height: 100%;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.2rem, 4vw, 3rem) clamp(4rem, 8vw, 6rem) clamp(1.2rem, 4vw, 3rem);
   }
 
+  .landing-third-panel__content {
+    display: grid;
+    gap: clamp(1.4rem, 3vw, 2.2rem);
+    width: 100%;
+  }
+
+  /* ── Heading ── */
   .landing-third-panel__heading {
     display: grid;
-    gap: 0.9rem;
-    max-width: 76ch;
-  }
-
-  .landing-third-panel__eyebrow {
-    margin: 0;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 66%, transparent);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-size: clamp(0.68rem, 0.4vw + 0.52rem, 0.82rem);
-  }
-
-  .landing-third-panel__label {
-    margin: 0;
-    font-size: clamp(0.68rem, 0.4vw + 0.5rem, 0.8rem);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 74%, transparent);
+    gap: 0;
   }
 
   .landing-third-panel__heading h2 {
-    margin: 0;
+    margin: 0 0 clamp(0.9rem, 1.4vw, 1.2rem);
     font-size: clamp(1.6rem, 2.4vw + 0.4rem, 4.2rem);
     letter-spacing: -0.03em;
     line-height: 1.06;
     font-weight: 520;
   }
 
-  .landing-third-panel__heading > p:last-child {
+  .landing-third-panel__intro {
     margin: 0;
-    font-size: clamp(0.92rem, 0.6vw + 0.56rem, 1.24rem);
-    line-height: 1.8;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 82%, transparent);
+    font-size: clamp(0.92rem, 0.6vw + 0.56rem, 1.2rem);
+    line-height: 1.82;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 78%, transparent);
   }
 
+  .landing-third-panel__divider {
+    width: min(10rem, 28vw);
+    height: 1px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    background: var(--color-border-inverse-strong);
+  }
+
+  /* ── 2×2 card grid ── */
   .landing-third-panel__grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(0.9rem, 2vw, 1.2rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.7rem, 1.2vw, 1rem);
   }
 
   .landing-third-panel__card {
@@ -120,14 +143,15 @@ const { locale, eyebrow, label, title, intro, modules } = Astro.props;
     background: color-mix(in srgb, #0a111d 86%, transparent);
     backdrop-filter: blur(3px);
     border-radius: 14px;
-    padding: clamp(1rem, 1.6vw, 1.3rem);
+    padding: clamp(0.9rem, 1.4vw, 1.2rem);
     display: grid;
-    gap: 0.7rem;
+    gap: 0.6rem;
+    align-content: start;
   }
 
   .landing-third-panel__card h3 {
     margin: 0;
-    font-size: clamp(1rem, 1.1vw + 0.3rem, 1.48rem);
+    font-size: clamp(0.9rem, 0.9vw + 0.3rem, 1.28rem);
     line-height: 1.25;
     font-weight: 500;
   }
@@ -135,46 +159,53 @@ const { locale, eyebrow, label, title, intro, modules } = Astro.props;
   .landing-third-panel__card p {
     margin: 0;
     color: color-mix(in srgb, var(--color-secondary-foreground) 80%, transparent);
-    line-height: 1.72;
-    font-size: clamp(0.82rem, 0.5vw + 0.56rem, 1rem);
+    line-height: 1.7;
+    font-size: clamp(0.78rem, 0.4vw + 0.52rem, 0.96rem);
   }
 
+  /* ── Tablet: widen content to 60% ── */
   @media (max-width: 1024px) {
+    .landing-third-panel__inner {
+      width: 60%;
+    }
+
+    .landing-third-panel__veil {
+      inset: 0 60% 0 0;
+    }
+
     .landing-third-panel__heading h2 {
       font-size: clamp(1.4rem, 2.8vw + 0.2rem, 2.8rem);
     }
 
-    .landing-third-panel__heading > p:last-child {
-      font-size: clamp(0.88rem, 1vw + 0.48rem, 1.12rem);
-    }
-
-    .landing-third-panel__grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(0.7rem, 1.4vw, 1rem);
-    }
-
     .landing-third-panel__card h3 {
-      font-size: clamp(0.9rem, 1.2vw + 0.2rem, 1.2rem);
+      font-size: clamp(0.88rem, 1.2vw + 0.2rem, 1.1rem);
     }
 
     .landing-third-panel__card p {
-      font-size: clamp(0.78rem, 0.8vw + 0.4rem, 0.96rem);
+      font-size: clamp(0.76rem, 0.8vw + 0.38rem, 0.92rem);
     }
   }
 
+  /* ── Mobile: full width, no veil ── */
   @media (max-width: 720px) {
-    .landing-third-panel {
+    .landing-third-panel__veil {
+      display: none;
+    }
+
+    .landing-third-panel__inner {
+      width: 100%;
       padding-top: max(4rem, calc(env(safe-area-inset-top) + 2.8rem));
       padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
         max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
       padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
+      align-items: start;
     }
 
     .landing-third-panel__heading h2 {
       font-size: clamp(1.3rem, 5.5vw, 2rem);
     }
 
-    .landing-third-panel__heading > p:last-child {
+    .landing-third-panel__intro {
       font-size: clamp(0.84rem, 3.2vw, 1rem);
     }
 
