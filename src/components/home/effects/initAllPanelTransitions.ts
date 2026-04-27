@@ -278,6 +278,10 @@ const initFullTransitions = ({
   const panelPushStart = fakeScrollDuration;
   const panelPushDuration = 1.6;
 
+  // Tracks a pending delayed-call that resets secondPanel after onLeaveBack.
+  // Cancelled if the user re-enters the 2→3 zone before the delay fires.
+  let secondPanelResetCall: gsap.core.Tween | null = null;
+
   const secondTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: scrollSpacer,
@@ -286,6 +290,9 @@ const initFullTransitions = ({
       scrub: 0.6,
       invalidateOnRefresh: true,
       onEnter: () => {
+        // Cancel any pending post-LeaveBack reset so it doesn't fire mid-transition.
+        secondPanelResetCall?.kill();
+        secondPanelResetCall = null;
         // Reset panels to their pre-transition state so the scrub timeline starts
         // from a clean slate. Do NOT touch backplate/shade here — their opacity
         // is driven entirely by the scrub timeline to avoid any jump-frame flash.
@@ -306,58 +313,64 @@ const initFullTransitions = ({
       },
       onEnterBack: () => {
         // Re-entering the 2→3 zone from below (scrolling back up from 3rd screen).
-        // thirdPanel slides back down — restore it to its incoming position.
-        // Do NOT touch secondPanel here: scrub already has it at progress=1 state
-        // (scaled down, shade fading). Resetting autoAlpha would cause a 1-frame
-        // flash of secondPanel at full size before scrub can re-apply transforms.
+        // Cancel any pending post-LeaveBack reset — scrub is now back in control.
+        secondPanelResetCall?.kill();
+        secondPanelResetCall = null;
+        // Restore z-index and pointer-events so the scrub timeline can drive the panels.
+        // Do NOT touch opacity/autoAlpha/scale/y — scrub owns those values entirely.
+        // Forcing any visual property here causes a 1-frame pop before scrub catches up,
+        // which is exactly the flash seen when scrolling back quickly from screen 3.
         gsap.set(thirdPanel, {
           visibility: 'visible',
           pointerEvents: 'none',
           zIndex: 38,
         });
-        // Restore secondPanel's z-ordering and pointer events so scrub can drive it,
-        // but do NOT override opacity/scale/y — scrub owns those values.
         gsap.set(secondPanel, { visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
       },
       onLeave: () => {
         // Transition complete: thirdPanel is now the active screen.
-        // Drop secondPanel below thirdPanel so it can't bleed through if opacity briefly non-zero.
+        // Only update pointer-events and z-index — do NOT touch autoAlpha/opacity
+        // on secondPanel or secondShade. The scrub timeline drives those values; forcing
+        // them here causes a 1-frame flash when the user quickly scrolls back and
+        // onEnterBack fires before scrub can re-apply its own values.
         gsap.set(thirdPanel, { pointerEvents: 'auto', zIndex: 36 });
-        gsap.set(secondPanel, {
-          autoAlpha: 0,
-          pointerEvents: 'none',
-          zIndex: 30,
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
-        });
-          gsap.set(secondShade, { opacity: 0 });
+        gsap.set(secondPanel, { pointerEvents: 'none', zIndex: 30 });
       },
       onLeaveBack: () => {
         // Scrolled back above the 2→3 zone: secondPanel is active, thirdPanel goes back below.
+        // thirdPanel is safe to reset immediately — it's the incoming panel (not driven by scrub
+        // at this point, scrub was reversing it back to yPercent:100).
         gsap.set(thirdPanel, {
           opacity: 0,
           visibility: 'visible',
           pointerEvents: 'none',
           yPercent: 100,
           y: 0,
-          zIndex: 30,   // below secondPanel
+          zIndex: 30,
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
         });
-        gsap.set(secondPanel, {
-          autoAlpha: 1,
-          visibility: 'visible',
-          pointerEvents: 'auto',
-          scale: 1,
-          y: 0,
-          yPercent: 0,
-          zIndex: 36,   // active layer
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
-          borderBottomLeftRadius: 0,
-          borderBottomRightRadius: 0,
-        });
+        // secondPanel is the outgoing panel being driven by scrub (scrub: 0.6 lag).
+        // Immediately overriding scale/y here causes a 1-frame snap before scrub finishes
+        // easing back to progress=0. Defer the full reset until scrub has settled.
+        gsap.set(secondPanel, { pointerEvents: 'auto', zIndex: 36 });
         gsap.set(secondShade, { opacity: 0 });
+        // After the scrub easing window (scrub: 0.6s + small buffer), hard-reset secondPanel
+        // to its fully-visible resting state so it's clean for the next forward pass.
+        secondPanelResetCall = gsap.delayedCall(0.75, () => {
+          gsap.set(secondPanel, {
+            autoAlpha: 1,
+            visibility: 'visible',
+            scale: 1,
+            y: 0,
+            yPercent: 0,
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+          });
+          gsap.set(secondShade, { opacity: 0 });
+        });
       },
     },
   });
