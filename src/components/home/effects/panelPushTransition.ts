@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 
-export const PANEL_TRANSITION_RADIUS = 'clamp(18px, 2.2vw, 32px)';
+export const PANEL_TRANSITION_RADIUS = 'clamp(56px, 6.4vw, 104px)';
 
 export const getPanelFakeScrollDistance = (panel: HTMLElement, panelInner: HTMLElement | null) => {
   if (!panelInner) {

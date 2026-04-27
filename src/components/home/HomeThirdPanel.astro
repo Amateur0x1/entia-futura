@@ -49,7 +49,7 @@ const { locale, title, intro, modules } = Astro.props;
     /* Initial hidden state is driven by GSAP (opacity:0, yPercent:100 via transform) */
     opacity: 0;
     pointer-events: none;
-    overflow: clip;
+    overflow: hidden;
   }
 
   .landing-third-panel__nebula {
@@ -109,17 +109,26 @@ const { locale, title, intro, modules } = Astro.props;
 
   .landing-third-panel__heading h2 {
     margin: 0 0 clamp(0.9rem, 1.4vw, 1.2rem);
-    font-size: clamp(1.6rem, 2.4vw + 0.4rem, 4.2rem);
-    letter-spacing: -0.03em;
-    line-height: 1.06;
-    font-weight: 520;
+    font-size: clamp(1.9rem, 2.6vw + 0.5rem, 4.8rem);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    font-weight: 500;
   }
 
   .landing-third-panel__intro {
     margin: 0;
-    font-size: clamp(0.92rem, 0.6vw + 0.56rem, 1.2rem);
     line-height: 1.82;
     color: color-mix(in srgb, var(--color-secondary-foreground) 78%, transparent);
+  }
+
+  /* EN intro text */
+  .landing-third-panel--en .landing-third-panel__intro {
+    font-size: clamp(1.4rem, 0.8vw + 1.0rem, 1.76rem);
+  }
+
+  /* Chinese intro text — noticeably larger */
+  .landing-third-panel:not(.landing-third-panel--en) .landing-third-panel__intro {
+    font-size: clamp(1.5rem, 1.2vw + 0.9rem, 2.2rem);
   }
 
   .landing-third-panel__divider {
@@ -151,7 +160,7 @@ const { locale, title, intro, modules } = Astro.props;
 
   .landing-third-panel__card h3 {
     margin: 0;
-    font-size: clamp(0.9rem, 0.9vw + 0.3rem, 1.28rem);
+    font-size: clamp(1.04rem, 0.7vw + 0.44rem, 1.44rem);
     line-height: 1.25;
     font-weight: 500;
   }
@@ -160,29 +169,28 @@ const { locale, title, intro, modules } = Astro.props;
     margin: 0;
     color: color-mix(in srgb, var(--color-secondary-foreground) 80%, transparent);
     line-height: 1.7;
-    font-size: clamp(0.78rem, 0.4vw + 0.52rem, 0.96rem);
+    font-size: clamp(0.9rem, 0.35vw + 0.62rem, 1.1rem);
   }
 
-  /* ── Tablet: widen content to 60% ── */
+  /* ── Tablet: full width, centered content ── */
   @media (max-width: 1024px) {
     .landing-third-panel__inner {
-      width: 60%;
-    }
-
-    .landing-third-panel__veil {
-      inset: 0 60% 0 0;
+      width: 100%;
+      margin-left: 0;
+      max-width: 720px;
+      margin-inline: auto;
     }
 
     .landing-third-panel__heading h2 {
-      font-size: clamp(1.4rem, 2.8vw + 0.2rem, 2.8rem);
+      font-size: clamp(2.1rem, 2.8vw + 0.5rem, 3.8rem);
     }
 
     .landing-third-panel__card h3 {
-      font-size: clamp(0.88rem, 1.2vw + 0.2rem, 1.1rem);
+      font-size: clamp(1rem, 0.9vw + 0.4rem, 1.26rem);
     }
 
     .landing-third-panel__card p {
-      font-size: clamp(0.76rem, 0.8vw + 0.38rem, 0.92rem);
+      font-size: clamp(0.9rem, 0.46vw + 0.57rem, 1.05rem);
     }
   }
 
@@ -202,11 +210,15 @@ const { locale, title, intro, modules } = Astro.props;
     }
 
     .landing-third-panel__heading h2 {
-      font-size: clamp(1.3rem, 5.5vw, 2rem);
+      font-size: clamp(1.9rem, 5.6vw, 2.8rem);
     }
 
-    .landing-third-panel__intro {
-      font-size: clamp(0.84rem, 3.2vw, 1rem);
+    .landing-third-panel--en .landing-third-panel__intro {
+      font-size: clamp(1.32rem, 5vw, 1.56rem);
+    }
+
+    .landing-third-panel:not(.landing-third-panel--en) .landing-third-panel__intro {
+      font-size: clamp(1.04rem, 3.2vw, 1.24rem);
     }
 
     .landing-third-panel__grid {

@@ -4,6 +4,7 @@ import { addHeroMediaDriftSegment } from './addHeroMediaDriftSegment';
 import type { HomeHeroElements } from './getHomeHeroElements';
 import { addHeroVideoTransitionSegment } from './heroVideoEffects';
 import {
+  PANEL_TRANSITION_RADIUS,
   addPanelPushTransitionSegment,
   createTransitionShade,
   getPanelFakeScrollDistance,
@@ -191,6 +192,13 @@ const initFullTransitions = ({
         scrub: 0.35,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        onLeaveBack: () => {
+          // Scrub fully reversed past start: reset frame radius so it's clean
+          // if the user scrolls forward again.
+          if (heroTransitionFrame) {
+            gsap.set(heroTransitionFrame, { borderTopLeftRadius: 0, borderTopRightRadius: 0 });
+          }
+        },
       },
     });
 
@@ -226,6 +234,20 @@ const initFullTransitions = ({
       startAt: heroPanelExitStart,
       timeline: heroTimeline,
     });
+
+    // heroTransitionFrame is the actual full-screen visual container (100vh, overflow:hidden).
+    // Drive its border-radius separately so the rounded-corner clip is visible.
+    // No .set() at the end — scrub reversal would hit it and flash the corners away.
+    // immediateRender:false prevents the "from" state from snapping in on reverse scrub.
+    if (heroTransitionFrame) {
+      gsap.set(heroTransitionFrame, { borderTopLeftRadius: 0, borderTopRightRadius: 0 });
+      heroTimeline.fromTo(
+        heroTransitionFrame,
+        { immediateRender: false, borderTopLeftRadius: 0, borderTopRightRadius: 0 },
+        { borderTopLeftRadius: PANEL_TRANSITION_RADIUS, borderTopRightRadius: PANEL_TRANSITION_RADIUS, duration: heroPanelPushDuration, ease: 'none' },
+        heroPanelExitStart,
+      );
+    }
 
     // No need to manually hide heroTransitionRoot — GSAP pin unpin handles it.
 
@@ -296,6 +318,8 @@ const initFullTransitions = ({
         // Reset panels to their pre-transition state so the scrub timeline starts
         // from a clean slate. Do NOT touch backplate/shade here — their opacity
         // is driven entirely by the scrub timeline to avoid any jump-frame flash.
+        // Do NOT reset borderRadius here — the scrub timeline sets it on thirdPanel
+        // as it slides in; overriding here would kill the rounded-corner effect.
         gsap.set(thirdPanel, {
           opacity: 0,
           visibility: 'visible',
@@ -304,10 +328,6 @@ const initFullTransitions = ({
           y: 0,
           scale: 1,
           zIndex: 38,
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
-          borderBottomLeftRadius: 0,
-          borderBottomRightRadius: 0,
         });
         gsap.set(secondPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
       },

@@ -37,18 +37,17 @@ export const setupSecondPanelReveal = ({
     return;
   }
 
-  // Store original text content and clear elements for typewriter reveal.
-  // The heading (core question) is kept as-is — it stays visible at all times
-  // and fades in together with the panel rather than being typed out.
-  const labelText = secondPanelLabel instanceof HTMLElement ? secondPanelLabel.textContent ?? '' : '';
+  // Store original paragraph texts and clear them for typewriter reveal.
+  // Label and heading both fade in — no typewriter.
   const paragraphTexts = secondPanelParagraphs.map((p) => p.textContent ?? '');
 
-  if (secondPanelLabel instanceof HTMLElement) {
-    secondPanelLabel.textContent = '';
-  }
   secondPanelParagraphs.forEach((p) => { p.textContent = ''; });
 
-  // Hide body container until typewriter starts
+  // Hide label, heading, divider, body until reveal
+  if (secondPanelLabel instanceof HTMLElement) {
+    gsap.set(secondPanelLabel, { autoAlpha: 0 });
+  }
+  gsap.set(secondPanelHeading, { autoAlpha: 0 });
   gsap.set(secondPanelBody, { autoAlpha: 0 });
   gsap.set(secondPanelDivider, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
 
@@ -63,43 +62,40 @@ export const setupSecondPanelReveal = ({
       },
     });
 
-  // Label typewriter
-  if (secondPanelLabel instanceof HTMLElement && labelText) {
-    tl.to(
+  // Label fade-in (same style as heading)
+  if (secondPanelLabel instanceof HTMLElement) {
+    tl.fromTo(
       secondPanelLabel,
-      {
-        duration: labelText.length * 0.028,
-        text: { value: labelText, delimiter: '' },
-        ease: 'none',
-      },
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: 0.32, ease: 'power2.out' },
       startAt,
     );
   }
 
-  // Heading: always visible, no typewriter — just a quick fade in.
+  // Heading fade-in
   tl.fromTo(
     secondPanelHeading,
     { autoAlpha: 0 },
     { autoAlpha: 1, duration: 0.32, ease: 'power2.out' },
-    startAt + 0.08,
+    startAt + 0.1,
   );
 
   // Divider reveal
   tl.to(
     secondPanelDivider,
     { autoAlpha: 1, scaleX: 1, duration: 0.5, ease: 'power2.out' },
-    startAt + 0.36,
+    startAt + 0.28,
   );
 
   // Show body container
   tl.to(
     secondPanelBody,
     { autoAlpha: 1, duration: 0.1, ease: 'none' },
-    startAt + 0.52,
+    startAt + 0.44,
   );
 
   // Paragraphs typewriter — staggered one after another
-  let paragraphOffset = startAt + 0.56;
+  let paragraphOffset = startAt + 0.48;
   secondPanelParagraphs.forEach((p, i) => {
     const text = paragraphTexts[i] ?? '';
     if (!text) return;

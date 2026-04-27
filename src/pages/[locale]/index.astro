@@ -24,38 +24,43 @@ const coreQuestionLabel = pickByLocale(locale, '核心问题：', 'Core Question
 const coreQuestion = pickByLocale(locale, '未来我们将如何存在？', 'How shall we exist in the future?');
 const instituteIntro = pickByLocale(
   locale,
-  '未来人研究所是一个围绕“未来我们将如何存在？”这一核心问题展开工作的独立研究机构。我们以高等研究为基础，同时强调研究向现实问题、合作机制、未来项目与社会实验的持续转化。\n我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。',
-  'Entia Futura Institut is an independent institute organized around the question: “How shall we exist in the future?” Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, future ventures, and social experimentation.\nWe are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life.',
+  '未来人研究所是一个围绕"未来我们将如何存在？"这一核心问题展开工作的独立研究机构。我们以高等研究为基础，同时强调研究向现实问题、合作机制、未来项目与社会实验的持续转化。',
+  'Entia Futura Institut is an independent institute organized around the question: "How shall we exist in the future?" Grounded in advanced research, we are equally committed to the translation of inquiry into real-world problems, collaborative forms, future ventures, and social experimentation.',
 );
-const researchPracticeEyebrow = pickByLocale(locale, '6. 研究转化', '6. RESEARCH IN PRACTICE');
-const researchPracticeLabel = pickByLocale(locale, 'RESEARCH IN PRACTICE', 'RESEARCH IN PRACTICE');
-const researchPracticeTitle = pickByLocale(locale, '研究转化', 'Research in Practice');
-const researchPracticeIntro = pickByLocale(
+const whatWeDoTitle = pickByLocale(locale, '我们做什么', 'What We Do');
+const whatWeDoIntro = pickByLocale(
   locale,
-  '未来人研究所相信，研究不应停留在理论层面，也不应被压缩成单纯的策略包装。我们强调研究转化：让高等研究进入现实问题、组织实践、品牌叙事、空间场景与协作机制之中。',
-  'Entia Futura Institut believes that research should not remain at the level of theory alone, nor be reduced to strategic packaging. We emphasize research in practice: bringing advanced inquiry into real-world problems, organizational practice, narrative work, spatial settings, and collaborative mechanisms.',
+  '我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。',
+  'We are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life.',
 );
-const researchPracticeModules = [
+const whatWeDoModules = [
   {
-    zhTitle: '应用研究',
-    enTitle: 'Applied Research',
-    zhBody: '围绕企业、品牌、地方或空间的现实问题开展专题调研、案例分析、访谈、观察与研究输出。',
+    zhTitle: '研究',
+    enTitle: 'Research',
+    zhBody: '围绕未来社会的重要议题展开长期研究、写作、访谈、观察、案例档案与公共讨论。',
     enBody:
-      'Thematic inquiry, case analysis, interviews, observation, and public outputs developed around real-world questions faced by enterprises, brands, localities, and spaces.',
+      'Long-term inquiry, writing, interviews, observation, case archives, and public discussion around critical questions of future society.',
   },
   {
-    zhTitle: '策略与叙事支持',
-    enTitle: 'Strategy and Narrative Support',
-    zhBody: '将研究成果转化为品牌叙事、组织语言、公共表达与未来议题框架。',
+    zhTitle: '项目机制',
+    enTitle: 'Programs',
+    zhBody: '通过研究项目、公共活动、协作项目、驻留机制、社群结构与实验项目组织工作。',
     enBody:
-      'Translating research into brand narratives, organizational language, public expression, and frameworks for future-oriented questions.',
+      'Work organized through research programs, public programs, collaborative projects, residencies, community structures, and experimental initiatives.',
   },
   {
-    zhTitle: '组织与社群设计',
-    enTitle: 'Organizational and Community Design',
-    zhBody: '协助团队设计长期协作结构、学习路径与社群机制，让研究成为可持续的行动系统。',
+    zhTitle: '研究转化',
+    enTitle: 'Research in Practice',
+    zhBody: '让高等研究进入现实问题、组织实践、品牌叙事、空间场景与协作机制之中。',
     enBody:
-      'Designing long-term collaboration structures, learning pathways, and community mechanisms so research can evolve into sustained action.',
+      'Bringing advanced inquiry into real-world questions, organizational practice, narrative work, spaces, and collaborative structures.',
+  },
+  {
+    zhTitle: '未来项目',
+    enTitle: 'Future Ventures',
+    zhBody: '从研究中发展项目、机制、原型与新的组织形式，测试未来社会的可能结构。',
+    enBody:
+      'Developing projects, mechanisms, prototypes, and new institutional forms out of inquiry to test possible futures.',
   },
 ] as const;
 ---
@@ -73,11 +78,9 @@ const researchPracticeModules = [
     <div class="landing-scroll-spacer" data-landing-scroll-spacer aria-hidden="true"></div>
     <HomeThirdPanel
       locale={locale}
-      eyebrow={researchPracticeEyebrow}
-      label={researchPracticeLabel}
-      title={researchPracticeTitle}
-      intro={researchPracticeIntro}
-      modules={researchPracticeModules}
+      title={whatWeDoTitle}
+      intro={whatWeDoIntro}
+      modules={whatWeDoModules}
     />
   </main>
   <section class="landing-system" data-hero-stage>
