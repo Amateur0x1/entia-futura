@@ -121,11 +121,11 @@
 
       setTimeout(() => {
         loader.classList.add('is-done');
-        document.body.style.overflow = '';
         document.querySelectorAll('[data-hero-stage]').forEach((el) => {
           el.classList.add('is-revealed');
         });
-        // Signal that loading is fully done — effects init listens for this
+        // Signal that loading is fully done — effects init listens for this.
+        // Scroll is unlocked by the effects init after ScrollTrigger is ready.
         document.dispatchEvent(new CustomEvent('loader:done'));
       }, 320);
     };

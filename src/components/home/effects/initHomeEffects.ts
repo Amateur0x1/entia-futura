@@ -64,17 +64,14 @@ export const initHomeEffects = () => {
     prefersReducedMotion,
   });
 
-  // initHomeEffects is called after loader:done, so window.load has already fired.
-  // We must refresh ScrollTrigger BEFORE creating scroll timelines so that all
-  // layout measurements (heights, pin distances) are correct from the start.
-  // The loader fade-out takes 0.72s + 320ms = ~1040ms total; wait until it's
-  // fully gone before measuring and creating timelines.
-  setTimeout(() => {
-    ScrollTrigger.refresh();
-    initHomeScrollEffects({
-      homeHeroElements,
-      prefersReducedMotion,
-      splitTextAvailable: false,
-    });
-  }, 1100);
+  // initHomeEffects is called after loader:done. Refresh ScrollTrigger and
+  // create all scroll timelines immediately — layout is stable at this point
+  // since the loader has been covering the page. Unlock scroll after pin is set.
+  ScrollTrigger.refresh();
+  initHomeScrollEffects({
+    homeHeroElements,
+    prefersReducedMotion,
+    splitTextAvailable: false,
+  });
+  document.body.style.overflow = '';
 };
