@@ -21,8 +21,9 @@ const activeLocale = locale ?? getLocaleFromPath(currentPath);
 const localizedPath = activeLocale ? toLocalePath(activeLocale, currentPath) : currentPath;
 const htmlLang = activeLocale === 'en' ? 'en' : 'zh-CN';
 const navLinks = [
-  { href: '/', zh: '首页', en: 'Home' },
+  { href: '/collaboration', zh: '合作', en: 'Collaboration' },
   { href: '/contact', zh: '联系', en: 'Contact' },
+  { href: '/join', zh: '加入', en: 'Join' },
 ];
 ---
 

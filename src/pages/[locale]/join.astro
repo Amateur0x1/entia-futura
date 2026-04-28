@@ -1,0 +1,284 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { siteMeta } from '../../content/site';
+import { isLocale, pickByLocale } from '../../i18n/config';
+
+const { locale } = Astro.params;
+
+if (!isLocale(locale)) {
+  throw new Error(`Unsupported locale: ${locale}`);
+}
+
+const pageTitle       = pickByLocale(locale, '加入我们', 'Join Us');
+const pageDescription = pickByLocale(
+  locale,
+  '了解如何参与未来人研究所的活动、社群与研究项目。',
+  "Learn how to participate in Entia Futura Institut's events, community, and research projects.",
+);
+
+// ── Module 1 ──────────────────────────────────────────────────────────────
+const mod1Title = pickByLocale(locale, '我们想连接的人', 'Who We Hope to Connect With');
+const mod1Items = locale === 'zh'
+  ? [
+      '对未来问题有真实兴趣的人',
+      '不满足于既有答案、愿意继续追问的人',
+      '希望连接思想与现实、研究与行动的人',
+      '同时关心技术、社会、文化、地方、组织与生活形式的人',
+      '不愿把自己缩减为单一身份的人',
+      '愿意长期参与，而不是只围观热闹的人',
+    ]
+  : [
+      'people genuinely concerned with questions about the future',
+      'people unwilling to settle for ready-made answers',
+      'people seeking to connect thought and reality, inquiry and action',
+      'people who care simultaneously about technology, society, culture, locality, organization, and forms of life',
+      'people who do not wish to reduce themselves to a single identity',
+      'people willing to participate over time rather than merely observe',
+    ];
+
+// ── Module 2 ──────────────────────────────────────────────────────────────
+const mod2Title = pickByLocale(locale, '参与方式', 'Ways to Participate');
+const mod2Items = locale === 'zh'
+  ? [
+      '参与活动',
+      '加入社群',
+      '共创项目',
+      '发起合作',
+      '提交提案',
+      '成为访问者或驻留者',
+    ]
+  : [
+      'join events',
+      'enter the community',
+      'co-create projects',
+      'initiate collaboration',
+      'submit proposals',
+      'become a visitor or resident',
+    ];
+
+// ── Module 3 ──────────────────────────────────────────────────────────────
+const mod3Title = pickByLocale(locale, '我们重视什么', 'What We Value');
+const mod3Items = locale === 'zh'
+  ? [
+      '认真讨论，而不只是寻求曝光',
+      '长期积累，而不只期待即时回报',
+      '共同承担问题，而不只是消费结论',
+      '在不确定中摸索，而不只是等待现成答案',
+    ]
+  : [
+      'serious discussion rather than visibility-seeking',
+      'long-term building rather than immediate return',
+      'shared responsibility for questions rather than passive consumption',
+      'exploration of uncertainty rather than waiting for ready-made answers',
+    ];
+---
+
+<Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale}>
+  <main>
+
+    <!-- Page heading -->
+    <section class="section-card join-hero">
+      <div class="section-heading">
+        <p class="eyebrow">JOIN US</p>
+        <h1>{pageTitle}</h1>
+      </div>
+    </section>
+
+    <!-- Three modules -->
+    <div class="join-modules">
+
+      <!-- Module 1 -->
+      <section class="join-module">
+        <div class="join-module__header">
+          <span class="join-module__index">01</span>
+          <h2>{mod1Title}</h2>
+        </div>
+        <ul class="join-module__list">
+          {mod1Items.map((item) => <li>{item}</li>)}
+        </ul>
+      </section>
+
+      <!-- Module 2 -->
+      <section class="join-module">
+        <div class="join-module__header">
+          <span class="join-module__index">02</span>
+          <h2>{mod2Title}</h2>
+        </div>
+        <ul class="join-module__list join-module__list--grid">
+          {mod2Items.map((item) => <li>{item}</li>)}
+        </ul>
+      </section>
+
+      <!-- Module 3 -->
+      <section class="join-module">
+        <div class="join-module__header">
+          <span class="join-module__index">03</span>
+          <h2>{mod3Title}</h2>
+        </div>
+        <ul class="join-module__list">
+          {mod3Items.map((item) => <li>{item}</li>)}
+        </ul>
+      </section>
+
+    </div>
+
+    <!-- CTA -->
+    <section class="section-card join-cta">
+      <p class="join-cta__email">
+        <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
+      </p>
+      <div class="cta-row">
+        <a class="button primary" href={`mailto:${siteMeta.email}`}>
+          {pickByLocale(locale, '写信联系我们', 'Write to Us')}
+        </a>
+      </div>
+    </section>
+
+  </main>
+</Layout>
+
+<style>
+  /* ── Hero ── */
+  .join-hero {
+    padding-bottom: 0;
+  }
+
+  .join-hero h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 500;
+  }
+
+  /* ── Modules wrapper ── */
+  .join-modules {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 3rem;
+  }
+
+  /* ── Single module ── */
+  .join-module {
+    padding: 2.8rem 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .join-module:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .join-module__header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .join-module__index {
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.7rem, 0.55vw + 0.52rem, 0.88rem);
+    letter-spacing: 0.18em;
+    color: var(--color-primary);
+    opacity: 0.75;
+    flex-shrink: 0;
+    line-height: 1;
+    padding-top: 0.18em;
+  }
+
+  .join-module h2 {
+    margin: 0;
+    font-size: clamp(1.3rem, 2vw + 0.5rem, 2rem);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  /* ── List ── */
+  .join-module__list {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .join-module__list li {
+    position: relative;
+    padding: 0.88rem 0 0.88rem 1.6rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+    font-size: clamp(0.95rem, 0.6vw + 0.76rem, 1.12rem);
+    line-height: 1.7;
+    color: var(--color-text-body);
+  }
+
+  .join-module__list li:last-child {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  }
+
+  /* dot indicator */
+  .join-module__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    opacity: 0.7;
+  }
+
+  /* Module 2 — 2-column grid on wider screens */
+  .join-module__list--grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+  }
+
+  .join-module__list--grid li {
+    /* keep left border between columns */
+  }
+
+  .join-module__list--grid li:nth-child(even) {
+    border-left: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+    padding-left: calc(1.6rem + 1px);
+  }
+
+  /* ── CTA ── */
+  .join-cta {
+    padding-top: 2.8rem;
+  }
+
+  .join-cta__email {
+    margin: 0 0 1.2rem;
+    font-size: clamp(0.88rem, 0.5vw + 0.72rem, 1rem);
+    color: var(--color-text-muted);
+  }
+
+  .join-cta__email a {
+    color: var(--color-primary);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+
+  .join-cta__email a:hover {
+    text-decoration: underline;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .join-module__list--grid {
+      grid-template-columns: 1fr;
+    }
+
+    .join-module__list--grid li:nth-child(even) {
+      border-left: none;
+      padding-left: 1.6rem;
+    }
+
+    .join-module h2 {
+      font-size: clamp(1.1rem, 4vw + 0.3rem, 1.5rem);
+    }
+  }
+</style>

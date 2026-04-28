@@ -22,17 +22,16 @@ const pageDescription = pickByLocale(
     <section class="section-card contact-card">
       <div class="section-heading">
         <p class="eyebrow">{pickByLocale(locale, '联系', 'Contact')}</p>
-        <h1>{pickByLocale(locale, '带着问题写信给我们。', 'Write to Us with the Question.')}</h1>
+        <h1>{pickByLocale(locale, '联系我们', 'Contact')}</h1>
       </div>
       <p>
         {pickByLocale(
           locale,
-          '告诉我们你是谁、你正在面对什么问题，以及你希望如何展开合作。',
-          'Tell us who you are, what question you are facing, and how you imagine the collaboration can begin.',
+          '如果你希望围绕某个问题、合作、项目、提案或计划与未来人研究所建立联系，欢迎向我们写信。',
+          'If you would like to connect with Entia Futura Institut around a question, collaboration, project, proposal, or program, we welcome you to write to us.',
         )}
       </p>
       <p class="email-row">
-        Email:
         <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
       </p>
       <div class="cta-row">

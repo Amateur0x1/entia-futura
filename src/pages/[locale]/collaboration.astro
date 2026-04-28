@@ -1,0 +1,296 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { siteMeta } from '../../content/site';
+import { isLocale, pickByLocale } from '../../i18n/config';
+
+const { locale } = Astro.params;
+
+if (!isLocale(locale)) {
+  throw new Error(`Unsupported locale: ${locale}`);
+}
+
+const pageTitle       = pickByLocale(locale, '合作方式', 'Collaboration');
+const pageDescription = pickByLocale(
+  locale,
+  '了解未来人研究所的合作对象、合作形式与合作方法。',
+  "Learn about Entia Futura Institut's collaborative partners, forms of collaboration, and working approach.",
+);
+
+// ── Module 1 ──────────────────────────────────────────────────────────────
+const mod1Title = pickByLocale(locale, '我们合作的对象', 'Who We Work With');
+const mod1Items = locale === 'zh'
+  ? [
+      '面对组织转型、品牌更新、青年连接或技术变化问题的企业',
+      '希望建立长期叙事与公共性的品牌',
+      '寻找新机制与新表达的地方项目与区域平台',
+      '希望拓展公共性与社群能力的书店与文化空间',
+      '对未来学习、未来组织和未来生活感兴趣的机构与社群组织',
+    ]
+  : [
+      'enterprises facing questions of transformation, branding, youth engagement, or technological change',
+      'brands seeking long-term narratives and public relevance',
+      'local initiatives and regional platforms in search of new mechanisms and forms of expression',
+      'bookstores and cultural spaces seeking to deepen their public role and community capacity',
+      'institutions and communities concerned with future learning, future organization, and future life',
+    ];
+
+// ── Module 2 ──────────────────────────────────────────────────────────────
+const mod2Title = pickByLocale(locale, '合作形式', 'Forms of Collaboration');
+const mod2Items = locale === 'zh'
+  ? [
+      '联合研究',
+      '内容共创',
+      '闭门讨论与工作坊',
+      '品牌与叙事合作',
+      '空间与地方合作',
+      '青年计划与成员计划',
+      '实验性合作',
+    ]
+  : [
+      'joint research',
+      'co-created content',
+      'closed discussions and workshops',
+      'brand and narrative collaboration',
+      'spatial and place-based collaboration',
+      'youth and membership programs',
+      'experimental collaborations',
+    ];
+
+// ── Module 3 ──────────────────────────────────────────────────────────────
+const mod3Title = pickByLocale(locale, '我们的合作方法', 'How We Work');
+const mod3Items = locale === 'zh'
+  ? [
+      '有明确问题，而不是模糊需求',
+      '有长期视角，而不只追逐短期热度',
+      '有现实场景，而不只是概念包装',
+      '有共同建构的意愿，而不是单向外包',
+    ]
+  : [
+      'with clear questions rather than vague demands',
+      'with long-term perspective rather than short-term attention',
+      'with real-world settings rather than conceptual packaging',
+      'with a willingness to build together rather than outsource unilaterally',
+    ];
+
+const closingLine = pickByLocale(
+  locale,
+  '合作不是研究的妥协，而是研究进入现实的一种方式。',
+  'Collaboration is not a compromise of research, but one of the ways research enters reality.',
+);
+---
+
+<Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale}>
+  <main>
+
+    <!-- Page heading -->
+    <section class="section-card collab-hero">
+      <div class="section-heading">
+        <p class="eyebrow">COLLABORATION</p>
+        <h1>{pageTitle}</h1>
+      </div>
+    </section>
+
+    <!-- Three modules -->
+    <div class="collab-modules">
+
+      <!-- Module 1 -->
+      <section class="collab-module">
+        <div class="collab-module__header">
+          <span class="collab-module__index">01</span>
+          <h2>{mod1Title}</h2>
+        </div>
+        <ul class="collab-module__list">
+          {mod1Items.map((item) => <li>{item}</li>)}
+        </ul>
+      </section>
+
+      <!-- Module 2 -->
+      <section class="collab-module">
+        <div class="collab-module__header">
+          <span class="collab-module__index">02</span>
+          <h2>{mod2Title}</h2>
+        </div>
+        <ul class="collab-module__list collab-module__list--grid">
+          {mod2Items.map((item) => <li>{item}</li>)}
+        </ul>
+      </section>
+
+      <!-- Module 3 -->
+      <section class="collab-module">
+        <div class="collab-module__header">
+          <span class="collab-module__index">03</span>
+          <h2>{mod3Title}</h2>
+        </div>
+        <ul class="collab-module__list">
+          {mod3Items.map((item) => <li>{item}</li>)}
+        </ul>
+      </section>
+
+    </div>
+
+    <!-- Closing line + CTA -->
+    <section class="section-card collab-cta">
+      <p class="collab-cta__closing">{closingLine}</p>
+      <p class="collab-cta__email">
+        <a href={`mailto:${siteMeta.email}`}>{siteMeta.email}</a>
+      </p>
+      <div class="cta-row">
+        <a class="button primary" href={`mailto:${siteMeta.email}`}>
+          {pickByLocale(locale, '发起合作', 'Start a Collaboration')}
+        </a>
+      </div>
+    </section>
+
+  </main>
+</Layout>
+
+<style>
+  /* ── Hero ── */
+  .collab-hero {
+    padding-bottom: 0;
+  }
+
+  .collab-hero h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 500;
+  }
+
+  /* ── Modules wrapper ── */
+  .collab-modules {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 3rem;
+  }
+
+  /* ── Single module ── */
+  .collab-module {
+    padding: 2.8rem 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .collab-module:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .collab-module__header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .collab-module__index {
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.7rem, 0.55vw + 0.52rem, 0.88rem);
+    letter-spacing: 0.18em;
+    color: var(--color-primary);
+    opacity: 0.75;
+    flex-shrink: 0;
+    line-height: 1;
+    padding-top: 0.18em;
+  }
+
+  .collab-module h2 {
+    margin: 0;
+    font-size: clamp(1.3rem, 2vw + 0.5rem, 2rem);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  /* ── List ── */
+  .collab-module__list {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .collab-module__list li {
+    position: relative;
+    padding: 0.88rem 0 0.88rem 1.6rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+    font-size: clamp(0.95rem, 0.6vw + 0.76rem, 1.12rem);
+    line-height: 1.7;
+    color: var(--color-text-body);
+  }
+
+  .collab-module__list li:last-child {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  }
+
+  /* dot indicator */
+  .collab-module__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    opacity: 0.7;
+  }
+
+  /* Module 2 — 2-column grid on wider screens */
+  .collab-module__list--grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+  }
+
+  .collab-module__list--grid li:nth-child(even) {
+    border-left: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+    padding-left: calc(1.6rem + 1px);
+  }
+
+  /* ── CTA ── */
+  .collab-cta {
+    padding-top: 2.8rem;
+  }
+
+  .collab-cta__closing {
+    margin: 0 0 2rem;
+    max-width: 52rem;
+    font-size: clamp(1rem, 0.8vw + 0.72rem, 1.22rem);
+    line-height: 1.85;
+    color: var(--color-text-body);
+    font-style: italic;
+  }
+
+  .collab-cta__email {
+    margin: 0 0 1.2rem;
+    font-size: clamp(0.88rem, 0.5vw + 0.72rem, 1rem);
+    color: var(--color-text-muted);
+  }
+
+  .collab-cta__email a {
+    color: var(--color-primary);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+
+  .collab-cta__email a:hover {
+    text-decoration: underline;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .collab-module__list--grid {
+      grid-template-columns: 1fr;
+    }
+
+    .collab-module__list--grid li:nth-child(even) {
+      border-left: none;
+      padding-left: 1.6rem;
+    }
+
+    .collab-module h2 {
+      font-size: clamp(1.1rem, 4vw + 0.3rem, 1.5rem);
+    }
+  }
+</style>
