@@ -1,5 +1,7 @@
 ---
 import './landing-hero/landingHero.css';
+import { siteMeta } from '../../content/site';
+const { assetsUrl } = siteMeta;
 ---
 
 <section class="hero-transition-stage" data-hero-transition-root>
@@ -9,7 +11,7 @@ import './landing-hero/landingHero.css';
       <video
         class="hero-video hero-video-scroll"
         data-scroll-video
-        src="https://pub-5dd2e73aff1641778217be6e323fce48.r2.dev/root/portal-scroll.mp4"
+        src={`${assetsUrl}/root/portal-scroll.mp4`}
         muted
         playsinline
         preload="auto"

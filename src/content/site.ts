@@ -9,6 +9,7 @@ export const siteMeta = {
   oneLineEn:
     'An independent institute grounded in advanced research, committed to research in practice, future ventures, and real-world collaboration.',
   siteUrl: 'https://entiafutura.com',
+  assetsUrl: 'https://assets.entiafutura.com',
   email: 'amateur11m11d@gmail.com',
 };
 
