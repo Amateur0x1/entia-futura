@@ -151,13 +151,6 @@ const initFullTransitions = ({
 
   gsap.set([heroShade, secondShade, thirdShade], { opacity: 0 });
 
-  // Optionally create shades for 4th and 5th panels if they exist
-  // Shade for 3rd panel (outgoing in 3→4)
-  const fourthShade = fourthPanel
-    ? createTransitionShade('data-fourth-panel-transition-shade', fourthPanel)
-    : null;
-  if (fourthShade) gsap.set(fourthShade, { opacity: 0 });
-
   // ── initial states ─────────────────────────────────────────────────────────
   const outgoingHeroPanel = heroTransitionRoot;
 
@@ -484,94 +477,65 @@ const initFullTransitions = ({
     });
   }
 
-  // ── Helper: build one "N→N+1" scrub push timeline ─────────────────────────
-  /**
-   * Creates a scrub-based push transition between two adjacent fixed panels,
-   * following the exact same pattern as the 2→3 secondTimeline above.
-   *
-   * @param outgoingPanel  - The panel currently visible (will scale-shrink)
-   * @param incomingPanel  - The panel that slides up from below
-   * @param outgoingShade  - Dark overlay sitting inside outgoingPanel
-   * @param spacerEl       - The scroll-spacer that acts as the ScrollTrigger trigger
-   * @param outgoingZIndex - Starting z-index for the outgoing panel at rest
-   */
-  const buildPushTimeline = (
-    outgoingPanel: HTMLElement,
-    incomingPanel: HTMLElement,
-    outgoingShade: HTMLElement,
-    spacerEl: HTMLElement,
-    outgoingZIndex: number,
-  ) => {
-    const PUSH_DURATION = 1.6;
-    const PUSH_START = 0;
+  // ── 3→4 scrub timeline ────────────────────────────────────────────────────
+  // Mirrors the 2→3 secondTimeline exactly: same scrub, same push segment,
+  // same spacer calibration pattern.
+  if (fourthPanel && fourthScrollSpacer) {
+    const fourthPanelPushDuration = 1.6;
+    const fourthPanelPushStart = 0;
 
-    // Tracks a pending delayed-call that resets outgoingPanel after onLeaveBack.
-    let resetCall: gsap.core.Tween | null = null;
+    let fourthPanelResetCall: gsap.core.Tween | null = null;
 
-    const tl = gsap.timeline({
+    const fourthTimeline = gsap.timeline({
       scrollTrigger: {
-        trigger: spacerEl,
+        trigger: fourthScrollSpacer,
         start: 'top top',
-        end: () => `+=${Math.round(window.innerHeight * (PUSH_START + PUSH_DURATION + 0.4))}`,
+        end: () => `+=${Math.round(fourthTimeline.totalDuration() * window.innerHeight)}`,
         invalidateOnRefresh: true,
         scrub: 0.35,
         onEnter: () => {
-          resetCall?.kill();
-          resetCall = null;
-          // Reset panels to their pre-transition state on forward entry
-          gsap.set(incomingPanel, {
+          fourthPanelResetCall?.kill();
+          fourthPanelResetCall = null;
+          gsap.set(fourthPanel, {
             opacity: 0,
             visibility: 'visible',
             pointerEvents: 'none',
             yPercent: 100,
             y: 0,
             scale: 1,
-            zIndex: outgoingZIndex + 2,
+            zIndex: 38,
           });
-          gsap.set(outgoingPanel, {
-            autoAlpha: 1,
-            visibility: 'visible',
-            pointerEvents: 'auto',
-            zIndex: outgoingZIndex,
-          });
+          gsap.set(thirdPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
         },
         onEnterBack: () => {
-          resetCall?.kill();
-          resetCall = null;
-          // Re-entering from below: restore z-index; scrub owns visual props
-          gsap.set(incomingPanel, {
+          fourthPanelResetCall?.kill();
+          fourthPanelResetCall = null;
+          gsap.set(fourthPanel, {
             visibility: 'visible',
             pointerEvents: 'none',
-            zIndex: outgoingZIndex + 2,
+            zIndex: 38,
           });
-          gsap.set(outgoingPanel, {
-            visibility: 'visible',
-            pointerEvents: 'auto',
-            zIndex: outgoingZIndex,
-          });
+          gsap.set(thirdPanel, { visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
         },
         onLeave: () => {
-          // Transition complete: incomingPanel is the active screen
-          gsap.set(incomingPanel, { pointerEvents: 'auto', zIndex: outgoingZIndex });
-          gsap.set(outgoingPanel, { pointerEvents: 'none', zIndex: outgoingZIndex - 6 });
+          gsap.set(fourthPanel, { pointerEvents: 'auto', zIndex: 36 });
+          gsap.set(thirdPanel, { pointerEvents: 'none', zIndex: 30 });
         },
         onLeaveBack: () => {
-          // Scrolled back above this zone: outgoingPanel is active again
-          gsap.set(incomingPanel, {
+          gsap.set(fourthPanel, {
             opacity: 0,
             visibility: 'visible',
             pointerEvents: 'none',
             yPercent: 100,
             y: 0,
-            zIndex: outgoingZIndex - 6,
+            zIndex: 30,
             borderTopLeftRadius: 0,
             borderTopRightRadius: 0,
           });
-          gsap.set(outgoingPanel, { pointerEvents: 'auto', zIndex: outgoingZIndex });
-          gsap.set(outgoingShade, { opacity: 0 });
-          // Defer full reset until scrub easing settles (scrub: 0.35 + buffer)
-          resetCall = gsap.delayedCall(0.75, () => {
-            gsap.set(outgoingPanel, {
+          gsap.set(thirdPanel, { pointerEvents: 'auto', zIndex: 36 });
+          gsap.set(thirdShade, { opacity: 0 });
+          fourthPanelResetCall = gsap.delayedCall(0.75, () => {
+            gsap.set(thirdPanel, {
               autoAlpha: 1,
               visibility: 'visible',
               scale: 1,
@@ -582,49 +546,36 @@ const initFullTransitions = ({
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
             });
-            gsap.set(outgoingShade, { opacity: 0 });
+            gsap.set(thirdShade, { opacity: 0 });
           });
         },
       },
     });
 
     addPanelPushTransitionSegment({
-      duration: PUSH_DURATION,
-      incomingPanel,
+      duration: fourthPanelPushDuration,
+      incomingPanel: fourthPanel,
       liftDistance: () => 0,
-      outgoingPanel,
+      outgoingPanel: thirdPanel,
       outgoingScale: 0.72,
-      shade: outgoingShade,
+      shade: thirdShade,
       shadeOpacity: 0.58,
-      startAt: PUSH_START,
-      timeline: tl,
+      startAt: fourthPanelPushStart,
+      timeline: fourthTimeline,
     });
 
-    // Calibrate spacer height so 1 timeline-unit == 1 vh of scroll distance.
-    // Use +160 buffer (matching the 2→3 spacer logic) so there is always
-    // enough runway after the animation completes before the next trigger fires.
-    const vh = window.innerHeight;
-    const totalScrollPixels = Math.ceil(tl.totalDuration() * vh);
-    const neededSvh = Math.ceil((totalScrollPixels / vh) * 100) + 160;
-    spacerEl.style.height = `${neededSvh}svh`;
+    // Calibrate spacer height — same pattern as 2→3
+    {
+      const vh = window.innerHeight;
+      const totalScrollPixels = Math.ceil(fourthTimeline.totalDuration() * vh);
+      const neededSvh = Math.ceil((totalScrollPixels / vh) * 100) + 160;
+      fourthScrollSpacer.style.height = `${neededSvh}svh`;
 
-    gsap.ticker.add(function refreshLater() {
-      ScrollTrigger.refresh();
-      gsap.ticker.remove(refreshLater);
-    });
-
-    return tl;
-  };
-
-  // ── 3→4 scrub timeline ────────────────────────────────────────────────────
-  if (fourthPanel && fourthScrollSpacer && fourthShade) {
-    buildPushTimeline(
-      thirdPanel,
-      fourthPanel,
-      thirdShade,
-      fourthScrollSpacer,
-      36,
-    );
+      gsap.ticker.add(function refreshFourth() {
+        ScrollTrigger.refresh();
+        gsap.ticker.remove(refreshFourth);
+      });
+    }
   }
 
 };
