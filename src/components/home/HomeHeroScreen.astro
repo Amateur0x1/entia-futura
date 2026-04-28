@@ -47,6 +47,9 @@ const { assetsUrl } = siteMeta;
   if (scrollVideo) {
     let readyDispatched = false;
 
+    // How much of the video must be buffered before we consider it "ready".
+    const READY_THRESHOLD = 0.98;
+
     const getBufferedPct = (): number => {
       const buf = scrollVideo.buffered;
       const dur = scrollVideo.duration;
@@ -68,14 +71,12 @@ const { assetsUrl } = siteMeta;
       if (!readyDispatched) setTimeout(checkBuffer, 200);
     };
 
-    // Fire ready only when the browser confirms the entire file is buffered.
-    // 'canplaythrough' + buffered reaching duration is the most reliable signal.
+    // Fire ready as soon as the buffered threshold is reached.
     scrollVideo.addEventListener('canplaythrough', () => {
       const pct = getBufferedPct();
-      if (pct >= 1) {
+      if (pct >= READY_THRESHOLD) {
         dispatchReady();
       }
-      // If not fully buffered yet, keep polling until it is.
     }, { once: true });
 
     const startPolling = () => {
@@ -84,7 +85,7 @@ const { assetsUrl } = siteMeta;
       scrollVideo.addEventListener('progress', () => {
         const pct = getBufferedPct();
         document.dispatchEvent(new CustomEvent('scrollvideo:bufferupdate', { detail: { pct } }));
-        if (!readyDispatched && pct >= 1) dispatchReady();
+        if (!readyDispatched && pct >= READY_THRESHOLD) dispatchReady();
       });
     };
 
