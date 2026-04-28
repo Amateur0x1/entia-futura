@@ -88,6 +88,8 @@
 
     // ── Config ────────────────────────────────────────────────────────────────
     const MIN_DISPLAY_MS = 1800;  // always show loader for at least this long
+    // If video data is still 0% after this many ms, skip the hero entirely.
+    const VIDEO_SKIP_TIMEOUT_MS = 6000;
 
     // ── State ─────────────────────────────────────────────────────────────────
     let displayed = 0;
@@ -95,6 +97,8 @@
     let windowLoaded = false;
     let minTimeReached = false;
     let videoBufferReady = false;
+    let videoHadAnyData = false; // tracks whether any buffer progress was received
+    let skipHero = false;
     let raf: number;
 
     // ── Display tick — smoothly eases displayed toward target ─────────────────
@@ -126,7 +130,7 @@
         });
         // Signal that loading is fully done — effects init listens for this.
         // Scroll is unlocked by the effects init after ScrollTrigger is ready.
-        document.dispatchEvent(new CustomEvent('loader:done'));
+        document.dispatchEvent(new CustomEvent('loader:done', { detail: { skipHero } }));
       }, 320);
     };
 
@@ -152,8 +156,18 @@
     // and dispatches scrollvideo:bufferupdate with the current fraction (0–1).
     // The progress bar directly mirrors the real download: buffer 0→1 = loader 0→99.
     // When buffered >= 95%, scrollvideo:bufferready is dispatched and we can finish.
+    // 6-second skip-hero watchdog: if video data is still 0 after 6s, skip the hero.
+    setTimeout(() => {
+      if (!videoHadAnyData && !videoBufferReady) {
+        skipHero = true;
+        videoBufferReady = true; // release the gate
+        tryFinish();
+      }
+    }, VIDEO_SKIP_TIMEOUT_MS);
+
     document.addEventListener('scrollvideo:bufferupdate', (e: Event) => {
       const pct = (e as CustomEvent<{ pct: number }>).detail?.pct ?? 0;
+      if (pct > 0) videoHadAnyData = true;
       // buffer 0–1 → loader 0–99 (100 is reserved for the final "done" snap)
       const loaderTarget = Math.round(pct * 99);
       if (loaderTarget > target) target = loaderTarget;

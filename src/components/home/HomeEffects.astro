@@ -4,7 +4,31 @@
   // Wait for the page loader to finish before initialising effects.
   // This ensures video metadata (including duration) is available when
   // the scroll timeline is created, so scrub-based frame control works correctly.
-  document.addEventListener('loader:done', () => {
+  document.addEventListener('loader:done', (e: Event) => {
+    const shouldSkipHero = (e as CustomEvent<{ skipHero?: boolean }>).detail?.skipHero === true;
     initHomeEffects();
+
+    // If the scroll video never loaded (e.g. mobile browser blocked R2),
+    // fall back to showing the loop video (which is served locally) on the first screen.
+    if (shouldSkipHero) {
+      const scrollVideo = document.querySelector<HTMLVideoElement>('[data-scroll-video]');
+      const loopVideo = document.querySelector<HTMLVideoElement>('[data-loop-video]');
+      const heroVideoLoading = document.querySelector<HTMLElement>('[data-hero-video-loading]');
+
+      // Hide the broken scroll video, show the loop video instead
+      if (scrollVideo) {
+        scrollVideo.style.opacity = '0';
+        scrollVideo.style.visibility = 'hidden';
+      }
+      if (loopVideo) {
+        loopVideo.style.opacity = '1';
+        loopVideo.style.visibility = 'visible';
+        loopVideo.play().catch(() => {});
+      }
+      // Hide the loading overlay
+      if (heroVideoLoading) {
+        heroVideoLoading.classList.add('is-hidden');
+      }
+    }
   }, { once: true });
 </script>
