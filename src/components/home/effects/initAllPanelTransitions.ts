@@ -320,7 +320,9 @@ const initFullTransitions = ({
     });
   };
 
-  if (heroVideoShell && scrollVideo && scrollVideo.readyState < 1) {
+  // If error already fired before this code runs, scrollVideo.readyState stays 0
+  // but the 'error' event will never fire again — detect via scrollVideo.error.
+  if (heroVideoShell && scrollVideo && scrollVideo.readyState < 1 && !scrollVideo.error) {
     let timelineCreated = false;
     const initOnce = () => {
       if (timelineCreated) return;

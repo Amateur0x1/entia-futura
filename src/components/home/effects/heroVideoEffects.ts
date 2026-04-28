@@ -56,17 +56,31 @@ export const initHeroVideoEffects = ({
     hideHeroVideoLoading(heroVideoLoading);
   };
 
-  if (scrollVideo.readyState >= 1) {
+  // When scroll video fails to load, fall back: hide loader and show loop video directly.
+  const initializeHeroVideosOnError = () => {
+    gsap.set(scrollVideo, { autoAlpha: 0 });
+    gsap.set(loopVideo, { autoAlpha: 1 });
+    startLoopVideo(loopVideo);
+    hideHeroVideoLoading(heroVideoLoading);
+  };
+
+  // scrollVideo.error means the error event already fired before initHomeEffects ran —
+  // fall back immediately without waiting for a listener that will never fire.
+  if (scrollVideo.error) {
+    initializeHeroVideosOnError();
+  } else if (scrollVideo.readyState >= 1) {
     initializeHeroVideos();
   } else {
     scrollVideo.addEventListener('loadedmetadata', initializeHeroVideos, { once: true });
+    scrollVideo.addEventListener('error', initializeHeroVideosOnError, { once: true });
   }
 
-  if (scrollVideo.readyState >= 3) {
+  if (scrollVideo.error || scrollVideo.readyState >= 3) {
     hideHeroVideoLoading(heroVideoLoading);
   } else {
     scrollVideo.addEventListener('canplaythrough', () => hideHeroVideoLoading(heroVideoLoading), { once: true });
     scrollVideo.addEventListener('loadeddata', () => hideHeroVideoLoading(heroVideoLoading), { once: true });
+    scrollVideo.addEventListener('error', () => hideHeroVideoLoading(heroVideoLoading), { once: true });
   }
 
   if (loopVideo.readyState >= 2) {
@@ -158,6 +172,28 @@ export const addHeroVideoTransitionSegment = ({
     });
   };
 
+  // On error: skip scroll-video scrub entirely — show loop video immediately
+  // so GSAP panel transitions still initialise correctly (no video currentTime tween).
+  const attachOnError = () => {
+    if (attached) return;
+    attached = true;
+    if (loopVideo) {
+      gsap.set(scrollVideo, { autoAlpha: 0 });
+      gsap.set(loopVideo, { autoAlpha: 1 });
+    }
+    requestAnimationFrame(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).__gsapScrollTriggerRefresh?.();
+    });
+  };
+
+  // If error already fired before addHeroVideoTransitionSegment was called, handle immediately.
+  if (scrollVideo.error) {
+    attachOnError();
+    return;
+  }
+
   scrollVideo.addEventListener('loadedmetadata', attachOnce, { once: true });
   scrollVideo.addEventListener('durationchange', attachOnce, { once: true });
+  scrollVideo.addEventListener('error', attachOnError, { once: true });
 };

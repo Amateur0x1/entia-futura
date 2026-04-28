@@ -50,7 +50,7 @@ const { assetsUrl } = siteMeta;
     let readyDispatched = false;
 
     // How much of the video must be buffered before we consider it "ready".
-    const READY_THRESHOLD = 0.98;
+    const READY_THRESHOLD = 0.95;
 
     const getBufferedPct = (): number => {
       const buf = scrollVideo.buffered;
@@ -90,6 +90,14 @@ const { assetsUrl } = siteMeta;
         if (!readyDispatched && pct >= READY_THRESHOLD) dispatchReady();
       });
     };
+
+    // If video errors out, skip the buffer gate immediately.
+    // Also handle the case where error already fired before this script ran.
+    if (scrollVideo.error) {
+      dispatchReady();
+    } else {
+      scrollVideo.addEventListener('error', () => dispatchReady(), { once: true });
+    }
 
     if (scrollVideo.readyState >= 1) {
       startPolling();
