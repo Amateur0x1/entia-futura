@@ -8,12 +8,25 @@ interface Props {
 const { locale } = Astro.props;
 
 const title = pickByLocale(locale, '合作方式', 'Collaboration');
-const body = pickByLocale(
-  locale,
-  '我们欢迎与企业、品牌、地方项目、文化空间、书店、学校及各类组织与个人展开合作。我们理解的合作，不只是项目执行，而是把研究能力、问题意识与现实场景连接起来。',
-  'We welcome collaboration with enterprises, brands, place-based initiatives, cultural spaces, bookstores, schools, and a wide range of organizations and individuals. For us, collaboration is not merely execution, but a way of connecting research capacity, problem-consciousness, and real-world settings.',
-);
 const btnLabel = pickByLocale(locale, '发起合作', 'Start a Collaboration');
+
+const items = locale === 'zh'
+  ? [
+      '企业与品牌',
+      '文化空间与书店',
+      '地方项目与社区',
+      '学校与教育机构',
+      '研究者与独立个人',
+      '社会实验与原型项目',
+    ]
+  : [
+      'Enterprises and Brands',
+      'Cultural Spaces and Bookstores',
+      'Place-based Projects',
+      'Schools and Educational Institutions',
+      'Researchers and Individuals',
+      'Social Experiments and Prototypes',
+    ];
 ---
 
 <section
@@ -21,24 +34,48 @@ const btnLabel = pickByLocale(locale, '发起合作', 'Start a Collaboration');
   data-fifth-panel
   aria-label={title}
 >
+  <!-- Nebula particle background -->
+  <canvas class="landing-fifth-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
+
+  <!-- Atmosphere veil: top-right cyan, bottom-left violet -->
   <div class="landing-fifth-panel__veil" aria-hidden="true"></div>
-  <div class="landing-fifth-panel__inner">
-    <article class="landing-fifth-panel__block">
-      <p class="landing-fifth-panel__label">{pickByLocale(locale, '合作', 'Collaboration')}</p>
-      <h2 class="landing-fifth-panel__title">{title}</h2>
-      <div class="landing-fifth-panel__divider" aria-hidden="true"></div>
-      <p class="landing-fifth-panel__body">{body}</p>
-      <a
-        class="landing-fifth-panel__btn"
-        href={toLocalePath(locale, '/contact')}
-      >
-        {btnLabel}
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/>
-        </svg>
-      </a>
-    </article>
+
+  <!-- Central logo -->
+  <div class="landing-fifth-panel__logo-wrap" aria-hidden="true">
+    <img
+      class="landing-fifth-panel__logo"
+      src="/brand/entia-logo-white-lines.png"
+      alt=""
+      draggable="false"
+    />
   </div>
+
+  <!-- Orbit canvas -->
+  <canvas
+    class="landing-fifth-panel__canvas"
+    data-fifth-panel-canvas
+    data-items={JSON.stringify(items)}
+    aria-hidden="true"
+  ></canvas>
+
+  <!-- SR fallback -->
+  <div class="landing-fifth-panel__sr-list" aria-label={title}>
+    <h2>{title}</h2>
+    <ul>
+      {items.map((item) => <li>{item}</li>)}
+    </ul>
+  </div>
+
+  <!-- CTA button -->
+  <a
+    class="landing-fifth-panel__btn"
+    href={toLocalePath(locale, '/contact')}
+  >
+    {btnLabel}
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/>
+    </svg>
+  </a>
 </section>
 
 <style>
@@ -46,7 +83,7 @@ const btnLabel = pickByLocale(locale, '发起合作', 'Start a Collaboration');
     position: fixed;
     inset: 0;
     z-index: 42;
-    background: transparent;
+    background: var(--color-background);
     color: var(--color-secondary-foreground);
     opacity: 0;
     pointer-events: none;
@@ -56,88 +93,96 @@ const btnLabel = pickByLocale(locale, '发起合作', 'Start a Collaboration');
     justify-content: center;
   }
 
+  .landing-fifth-panel__nebula {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.88;
+  }
+
+  /* Veil: top-right cyan, bottom-left violet (mirrored from fourth panel) */
   .landing-fifth-panel__veil {
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: 1;
     pointer-events: none;
     background:
       radial-gradient(
-        ellipse 90% 90% at -10% 110%,
-        color-mix(in srgb, var(--color-primary) 16%, transparent) 0%,
-        transparent 60%
+        ellipse 90% 90% at 110% -10%,
+        color-mix(in srgb, var(--color-primary) 18%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary) 6%, transparent) 50%,
+        transparent 78%
       ),
       radial-gradient(
-        ellipse 90% 90% at 110% -10%,
-        color-mix(in srgb, var(--color-secondary) 14%, transparent) 0%,
-        transparent 60%
+        ellipse 90% 90% at -10% 110%,
+        color-mix(in srgb, var(--color-secondary) 18%, transparent) 0%,
+        color-mix(in srgb, var(--color-secondary) 6%, transparent) 50%,
+        transparent 78%
       );
   }
 
-  .landing-fifth-panel__inner {
-    position: relative;
-    z-index: 2;
+  .landing-fifth-panel__logo-wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    pointer-events: none;
+    width: clamp(260px, 34vmin, 480px);
+    height: clamp(260px, 34vmin, 480px);
+  }
+
+  .landing-fifth-panel__logo {
     width: 100%;
-    max-width: 720px;
-    padding: clamp(4rem, 12vh, 8rem) clamp(1.4rem, 5vw, 4rem);
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.88;
+    filter: drop-shadow(0 0 32px color-mix(in srgb, var(--color-primary) 36%, transparent));
   }
 
-  .landing-fifth-panel__block {
-    display: grid;
-    gap: 0;
+  .landing-fifth-panel__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    pointer-events: none;
   }
 
-  .landing-fifth-panel__label {
-    margin: 0 0 0.6rem;
-    font-size: clamp(0.72rem, 0.5vw + 0.56rem, 0.9rem);
-    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    opacity: 0.78;
-  }
-
-  .landing-fifth-panel__title {
-    margin: 0 0 clamp(1.2rem, 2.5vh, 2rem);
-    font-size: clamp(2.4rem, 4vw + 1rem, 5.2rem);
-    font-weight: 500;
-    letter-spacing: -0.03em;
-    line-height: 1.06;
-    color: var(--color-text-primary);
-  }
-
-  .landing-fifth-panel__divider {
-    width: clamp(40px, 8vw, 80px);
+  .landing-fifth-panel__sr-list {
+    position: absolute;
+    width: 1px;
     height: 1px;
-    background: color-mix(in srgb, var(--color-primary) 48%, transparent);
-    margin-bottom: clamp(1.4rem, 3vh, 2.4rem);
-  }
-
-  .landing-fifth-panel__body {
-    margin: 0 0 clamp(2rem, 4vh, 3.2rem);
-    font-size: clamp(1.1rem, 0.8vw + 0.8rem, 1.6rem);
-    line-height: 1.84;
-    color: color-mix(in srgb, var(--color-text-secondary) 88%, transparent);
-    max-width: 56ch;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
   .landing-fifth-panel__btn {
+    position: absolute;
+    bottom: max(2.4rem, calc(env(safe-area-inset-bottom) + 1.8rem));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.76rem 1.6rem 0.72rem;
+    padding: 0.72rem 1.4rem 0.68rem;
     border: 1.5px solid color-mix(in srgb, var(--color-primary) 56%, transparent);
     border-radius: 999px;
     background: color-mix(in srgb, var(--color-primary) 10%, transparent);
     color: var(--color-primary);
     font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
-    font-size: clamp(0.8rem, 0.6vw + 0.6rem, 1rem);
-    letter-spacing: 0.1em;
+    font-size: clamp(0.78rem, 0.6vw + 0.58rem, 0.96rem);
+    letter-spacing: 0.12em;
     line-height: 1;
     text-decoration: none;
-    box-shadow: 0 0 16px color-mix(in srgb, var(--color-primary) 18%, transparent);
-    transition: background 200ms ease, box-shadow 200ms ease;
-    width: fit-content;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--color-primary) 20%, transparent);
+    transition: background 200ms ease, box-shadow 200ms ease, color 200ms ease;
+    white-space: nowrap;
   }
 
   .landing-fifth-panel__btn svg {
@@ -150,16 +195,192 @@ const btnLabel = pickByLocale(locale, '发起合作', 'Start a Collaboration');
   .landing-fifth-panel__btn:hover,
   .landing-fifth-panel__btn:focus-visible {
     background: color-mix(in srgb, var(--color-primary) 18%, transparent);
-    box-shadow: 0 0 24px color-mix(in srgb, var(--color-primary) 30%, transparent);
+    box-shadow: 0 0 24px color-mix(in srgb, var(--color-primary) 32%, transparent);
   }
 
   @media (max-width: 720px) {
-    .landing-fifth-panel__title {
-      font-size: clamp(2rem, 5vw + 0.5rem, 3.2rem);
-    }
-
-    .landing-fifth-panel__body {
-      font-size: clamp(1rem, 1vw + 0.76rem, 1.36rem);
+    .landing-fifth-panel__btn {
+      font-size: clamp(0.68rem, 0.5vw + 0.52rem, 0.84rem);
+      padding: 0.62rem 1.1rem 0.58rem;
+      bottom: max(1.8rem, calc(env(safe-area-inset-bottom) + 1.2rem));
     }
   }
 </style>
+
+<script>
+  (() => {
+    const panel = document.querySelector<HTMLElement>('[data-fifth-panel]');
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-fifth-panel-canvas]');
+    if (!panel || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const FONT_SIZE_BASE = 15;
+    const FONT_FAMILY = "'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif";
+    const LINE_HEIGHT = 1.55;
+    const REPULSE_RADIUS = 90;
+    const REPULSE_STRENGTH = 0.38;
+    const SPRING = 0.08;
+    const DAMPING = 0.82;
+    const ORBIT_RADIUS_SCALE = 0.42;
+    const FADE_IN_DUR = 800;
+    const SPIN_SPEED = 0.000055;
+    const ACCENT_COLOR = '#00e5ff';
+    const TEXT_COLOR = '#b9cad0';
+
+    const ITEMS: string[] = JSON.parse(canvas.getAttribute('data-items') ?? '[]');
+
+    interface TextBlock {
+      lines: string[];
+      x: number; y: number;
+      vx: number; vy: number;
+      alpha: number;
+      maxW: number;
+      baseAngle: number;
+      orbitR: number;
+    }
+
+    let W = 0, H = 0;
+    let mouseX = -9999, mouseY = -9999;
+    let blocks: TextBlock[] = [];
+    let startTime = 0;
+    let active = false;
+    let raf = 0;
+
+    function wrapText(text: string, maxW: number, fontSize: number): string[] {
+      ctx!.font = `${fontSize}px ${FONT_FAMILY}`;
+      const words = text.split(' ');
+      const lines: string[] = [];
+      let current = '';
+      for (const w of words) {
+        const probe = current ? `${current} ${w}` : w;
+        if (ctx!.measureText(probe).width > maxW && current) { lines.push(current); current = w; }
+        else { current = probe; }
+      }
+      if (current) lines.push(current);
+      return lines;
+    }
+
+    function buildBlocks(w: number, h: number) {
+      if (ITEMS.length === 0) return;
+      const logoR = Math.min(w, h) * 0.19;
+      const baseOrbitR = Math.min(w, h) * ORBIT_RADIUS_SCALE + logoR;
+      const count = ITEMS.length;
+      const fs = Math.max(12, Math.min(FONT_SIZE_BASE, w / 60));
+      const blockMaxW = Math.min(200, w * 0.22);
+      const cx = w / 2, cy = h / 2;
+
+      blocks = ITEMS.map((text, i) => {
+        const baseAngle = (i / count) * Math.PI * 2 - Math.PI / 2;
+        const extraR = text.length > 20 ? baseOrbitR * 0.10 : 0;
+        const orbitR = baseOrbitR + extraR;
+        const lines = wrapText(text, blockMaxW, fs);
+        const px = cx + Math.cos(baseAngle) * orbitR;
+        const py = cy + Math.sin(baseAngle) * orbitR;
+        return { lines, x: px, y: py, vx: 0, vy: 0, alpha: 0, maxW: blockMaxW, baseAngle, orbitR };
+      });
+    }
+
+    function resize() {
+      W = panel!.offsetWidth;
+      H = panel!.offsetHeight;
+      canvas!.width = W;
+      canvas!.height = H;
+      buildBlocks(W, H);
+    }
+
+    function draw(ts: number) {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+      ctx!.clearRect(0, 0, W, H);
+
+      const fs = Math.max(12, Math.min(FONT_SIZE_BASE, W / 60));
+      const lh = fs * LINE_HEIGHT;
+      const fadeProgress = Math.min(elapsed / FADE_IN_DUR, 1);
+      const spinAngle = elapsed * SPIN_SPEED;
+      const cx = W / 2, cy = H / 2;
+
+      for (const b of blocks) {
+        const rotAngle = b.baseAngle + spinAngle;
+        const ox = cx + Math.cos(rotAngle) * b.orbitR;
+        const oy = cy + Math.sin(rotAngle) * b.orbitR;
+
+        const dx = mouseX - b.x;
+        const dy = mouseY - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < REPULSE_RADIUS && dist > 0) {
+          const force = (1 - dist / REPULSE_RADIUS) * REPULSE_STRENGTH;
+          b.vx -= (dx / dist) * force * 12;
+          b.vy -= (dy / dist) * force * 12;
+        }
+
+        b.vx += (ox - b.x) * SPRING;
+        b.vy += (oy - b.y) * SPRING;
+        b.vx *= DAMPING;
+        b.vy *= DAMPING;
+        b.x += b.vx;
+        b.y += b.vy;
+        b.alpha = fadeProgress;
+
+        const cosA = Math.cos(rotAngle);
+        const align: CanvasTextAlign = cosA > 0.2 ? 'left' : cosA < -0.2 ? 'right' : 'center';
+
+        ctx!.save();
+        ctx!.font = `${fs}px ${FONT_FAMILY}`;
+        ctx!.textBaseline = 'middle';
+        ctx!.textAlign = align;
+
+        const totalH = b.lines.length * lh;
+        const startY = b.y - totalH / 2 + lh / 2;
+        const firstW = ctx!.measureText(b.lines[0] ?? '').width;
+        const sepX = align === 'right' ? b.x - firstW : align === 'left' ? b.x : b.x - firstW / 2;
+
+        ctx!.globalAlpha = b.alpha * 0.18;
+        ctx!.strokeStyle = ACCENT_COLOR;
+        ctx!.lineWidth = 0.5;
+        ctx!.beginPath();
+        ctx!.moveTo(sepX, startY - lh * 0.62);
+        ctx!.lineTo(sepX + firstW, startY - lh * 0.62);
+        ctx!.stroke();
+
+        ctx!.globalAlpha = b.alpha * 0.28;
+        ctx!.fillStyle = ACCENT_COLOR;
+        ctx!.shadowColor = ACCENT_COLOR;
+        ctx!.shadowBlur = 8;
+        b.lines.forEach((line, li) => ctx!.fillText(line, b.x, startY + li * lh));
+
+        ctx!.globalAlpha = b.alpha * 0.82;
+        ctx!.shadowBlur = 0;
+        ctx!.fillStyle = TEXT_COLOR;
+        b.lines.forEach((line, li) => ctx!.fillText(line, b.x, startY + li * lh));
+
+        ctx!.restore();
+      }
+
+      if (active) raf = requestAnimationFrame(draw);
+    }
+
+    function onMouseMove(e: MouseEvent) {
+      const r = panel!.getBoundingClientRect();
+      mouseX = e.clientX - r.left;
+      mouseY = e.clientY - r.top;
+    }
+    function onPointerLeave() { mouseX = -9999; mouseY = -9999; }
+
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          if (!active) { active = true; startTime = 0; raf = requestAnimationFrame(draw); }
+        } else { active = false; cancelAnimationFrame(raf); }
+      }
+    }, { threshold: 0.01 });
+
+    io.observe(panel);
+    document.addEventListener('mousemove', onMouseMove, { passive: true });
+    panel.addEventListener('mouseleave', onPointerLeave, { passive: true });
+
+    resize();
+    new ResizeObserver(resize).observe(panel);
+  })();
+</script>

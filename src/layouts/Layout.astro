@@ -276,6 +276,8 @@ const navLinks = [
     background-color: var(--color-background);
   }
 
+  /* ── Rotating dot grid — HOME only ──────────────────────────────────────── */
+
   /* Clipping container — fixed, fills viewport, clips overflow */
   .dot-bg-clip {
     position: fixed;
@@ -295,28 +297,62 @@ const navLinks = [
     animation: dot-warp 14s ease-in-out infinite;
   }
 
+  /* Non-home pages: hide the rotating dot grid */
+  body:not(.theme-landing-dark) .dot-bg-clip {
+    display: none;
+  }
+
   @keyframes dot-warp {
-    0% {
-      transform: perspective(800px) rotateX(0deg) rotateY(0deg);
-    }
-    25% {
-      transform: perspective(800px) rotateX(10deg) rotateY(-7deg);
-    }
-    50% {
-      transform: perspective(800px) rotateX(0deg) rotateY(10deg);
-    }
-    75% {
-      transform: perspective(800px) rotateX(-8deg) rotateY(-5deg);
-    }
-    100% {
-      transform: perspective(800px) rotateX(0deg) rotateY(0deg);
-    }
+    0%   { transform: perspective(800px) rotateX(0deg)  rotateY(0deg);  }
+    25%  { transform: perspective(800px) rotateX(10deg) rotateY(-7deg); }
+    50%  { transform: perspective(800px) rotateX(0deg)  rotateY(10deg); }
+    75%  { transform: perspective(800px) rotateX(-8deg) rotateY(-5deg); }
+    100% { transform: perspective(800px) rotateX(0deg)  rotateY(0deg);  }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    body::before {
+    .dot-bg-layer {
       animation: none;
     }
+  }
+
+  /* ── Ambient glow — NON-HOME pages ───────────────────────────────────────── */
+  /* Top-left: primary (cyan), bottom-right: secondary (violet)                */
+
+  body:not(.theme-landing-dark)::before,
+  body:not(.theme-landing-dark)::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(120px);
+  }
+
+  /* Top-left cyan glow */
+  body:not(.theme-landing-dark)::before {
+    width: 55vmax;
+    height: 55vmax;
+    top: -18vmax;
+    left: -18vmax;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--color-primary) 18%, transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  /* Bottom-right violet glow */
+  body:not(.theme-landing-dark)::after {
+    width: 55vmax;
+    height: 55vmax;
+    bottom: -18vmax;
+    right: -18vmax;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--color-secondary) 18%, transparent) 0%,
+      transparent 70%
+    );
   }
 
   * {

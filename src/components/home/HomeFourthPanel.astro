@@ -9,24 +9,40 @@ interface Props {
 const { locale } = Astro.props;
 
 const title = pickByLocale(locale, '研究方向', 'Research Areas');
-const btnLabel = pickByLocale(locale, '查看全部研究方向', 'View All Research Areas');
+// Left block — Collaboration
+const colTitle  = pickByLocale(locale, '合作方式', 'Collaboration');
+const colBody   = pickByLocale(
+  locale,
+  '我们欢迎与企业、品牌、地方项目、文化空间、书店、学校及各类组织与个人展开合作。我们理解的合作，不只是项目执行，而是把研究能力、问题意识与现实场景连接起来。',
+  'We welcome collaboration with enterprises, brands, place-based initiatives, cultural spaces, bookstores, schools, and a wide range of organizations and individuals. For us, collaboration is not merely execution, but a way of connecting research capacity, problem-consciousness, and real-world settings.',
+);
+const colBtn    = pickByLocale(locale, '发起合作', 'Start a Collaboration');
+
+// Right block — Join Us
+const joinTitle = pickByLocale(locale, '加入我们', 'Join Us');
+const joinBody  = pickByLocale(
+  locale,
+  '未来人研究所欢迎所有认真对待未来问题的人。加入研究所不一定意味着固定身份，它也可以意味着参与讨论、加入计划、共创项目、提交提案，或在某个阶段与研究所共同工作。',
+  'Entia Futura Institut welcomes all those who take the future seriously. Joining the institute does not necessarily mean entering a fixed role; it may mean entering a discussion, joining a program, co-creating a project, submitting a proposal, or working alongside the institute for a certain period of time.',
+);
+const joinBtn   = pickByLocale(locale, '了解参与方式', 'Learn How to Participate');
 
 const items = locale === 'zh'
   ? [
       'AI 与未来生活',
-      '知识生产与新型学习共同体',
-      '社群、空间与新的公共生活',
-      '地方文化与未来组织形式',
-      '商业世界中的研究能力',
-      '未来共同体与生活形式实验',
+      '知识生产\n与新型学习共同体',
+      '社群、空间\n与新的公共生活',
+      '地方文化\n与未来组织形式',
+      '商业世界\n中的研究能力',
+      '未来共同体\n与生活形式实验',
     ]
   : [
-      'AI and Future Life',
-      'Knowledge Production and New Learning Communities',
-      'Communities, Space, and New Public Life',
-      'Local Culture and Future Forms of Organization',
-      'Research Capacity in the Commercial World',
-      'Experimenting with Future Forms of Collective Life',
+      'AI and\nFuture Life',
+      'Knowledge Production\nand New Learning Communities',
+      'Communities, Space,\nand New Public Life',
+      'Local Culture and\nFuture Forms of Organization',
+      'Research Capacity\nin the Commercial World',
+      'Experimenting with\nFuture Forms of Collective Life',
     ];
 ---
 
@@ -51,13 +67,15 @@ const items = locale === 'zh'
     />
   </div>
 
-  <!-- Pretext canvas — research items orbit around logo -->
-  <canvas
-    class="landing-fourth-panel__canvas"
-    data-fourth-panel-canvas
-    data-items={JSON.stringify(items)}
-    aria-hidden="true"
-  ></canvas>
+  <!-- Orbit items — HTML divs positioned by JS -->
+  <div class="landing-fourth-panel__orbit" data-orbit aria-hidden="true">
+    {items.map((item, i) => (
+      <div class="landing-fourth-panel__orbit-item" data-orbit-item data-index={i}>
+        <span class="landing-fourth-panel__orbit-dot" aria-hidden="true"></span>
+        <span class="landing-fourth-panel__orbit-text" set:html={item.replace(/\n/g, '<br>')} />
+      </div>
+    ))}
+  </div>
 
   <!-- Screen-reader / no-JS fallback list -->
   <div class="landing-fourth-panel__sr-list" aria-label={title}>
@@ -67,17 +85,34 @@ const items = locale === 'zh'
     </ul>
   </div>
 
-  <!-- CTA button -->
-  <a
-    class="landing-fourth-panel__btn"
-    href={toLocalePath(locale, '/research')}
-    data-fourth-panel-btn
-  >
-    {btnLabel}
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/>
-    </svg>
-  </a>
+  <!-- Left side block: Collaboration (cyan / primary) -->
+  <div class="landing-fourth-panel__side landing-fourth-panel__side--left landing-fourth-panel__side--cyan" aria-label={colTitle}>
+    <p class="landing-fourth-panel__side-label">{pickByLocale(locale, '合作', 'Collab')}</p>
+    <h2 class="landing-fourth-panel__side-title">{colTitle}</h2>
+    <div class="landing-fourth-panel__side-divider" aria-hidden="true"></div>
+    <p class="landing-fourth-panel__side-body">{colBody}</p>
+    <a class="landing-fourth-panel__side-btn" href={toLocalePath(locale, '/collaboration')}>
+      {colBtn}
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Right side block: Join Us (violet / secondary) -->
+  <div class="landing-fourth-panel__side landing-fourth-panel__side--right landing-fourth-panel__side--violet" aria-label={joinTitle}>
+    <p class="landing-fourth-panel__side-label">{pickByLocale(locale, '参与', 'Join')}</p>
+    <h2 class="landing-fourth-panel__side-title">{joinTitle}</h2>
+    <div class="landing-fourth-panel__side-divider" aria-hidden="true"></div>
+    <p class="landing-fourth-panel__side-body">{joinBody}</p>
+    <a class="landing-fourth-panel__side-btn" href={toLocalePath(locale, '/join')}>
+      {joinBtn}
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/>
+      </svg>
+    </a>
+  </div>
+
 </section>
 
 <style>
@@ -147,15 +182,52 @@ const items = locale === 'zh'
     filter: drop-shadow(0 0 32px color-mix(in srgb, var(--color-primary) 36%, transparent));
   }
 
-  /* ── Canvas (text orbits, above logo) ── */
-  .landing-fourth-panel__canvas {
+  /* ── Orbit container ── */
+  .landing-fourth-panel__orbit {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
     z-index: 4;
     pointer-events: none;
   }
+
+  /* ── Individual orbit item ── */
+  .landing-fourth-panel__orbit-item {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+    /* JS sets top/left to 50%/50% and uses translateX/Y to position */
+    top: 50%;
+    left: 50%;
+  }
+
+  .landing-fourth-panel__orbit-dot {
+    flex-shrink: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+      0 0 6px 1px var(--color-primary),
+      0 0 16px 2px color-mix(in srgb, var(--color-primary) 70%, transparent),
+      0 0 1px #fff;
+    opacity: 1;
+  }
+
+  .landing-fourth-panel__orbit-text {
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.75rem, 0.7vw + 0.52rem, 1.05rem);
+    letter-spacing: 0.06em;
+    line-height: 1.45;
+    color: #b9cad0;
+    white-space: pre-line;   /* respect <br> / newlines, still wrap naturally */
+    text-shadow: 0 0 12px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+
+  /* .is-right no longer used — dot is always on the left */
 
   /* ── SR fallback ── */
   .landing-fourth-panel__sr-list {
@@ -167,157 +239,216 @@ const items = locale === 'zh'
     white-space: nowrap;
   }
 
-  /* ── CTA button ── */
-  .landing-fourth-panel__btn {
+  /* ── Side blocks (left = Collaboration / cyan, right = Join Us / violet) ── */
+
+  /* Colour tokens per variant */
+  .landing-fourth-panel__side--cyan   { --accent: var(--color-primary); }
+  .landing-fourth-panel__side--violet { --accent: var(--color-secondary); }
+
+  .landing-fourth-panel__side {
     position: absolute;
-    bottom: max(2.4rem, calc(env(safe-area-inset-bottom) + 1.8rem));
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translateY(-50%);
     z-index: 5;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.72rem 1.4rem 0.68rem;
-    border: 1.5px solid color-mix(in srgb, var(--color-primary) 56%, transparent);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-    color: var(--color-primary);
-    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
-    font-size: clamp(0.78rem, 0.6vw + 0.58rem, 0.96rem);
-    letter-spacing: 0.12em;
-    line-height: 1;
-    text-decoration: none;
-    box-shadow: 0 0 16px color-mix(in srgb, var(--color-primary) 20%, transparent);
-    transition: background 200ms ease, box-shadow 200ms ease, color 200ms ease;
-    white-space: nowrap;
+    width: clamp(260px, 26vw, 400px);
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 2rem 1.8rem;
+    /* transparent border + frosted glass — colour driven by --accent */
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+    border-radius: 1.2rem;
+    background: color-mix(in srgb, var(--color-background) 55%, transparent);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+      0 0 48px color-mix(in srgb, var(--accent) 12%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent);
   }
 
-  .landing-fourth-panel__btn svg {
-    width: 1rem;
-    height: 1rem;
+  .landing-fourth-panel__side--left {
+    left: clamp(1.5rem, 3.5vw, 4rem);
+  }
+
+  .landing-fourth-panel__side--right {
+    right: clamp(1.5rem, 3.5vw, 4rem);
+    text-align: right;
+  }
+
+  .landing-fourth-panel__side-label {
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.62rem, 0.5vw + 0.44rem, 0.76rem);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.75;
+    line-height: 1;
+  }
+
+  .landing-fourth-panel__side-title {
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(1.6rem, 1.8vw + 0.8rem, 2.6rem);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    color: var(--color-foreground, #f0f4f8);
+    line-height: 1.05;
+  }
+
+  .landing-fourth-panel__side-divider {
+    width: 2.4rem;
+    height: 1px;
+    background: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+
+  .landing-fourth-panel__side--right .landing-fourth-panel__side-divider {
+    margin-left: auto;
+  }
+
+  .landing-fourth-panel__side-body {
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.78rem, 0.65vw + 0.54rem, 1rem);
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    color: color-mix(in srgb, var(--color-foreground, #f0f4f8) 72%, transparent);
+  }
+
+  .landing-fourth-panel__side-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.62rem 1.3rem 0.58rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.66rem, 0.48vw + 0.5rem, 0.84rem);
+    letter-spacing: 0.13em;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    align-self: flex-start;
+    transition: background 200ms ease, box-shadow 200ms ease;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .landing-fourth-panel__side--right .landing-fourth-panel__side-btn {
+    align-self: flex-end;
+  }
+
+  .landing-fourth-panel__side-btn svg {
+    width: 0.85rem;
+    height: 0.85rem;
     fill: currentColor;
     flex-shrink: 0;
   }
 
-  .landing-fourth-panel__btn:hover,
-  .landing-fourth-panel__btn:focus-visible {
-    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
-    box-shadow: 0 0 24px color-mix(in srgb, var(--color-primary) 32%, transparent);
+  .landing-fourth-panel__side-btn:hover,
+  .landing-fourth-panel__side-btn:focus-visible {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 30%, transparent);
   }
 
-  @media (max-width: 720px) {
-    .landing-fourth-panel__btn {
-      font-size: clamp(0.68rem, 0.5vw + 0.52rem, 0.84rem);
-      padding: 0.62rem 1.1rem 0.58rem;
-      bottom: max(1.8rem, calc(env(safe-area-inset-bottom) + 1.2rem));
+  @media (max-width: 1200px) {
+    .landing-fourth-panel__side {
+      width: clamp(220px, 22vw, 320px);
+      padding: 1.6rem 1.4rem;
+    }
+    .landing-fourth-panel__side-btn {
+      padding: 0.52rem 1rem 0.48rem;
+      font-size: clamp(0.6rem, 0.4vw + 0.44rem, 0.76rem);
+    }
+    .landing-fourth-panel__side-btn svg {
+      width: 0.72rem;
+      height: 0.72rem;
     }
   }
+
+  @media (max-width: 900px) {
+    .landing-fourth-panel__side {
+      width: clamp(180px, 24vw, 260px);
+      padding: 1.2rem 1rem;
+    }
+    .landing-fourth-panel__side-btn {
+      padding: 0.44rem 0.8rem 0.4rem;
+      font-size: clamp(0.56rem, 0.4vw + 0.38rem, 0.68rem);
+      gap: 0.28rem;
+    }
+    .landing-fourth-panel__side-btn svg {
+      width: 0.62rem;
+      height: 0.62rem;
+    }
+    .landing-fourth-panel__side-body {
+      display: none;
+    }
+    .landing-fourth-panel__side-title {
+      font-size: clamp(1.2rem, 2.5vw + 0.4rem, 1.8rem);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .landing-fourth-panel__side {
+      display: none;
+    }
+  }
+
 </style>
 
 <script>
   (() => {
     const panel = document.querySelector<HTMLElement>('[data-fourth-panel]');
-    const canvas = document.querySelector<HTMLCanvasElement>('[data-fourth-panel-canvas]');
-    if (!panel || !canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const orbitEls = Array.from(document.querySelectorAll<HTMLElement>('[data-orbit-item]'));
+    if (!panel || orbitEls.length === 0) return;
 
     // ── Config ──────────────────────────────────────────────────────────────
-    const FONT_SIZE_BASE = 15;
-    const FONT_FAMILY = "'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif";
-    const LINE_HEIGHT = 1.55;
-    const REPULSE_RADIUS = 90;    // px — mouse influence radius
-    const REPULSE_STRENGTH = 0.38;
-    const SPRING = 0.08;          // spring back to origin
-    const DAMPING = 0.82;
-    const ORBIT_RADIUS_SCALE = 0.30; // fraction of min(W,H) for orbit radius
-    const FADE_IN_DUR = 800;      // ms for panel text to fade in
+    const REPULSE_RADIUS   = 100;    // px
+    const REPULSE_STRENGTH = 0.42;
+    const SPRING           = 0.07;
+    const DAMPING          = 0.80;
+    const ORBIT_RADIUS_SCALE = 0.09; // very tight around logo — fraction of min(W,H)
+    const FADE_IN_DUR      = 900;    // ms
+    const SPIN_SPEED       = 0.000050; // rad/ms
 
-    // items injected by Astro at build time via canvas data-items attribute
-    const ITEMS: string[] = JSON.parse(canvas.getAttribute('data-items') ?? '[]');
-
-    // ── Types ────────────────────────────────────────────────────────────────
-    interface TextBlock {
-      lines: string[];
-      // current position (may be disturbed)
-      x: number;
-      y: number;
-      // rest position
-      ox: number;
-      oy: number;
-      // velocity
-      vx: number;
-      vy: number;
-      // render props
-      alpha: number;
-      maxW: number;
-      align: 'left' | 'right' | 'center';
+    // ── Per-item state ───────────────────────────────────────────────────────
+    interface Item {
+      el: HTMLElement;
+      baseAngle: number;
+      orbitR: number;
+      x: number; y: number;
+      vx: number; vy: number;
+      hw: number; hh: number; // half-width / half-height of element
     }
 
-    // ── State ────────────────────────────────────────────────────────────────
     let W = 0, H = 0;
     let mouseX = -9999, mouseY = -9999;
-    let blocks: TextBlock[] = [];
+    let items: Item[] = [];
     let startTime = 0;
     let active = false;
     let raf = 0;
 
-    // ── Layout helpers ───────────────────────────────────────────────────────
-    function wrapText(text: string, maxW: number, fontSize: number): string[] {
-      // simple canvas-based word wrap (no pretext needed for short strings)
-      ctx!.font = `${fontSize}px ${FONT_FAMILY}`;
-      const words = text.split(' ');
-      const lines: string[] = [];
-      let current = '';
-      for (const w of words) {
-        const probe = current ? `${current} ${w}` : w;
-        if (ctx!.measureText(probe).width > maxW && current) {
-          lines.push(current);
-          current = w;
-        } else {
-          current = probe;
-        }
-      }
-      if (current) lines.push(current);
-      return lines;
-    }
+    // ── Build item state ─────────────────────────────────────────────────────
+    function build() {
+      const count = orbitEls.length;
+      const logoR    = Math.min(W, H) * 0.16;
+      const orbitR   = Math.min(W, H) * ORBIT_RADIUS_SCALE + logoR;
+      const cx = W / 2, cy = H / 2;
 
-    function buildBlocks(w: number, h: number) {
-      if (ITEMS.length === 0) return;
-
-      const logoR = Math.min(w, h) * 0.19; // half-logo visual radius (matches enlarged CSS size)
-      const orbitR = Math.min(w, h) * ORBIT_RADIUS_SCALE + logoR;
-      const cx = w / 2;
-      const cy = h / 2;
-      const count = ITEMS.length;
-      const fs = Math.max(12, Math.min(FONT_SIZE_BASE, w / 60));
-      const blockMaxW = Math.min(200, w * 0.22);
-
-      blocks = ITEMS.map((text, i) => {
-        // Evenly spread around the circle, offset by 90° so first item is at top
-        const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
-        // Push out a bit more for long lines
-        const extraR = text.length > 20 ? orbitR * 0.12 : 0;
-        const r = orbitR + extraR;
-
-        const px = cx + Math.cos(angle) * r;
-        const py = cy + Math.sin(angle) * r;
-
-        // text alignment: items on the right align left, items on left align right
-        const align: 'left' | 'right' | 'center' =
-          Math.cos(angle) > 0.2 ? 'left' : Math.cos(angle) < -0.2 ? 'right' : 'center';
-
-        const lines = wrapText(text, blockMaxW, fs);
-
+      items = orbitEls.map((el, i) => {
+        const baseAngle = (i / count) * Math.PI * 2 - Math.PI / 2;
+        const px = cx + Math.cos(baseAngle) * orbitR;
+        const py = cy + Math.sin(baseAngle) * orbitR;
+        const rect = el.getBoundingClientRect();
         return {
-          lines,
+          el,
+          baseAngle,
+          orbitR,
           x: px, y: py,
-          ox: px, oy: py,
           vx: 0, vy: 0,
-          alpha: 0,
-          maxW: blockMaxW,
-          align,
+          hw: rect.width  / 2,
+          hh: rect.height / 2,
         };
       });
     }
@@ -326,82 +457,46 @@ const items = locale === 'zh'
     function resize() {
       W = panel!.offsetWidth;
       H = panel!.offsetHeight;
-      canvas!.width = W;
-      canvas!.height = H;
-      buildBlocks(W, H);
+      build();
     }
 
-    // ── Draw ─────────────────────────────────────────────────────────────────
+    // ── Draw loop ────────────────────────────────────────────────────────────
     function draw(ts: number) {
       if (!startTime) startTime = ts;
       const elapsed = ts - startTime;
-      ctx!.clearRect(0, 0, W, H);
-
-      const fs = Math.max(12, Math.min(FONT_SIZE_BASE, W / 60));
-      const lh = fs * LINE_HEIGHT;
       const fadeProgress = Math.min(elapsed / FADE_IN_DUR, 1);
+      const spinAngle = elapsed * SPIN_SPEED;
+      const cx = W / 2, cy = H / 2;
 
-      for (const b of blocks) {
-        // ── spring physics ──
-        const dx = mouseX - b.x;
-        const dy = mouseY - b.y;
+      for (const it of items) {
+        // rotating origin
+        const rotAngle = it.baseAngle + spinAngle;
+        const ox = cx + Math.cos(rotAngle) * it.orbitR;
+        const oy = cy + Math.sin(rotAngle) * it.orbitR;
+
+        // mouse repulsion
+        const dx = mouseX - it.x;
+        const dy = mouseY - it.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-
         if (dist < REPULSE_RADIUS && dist > 0) {
           const force = (1 - dist / REPULSE_RADIUS) * REPULSE_STRENGTH;
-          b.vx -= (dx / dist) * force * 12;
-          b.vy -= (dy / dist) * force * 12;
+          it.vx -= (dx / dist) * force * 14;
+          it.vy -= (dy / dist) * force * 14;
         }
 
-        // Spring back to origin
-        b.vx += (b.ox - b.x) * SPRING;
-        b.vy += (b.oy - b.y) * SPRING;
-        b.vx *= DAMPING;
-        b.vy *= DAMPING;
-        b.x += b.vx;
-        b.y += b.vy;
+        // spring back
+        it.vx += (ox - it.x) * SPRING;
+        it.vy += (oy - it.y) * SPRING;
+        it.vx *= DAMPING;
+        it.vy *= DAMPING;
+        it.x += it.vx;
+        it.y += it.vy;
 
-        // fade-in
-        b.alpha = fadeProgress;
+        // dot always on left side — no flip
 
-        // ── render ──
-        ctx!.save();
-        ctx!.font = `${fs}px ${FONT_FAMILY}`;
-        ctx!.textBaseline = 'middle';
-        ctx!.textAlign = b.align;
-
-        const totalH = b.lines.length * lh;
-        const startY = b.y - totalH / 2 + lh / 2;
-
-        // separator line — subtle, width of first line
-        const firstW = ctx!.measureText(b.lines[0] ?? '').width;
-        const sepX = b.align === 'right' ? b.x - firstW : b.align === 'left' ? b.x : b.x - firstW / 2;
-        ctx!.globalAlpha = b.alpha * 0.18;
-        ctx!.strokeStyle = '#00e5ff';
-        ctx!.lineWidth = 0.5;
-        ctx!.beginPath();
-        ctx!.moveTo(sepX, startY - lh * 0.62);
-        ctx!.lineTo(sepX + firstW, startY - lh * 0.62);
-        ctx!.stroke();
-
-        // text glow pass
-        ctx!.globalAlpha = b.alpha * 0.28;
-        ctx!.fillStyle = '#00e5ff';
-        ctx!.shadowColor = '#00e5ff';
-        ctx!.shadowBlur = 8;
-        b.lines.forEach((line, li) => {
-          ctx!.fillText(line, b.x, startY + li * lh);
-        });
-
-        // main text pass
-        ctx!.globalAlpha = b.alpha * 0.82;
-        ctx!.shadowBlur = 0;
-        ctx!.fillStyle = '#b9cad0';
-        b.lines.forEach((line, li) => {
-          ctx!.fillText(line, b.x, startY + li * lh);
-        });
-
-        ctx!.restore();
+        // apply transform: offset by -50% to use element centre as anchor
+        it.el.style.transform = `translate(calc(${it.x - W / 2}px - 50%), calc(${it.y - H / 2}px - 50%))`;
+        it.el.style.opacity = String(fadeProgress);
       }
 
       if (active) raf = requestAnimationFrame(draw);

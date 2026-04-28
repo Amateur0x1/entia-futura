@@ -34,10 +34,6 @@ interface InitAllPanelTransitionsOptions {
   scrollSpacer: HTMLElement;
   fourthPanel: HTMLElement | null;
   fourthScrollSpacer: HTMLElement | null;
-  fifthPanel: HTMLElement | null;
-  fifthScrollSpacer: HTMLElement | null;
-  sixthPanel: HTMLElement | null;
-  sixthScrollSpacer: HTMLElement | null;
   prefersReducedMotion: boolean;
   splitTextAvailable: boolean;
 }
@@ -51,10 +47,6 @@ const initReducedMotionTransitions = ({
   scrollSpacer,
   fourthPanel,
   fourthScrollSpacer,
-  fifthPanel,
-  fifthScrollSpacer,
-  sixthPanel,
-  sixthScrollSpacer,
 }: Pick<
   InitAllPanelTransitionsOptions,
   | 'elements'
@@ -62,10 +54,6 @@ const initReducedMotionTransitions = ({
   | 'scrollSpacer'
   | 'fourthPanel'
   | 'fourthScrollSpacer'
-  | 'fifthPanel'
-  | 'fifthScrollSpacer'
-  | 'sixthPanel'
-  | 'sixthScrollSpacer'
 >) => {
   const { heroTransitionRoot, secondPanel } = elements;
   if (!heroTransitionRoot || !secondPanel) return;
@@ -118,24 +106,18 @@ const initReducedMotionTransitions = ({
     });
   }
 
-  // 3→4/5/6: simple fade swaps for reduced-motion
-  const laterTransitions = [
-    { outgoing: thirdPanel, incoming: fourthPanel, spacer: fourthScrollSpacer },
-    { outgoing: fourthPanel, incoming: fifthPanel, spacer: fifthScrollSpacer },
-    { outgoing: fifthPanel, incoming: sixthPanel, spacer: sixthScrollSpacer },
-  ];
-  for (const { outgoing, incoming, spacer } of laterTransitions) {
-    if (!outgoing || !incoming || !spacer) continue;
+  // 3→4: simple fade swap for reduced-motion
+  if (fourthPanel && fourthScrollSpacer) {
     gsap.timeline({
       scrollTrigger: {
-        trigger: spacer,
+        trigger: fourthScrollSpacer,
         start: 'top -56%',
         end: 'top -92%',
         toggleActions: 'play none reverse reverse',
       },
     })
-      .to(outgoing, { autoAlpha: 0, visibility: 'hidden', pointerEvents: 'none', duration: 0.01, ease: 'none' })
-      .to(incoming, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.01, ease: 'none' }, 0);
+      .to(thirdPanel, { autoAlpha: 0, visibility: 'hidden', pointerEvents: 'none', duration: 0.01, ease: 'none' })
+      .to(fourthPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.01, ease: 'none' }, 0);
   }
 };
 
@@ -148,10 +130,6 @@ const initFullTransitions = ({
   scrollSpacer,
   fourthPanel,
   fourthScrollSpacer,
-  fifthPanel,
-  fifthScrollSpacer,
-  sixthPanel,
-  sixthScrollSpacer,
   splitTextAvailable,
 }: Omit<InitAllPanelTransitionsOptions, 'prefersReducedMotion'>) => {
   const secondPanelKnowMore = elements.secondPanelKnowMore;
@@ -174,14 +152,11 @@ const initFullTransitions = ({
   gsap.set([heroShade, secondShade, thirdShade], { opacity: 0 });
 
   // Optionally create shades for 4th and 5th panels if they exist
+  // Shade for 3rd panel (outgoing in 3→4)
   const fourthShade = fourthPanel
     ? createTransitionShade('data-fourth-panel-transition-shade', fourthPanel)
     : null;
-  const fifthShade = fifthPanel
-    ? createTransitionShade('data-fifth-panel-transition-shade', fifthPanel)
-    : null;
   if (fourthShade) gsap.set(fourthShade, { opacity: 0 });
-  if (fifthShade) gsap.set(fifthShade, { opacity: 0 });
 
   // ── initial states ─────────────────────────────────────────────────────────
   const outgoingHeroPanel = heroTransitionRoot;
@@ -201,8 +176,8 @@ const initFullTransitions = ({
     borderBottomRightRadius: 0,
   });
 
-  // Set panels 4/5/6 to their initial hidden-below state
-  for (const p of [fourthPanel, fifthPanel, sixthPanel]) {
+  // Set panel 4 to its initial hidden-below state
+  for (const p of [fourthPanel]) {
     if (!p) continue;
     gsap.set(p, {
       opacity: 0,
@@ -626,9 +601,11 @@ const initFullTransitions = ({
     });
 
     // Calibrate spacer height so 1 timeline-unit == 1 vh of scroll distance.
+    // Use +160 buffer (matching the 2→3 spacer logic) so there is always
+    // enough runway after the animation completes before the next trigger fires.
     const vh = window.innerHeight;
     const totalScrollPixels = Math.ceil(tl.totalDuration() * vh);
-    const neededSvh = Math.ceil((totalScrollPixels / vh) * 100) + 60;
+    const neededSvh = Math.ceil((totalScrollPixels / vh) * 100) + 160;
     spacerEl.style.height = `${neededSvh}svh`;
 
     gsap.ticker.add(function refreshLater() {
@@ -650,27 +627,6 @@ const initFullTransitions = ({
     );
   }
 
-  // ── 4→5 scrub timeline ────────────────────────────────────────────────────
-  if (fourthPanel && fifthPanel && fifthScrollSpacer && fourthShade) {
-    buildPushTimeline(
-      fourthPanel,
-      fifthPanel,
-      fourthShade,
-      fifthScrollSpacer,
-      36,
-    );
-  }
-
-  // ── 5→6 scrub timeline ────────────────────────────────────────────────────
-  if (fifthPanel && sixthPanel && sixthScrollSpacer && fifthShade) {
-    buildPushTimeline(
-      fifthPanel,
-      sixthPanel,
-      fifthShade,
-      sixthScrollSpacer,
-      36,
-    );
-  }
 };
 
 // ---------------------------------------------------------------------------
@@ -682,10 +638,6 @@ export const initAllPanelTransitions = ({
   scrollSpacer,
   fourthPanel,
   fourthScrollSpacer,
-  fifthPanel,
-  fifthScrollSpacer,
-  sixthPanel,
-  sixthScrollSpacer,
   prefersReducedMotion,
   splitTextAvailable,
 }: InitAllPanelTransitionsOptions) => {
@@ -696,10 +648,6 @@ export const initAllPanelTransitions = ({
       scrollSpacer,
       fourthPanel,
       fourthScrollSpacer,
-      fifthPanel,
-      fifthScrollSpacer,
-      sixthPanel,
-      sixthScrollSpacer,
     });
     return;
   }
@@ -710,10 +658,6 @@ export const initAllPanelTransitions = ({
     scrollSpacer,
     fourthPanel,
     fourthScrollSpacer,
-    fifthPanel,
-    fifthScrollSpacer,
-    sixthPanel,
-    sixthScrollSpacer,
     splitTextAvailable,
   });
 };

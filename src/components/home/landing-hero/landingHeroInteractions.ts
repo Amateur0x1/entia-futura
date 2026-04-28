@@ -317,12 +317,13 @@ export const initLandingHeroInteractions = () => {
   if (knowMoreButton instanceof HTMLElement) {
     knowMoreButton.addEventListener('click', () => {
       const heroTransitionRoot = document.querySelector('[data-hero-transition-root]');
-      const scrollSpacer = document.querySelector('[data-landing-scroll-spacer]');
+      const scrollSpacer  = document.querySelector('[data-landing-scroll-spacer]');
+      const scrollSpacer4 = document.querySelector('[data-landing-scroll-spacer-4]');
 
-      // Two-stage scroll:
-      //   1. Scroll to scrollSpacer start (second panel fully visible) in ~4 s
-      //   2. Pause 1 s so the user can see the second panel
-      //   3. Scroll to scrollSpacer end (third panel fully revealed) in ~4 s
+      // Three-stage scroll:
+      //   1. Scroll to scrollSpacer start  (second panel fully visible)  ~4 s
+      //   2. Pause 1 s → scroll to scrollSpacer end (third panel)        ~4 s
+      //   3. Pause 1 s → scroll to scrollSpacer-4 end (fourth panel)     ~4 s
       const stage1Target = (() => {
         if (scrollSpacer instanceof HTMLElement) return scrollSpacer.offsetTop;
         if (heroTransitionRoot instanceof HTMLElement) {
@@ -334,9 +335,12 @@ export const initLandingHeroInteractions = () => {
       const stage2Target = scrollSpacer instanceof HTMLElement
         ? scrollSpacer.offsetTop + scrollSpacer.offsetHeight
         : stage1Target;
+      const stage3Target = scrollSpacer4 instanceof HTMLElement
+        ? scrollSpacer4.offsetTop + scrollSpacer4.offsetHeight
+        : stage2Target;
 
       if (prefersReducedMotion) {
-        window.scrollTo({ top: stage2Target });
+        window.scrollTo({ top: stage3Target });
         return;
       }
 
@@ -357,10 +361,14 @@ export const initLandingHeroInteractions = () => {
         window.requestAnimationFrame(step);
       };
 
-      // Stage 1 → pause → Stage 2
+      // Stage 1 → pause → Stage 2 → pause → Stage 3
       smoothScroll(window.scrollY, stage1Target, () => {
         setTimeout(() => {
-          smoothScroll(window.scrollY, stage2Target, () => {});
+          smoothScroll(window.scrollY, stage2Target, () => {
+            setTimeout(() => {
+              smoothScroll(window.scrollY, stage3Target, () => {});
+            }, PAUSE);
+          });
         }, PAUSE);
       });
     });
