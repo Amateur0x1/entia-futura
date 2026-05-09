@@ -481,14 +481,14 @@ small[data-brand-animated-text] {
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  padding: clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem) clamp(4rem, 10vh, 7rem);
+  padding: clamp(3rem, 8vh, 6rem) clamp(2rem, 10vw, 12rem) clamp(5.2rem, 12vh, 8.4rem) clamp(1rem, 3vw, 2.5rem);
   pointer-events: none;
   opacity: 0;
   /* initial state — driven by GSAP scroll scrub */
 }
 
 .hero-institute-overview__inner {
-  max-width: min(52rem, 72vw);
+  max-width: min(50rem, 64vw);
   width: 100%;
 }
 
@@ -516,14 +516,27 @@ small[data-brand-animated-text] {
 }
 
 .hero-institute-overview__content {
-  display: grid;
-  gap: 0.9rem;
+  position: relative;
+  display: block;
+}
+
+.hero-institute-overview__void {
+  float: right;
+  width: clamp(10.4rem, 20.5vw, 17.2rem);
+  height: clamp(10.4rem, 20.5vw, 17.2rem);
+  margin: clamp(0.1rem, 1vh, 0.8rem) clamp(-0.6rem, -0.8vw, -0.2rem) 0.9rem 1.2rem;
+  border: 1px solid color-mix(in srgb, var(--color-border-inverse-strong) 24%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  shape-outside: circle(50%);
+  shape-margin: clamp(0.55rem, 1.4vw, 1.05rem);
+  pointer-events: none;
 }
 
 .hero-institute-overview__line {
-  margin: 0;
+  margin: 0 0 0.9rem;
   font-family: "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1rem, 1.4vw, 1.22rem);
+  font-size: clamp(1.08rem, 1.62vw, 1.38rem);
   line-height: 1.72;
   letter-spacing: 0.02em;
   color: color-mix(in srgb, var(--color-text-primary) 76%, transparent);
@@ -532,12 +545,18 @@ small[data-brand-animated-text] {
   /* GSAP drives fade-in per line */
 }
 
+:lang(zh) .hero-institute-overview__line {
+  line-height: 1.92;
+  letter-spacing: 0.05em;
+}
+
 .hero-institute-overview__line--secondary {
   color: color-mix(in srgb, var(--color-text-primary) 50%, transparent);
 }
 
 .hero-institute-overview__quote {
-  margin: 0.4rem 0 0;
+  clear: both;
+  margin: 0.5rem 0 0;
   padding: 0.7rem 0 0.7rem 1rem;
   border-left: 2px solid color-mix(in srgb, var(--color-primary) 52%, transparent);
   opacity: 0;
@@ -547,11 +566,16 @@ small[data-brand-animated-text] {
 .hero-institute-overview__quote-text {
   display: block;
   font-family: "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(0.98rem, 1.3vw, 1.16rem);
+  font-size: clamp(1.04rem, 1.46vw, 1.28rem);
   line-height: 1.6;
   letter-spacing: 0.03em;
   color: color-mix(in srgb, var(--color-primary) 84%, white 16%);
   -webkit-font-smoothing: antialiased;
+}
+
+:lang(zh) .hero-institute-overview__quote-text {
+  line-height: 1.78;
+  letter-spacing: 0.06em;
 }
 
 @media (max-width: 720px) {
@@ -564,16 +588,20 @@ small[data-brand-animated-text] {
     max-width: 100%;
   }
 
+  .hero-institute-overview__void {
+    display: none;
+  }
+
   .hero-institute-overview__label {
     font-size: 0.66rem;
   }
 
   .hero-institute-overview__line {
-    font-size: clamp(0.95rem, 3.8vw, 1.12rem);
+    font-size: clamp(1rem, 4.2vw, 1.2rem);
   }
 
   .hero-institute-overview__quote-text {
-    font-size: 0.98rem;
+    font-size: 1.05rem;
   }
 }
 
