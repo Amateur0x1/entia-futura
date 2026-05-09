@@ -303,6 +303,108 @@ export const initLandingHeroInteractions = () => {
       });
     }
 
+    const localeDropdownRoot = document.querySelector('[data-locale-dropdown]');
+    const localeTrigger =
+      localeDropdownRoot instanceof HTMLElement ? localeDropdownRoot.querySelector('[data-locale-trigger]') : null;
+    const localeFill =
+      localeTrigger instanceof HTMLElement ? localeTrigger.querySelector('[data-locale-fill]') : null;
+
+    const setLocaleFilled = (filled: boolean) => {
+      if (localeTrigger instanceof HTMLElement) {
+        localeTrigger.classList.toggle('is-more-filled', filled);
+      }
+    };
+
+    const expandLocaleFill = (originX: number, originY: number) => {
+      if (!(localeTrigger instanceof HTMLElement) || !(localeFill instanceof HTMLElement)) {
+        return;
+      }
+
+      const { diameter, x, y } = getMoreFillMetrics(localeTrigger, originX, originY);
+
+      gsap.killTweensOf(localeFill);
+      gsap.set(localeFill, {
+        width: diameter,
+        height: diameter,
+        x,
+        y,
+        scale: moreFillStartScale,
+        opacity: 1,
+      });
+      setLocaleFilled(true);
+
+      gsap.to(localeFill, {
+        scale: 1,
+        duration: 0.6,
+        ease: 'power2.out',
+      });
+    };
+
+    const collapseLocaleFill = () => {
+      if (!(localeTrigger instanceof HTMLElement) || !(localeFill instanceof HTMLElement)) {
+        return;
+      }
+
+      gsap.killTweensOf(localeFill);
+      gsap.to(localeFill, {
+        scale: moreFillStartScale,
+        opacity: 0,
+        duration: 0.28,
+        ease: 'power2.in',
+        onComplete: () => {
+          setLocaleFilled(false);
+        },
+      });
+    };
+
+    if (
+      localeDropdownRoot instanceof HTMLElement &&
+      localeTrigger instanceof HTMLElement &&
+      localeFill instanceof HTMLElement
+    ) {
+      const originForPointerEnter = (event: PointerEvent) => {
+        const rect = localeTrigger.getBoundingClientRect();
+        const inTrigger =
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom;
+
+        if (inTrigger) {
+          return {
+            x: Math.min(Math.max(event.clientX - rect.left, 0), rect.width),
+            y: Math.min(Math.max(event.clientY - rect.top, 0), rect.height),
+          };
+        }
+
+        return { x: rect.width / 2, y: rect.height / 2 };
+      };
+
+      localeDropdownRoot.addEventListener('pointerenter', (event) => {
+        const o = originForPointerEnter(event as PointerEvent);
+        expandLocaleFill(o.x, o.y);
+      });
+
+      localeDropdownRoot.addEventListener('pointerleave', () => {
+        collapseLocaleFill();
+      });
+
+      localeTrigger.addEventListener('focus', () => {
+        const rect = localeTrigger.getBoundingClientRect();
+        expandLocaleFill(rect.width / 2, rect.height / 2);
+      });
+
+      localeTrigger.addEventListener('blur', (event) => {
+        const nextTarget = event.relatedTarget;
+
+        if (nextTarget instanceof Node && localeDropdownRoot.contains(nextTarget)) {
+          return;
+        }
+
+        collapseLocaleFill();
+      });
+    }
+
     if (knowMoreButton instanceof HTMLElement) {
       gsap.to(knowMoreButton, {
         y: 8,
@@ -371,6 +473,63 @@ export const initLandingHeroInteractions = () => {
           });
         }, PAUSE);
       });
+    });
+  }
+
+  const localeDropdownRoot = document.querySelector('[data-locale-dropdown]');
+  const localeTrigger =
+    localeDropdownRoot instanceof HTMLElement ? localeDropdownRoot.querySelector('[data-locale-trigger]') : null;
+
+  if (localeDropdownRoot instanceof HTMLElement && localeTrigger instanceof HTMLElement) {
+    const setLocaleExpanded = (open: boolean) => {
+      localeTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    const finePointerHover = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+    localeDropdownRoot.addEventListener('pointerenter', () => {
+      setLocaleExpanded(true);
+    });
+
+    localeDropdownRoot.addEventListener('pointerleave', () => {
+      if (!localeDropdownRoot.classList.contains('is-locale-open')) {
+        setLocaleExpanded(false);
+      }
+    });
+
+    localeTrigger.addEventListener('click', (event) => {
+      if (finePointerHover.matches) {
+        return;
+      }
+
+      event.preventDefault();
+      localeDropdownRoot.classList.toggle('is-locale-open');
+      setLocaleExpanded(localeDropdownRoot.classList.contains('is-locale-open'));
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!localeDropdownRoot.classList.contains('is-locale-open')) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (target instanceof Node && localeDropdownRoot.contains(target)) {
+        return;
+      }
+
+      localeDropdownRoot.classList.remove('is-locale-open');
+      setLocaleExpanded(false);
+    });
+
+    localeDropdownRoot.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      localeDropdownRoot.classList.remove('is-locale-open');
+      setLocaleExpanded(false);
+      localeTrigger.blur();
     });
   }
 };

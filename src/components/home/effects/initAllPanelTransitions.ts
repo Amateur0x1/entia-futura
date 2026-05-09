@@ -19,6 +19,10 @@ import { setupThirdPanelReveal } from './setupThirdPanelReveal';
 export const HERO_TO_INTRO_TIMING = {
   videoPlaybackStart: 0,
   videoPlaybackDuration: 4.1,
+  // After scroll-video ends, loop-video holds for this many timeline units
+  // before the panel-push begins. During this window the Institute Overview
+  // overlay is revealed and readable.
+  loopVideoHoldDuration: 5.2,
   panelRevealDelayAfterVideoEnd: 0.52,
   transitionScrollDistanceDesktop: 3600,
   transitionScrollDistanceMobile: 2500,
@@ -57,6 +61,27 @@ const initReducedMotionTransitions = ({
 >) => {
   const { heroTransitionRoot, secondPanel } = elements;
   if (!heroTransitionRoot || !secondPanel) return;
+
+  // Reduced-motion: show institute overview immediately (no animation)
+  const overviewElRM = heroTransitionRoot.querySelector<HTMLElement>('[data-institute-overview]');
+  if (overviewElRM) {
+    const overviewLines = Array.from(overviewElRM.querySelectorAll<HTMLElement>('[data-overview-line]'));
+    const overviewQuote = overviewElRM.querySelector<HTMLElement>('[data-overview-quote]');
+    const overviewDivider = overviewElRM.querySelector<HTMLElement>('[data-overview-divider]');
+    gsap.set(overviewElRM, { opacity: 1 });
+    if (overviewDivider) gsap.set(overviewDivider, { scaleX: 1 });
+    if (overviewLines.length > 0) gsap.set(overviewLines, { opacity: 1, y: 0 });
+    if (overviewQuote) gsap.set(overviewQuote, { opacity: 1 });
+    // Hide when hero scrolls past ~60%
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: heroTransitionRoot,
+        start: 'top -55%',
+        end: 'top -70%',
+        toggleActions: 'play none reverse reverse',
+      },
+    }).to(overviewElRM, { opacity: 0, duration: 0.01 });
+  }
 
   // 1→2: fade in secondPanel when hero scrolls out
   gsap.timeline({
@@ -259,18 +284,95 @@ const initFullTransitions = ({
       });
     }
 
-    const heroPanelExitStart =
+    // videoPlaybackEnd is the point at which the scroll-video finishes.
+    // After that we hold on the loop-video for loopVideoHoldDuration units
+    // while showing the Institute Overview overlay.
+    // The panel-push starts at heroPanelExitStart (after the hold).
+    const videoPlaybackEnd =
       HERO_TO_INTRO_TIMING.videoPlaybackStart +
-      HERO_TO_INTRO_TIMING.videoPlaybackDuration +
-      HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
+      HERO_TO_INTRO_TIMING.videoPlaybackDuration;
+
+    const loopHoldStart = videoPlaybackEnd + HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
+    const loopHoldEnd = loopHoldStart + HERO_TO_INTRO_TIMING.loopVideoHoldDuration;
+
+    const heroPanelExitStart = loopHoldEnd;
     const heroPanelPushDuration = 1.6;
     const panelTextRevealStart = heroPanelExitStart + heroPanelPushDuration + 0.16;
 
-    heroTimeline.to(
-      elements.signalCards,
-      { autoAlpha: 0, y: -58, duration: 0.32, stagger: 0.02 },
-      heroPanelExitStart,
-    );
+    // ── Institute Overview reveal during loop-video hold ─────────────────
+    const overviewEl = heroTransitionRoot.querySelector<HTMLElement>('[data-institute-overview]');
+    const overviewDivider = heroTransitionRoot.querySelector<HTMLElement>('[data-overview-divider]');
+    const overviewLines = heroTransitionRoot
+      ? Array.from(heroTransitionRoot.querySelectorAll<HTMLElement>('[data-overview-line]'))
+      : [];
+    const overviewQuote = heroTransitionRoot.querySelector<HTMLElement>('[data-overview-quote]');
+
+    if (overviewEl) {
+      // Set initial states: lines start slightly below with opacity 0
+      if (overviewLines.length > 0) {
+        gsap.set(overviewLines, { opacity: 0, y: 14 });
+      }
+      if (overviewQuote) {
+        gsap.set(overviewQuote, { opacity: 0 });
+      }
+
+      // Signal cards fade out early so they don't overlap the overview overlay
+      const signalCardsFadeOutAt = loopHoldStart - 0.3;
+      heroTimeline.to(
+        elements.signalCards,
+        { autoAlpha: 0, y: -38, duration: 0.28, stagger: 0.02 },
+        signalCardsFadeOutAt,
+      );
+
+      // Fade the whole overlay in at loopHoldStart
+      heroTimeline.to(overviewEl, { opacity: 1, duration: 0.5, ease: 'power2.out' }, loopHoldStart);
+
+      // Divider scale-in
+      if (overviewDivider) {
+        heroTimeline.to(
+          overviewDivider,
+          { scaleX: 1, duration: 0.45, ease: 'power2.out' },
+          loopHoldStart + 0.18,
+        );
+      }
+
+      // Lines fade in staggered
+      if (overviewLines.length > 0) {
+        heroTimeline.to(
+          overviewLines,
+          { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out', stagger: 0.22 },
+          loopHoldStart + 0.35,
+        );
+      }
+
+      // Quote fades in last
+      if (overviewQuote) {
+        heroTimeline.to(
+          overviewQuote,
+          { opacity: 1, duration: 0.45, ease: 'power2.out' },
+          loopHoldStart + 0.35 + overviewLines.length * 0.22 + 0.3,
+        );
+      }
+
+      // Fade overlay OUT just before the panel-push starts
+      const overviewFadeOutStart = heroPanelExitStart - 0.55;
+      heroTimeline.to(
+        overviewEl,
+        { opacity: 0, duration: 0.45, ease: 'power2.in' },
+        overviewFadeOutStart,
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Signal cards already handled above when overviewEl exists; this handles
+    // the fallback case where there is no overview overlay.
+    if (!overviewEl) {
+      heroTimeline.to(
+        elements.signalCards,
+        { autoAlpha: 0, y: -58, duration: 0.32, stagger: 0.02 },
+        heroPanelExitStart,
+      );
+    }
 
     addPanelPushTransitionSegment({
       duration: heroPanelPushDuration,
@@ -308,10 +410,14 @@ const initFullTransitions = ({
       startAt: panelTextRevealStart,
     });
 
+    // Video scrub: scroll-video plays until videoPlaybackEnd (NOT heroPanelExitStart).
+    // The loop-video cross-fade already happens inside addHeroVideoTransitionSegment
+    // near the end of the video slot. After videoPlaybackEnd the loop-video is
+    // fully visible and loops freely during the loopVideoHoldDuration window.
     addHeroVideoTransitionSegment({
       elements,
       heroTimeline,
-      videoPlaybackEnd: heroPanelExitStart,
+      videoPlaybackEnd,
     });
 
     gsap.ticker.add(function refreshHero() {

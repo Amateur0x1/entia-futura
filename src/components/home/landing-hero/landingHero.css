@@ -50,18 +50,145 @@
   transform-style: preserve-3d;
 }
 
-.floating-button.floating-contact-button {
+.floating-top-actions {
   position: fixed;
   top: max(1.3rem, calc(env(safe-area-inset-top) + 1rem));
-  left: auto;
-  right: calc(max(1rem, calc(env(safe-area-inset-right) + 0.5rem)) + 16px);
+  right: max(1rem, calc(env(safe-area-inset-right) + 0.5rem));
   z-index: 60;
-  will-change: transform;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.65rem;
   animation: floating-brand-drift 14s ease-in-out infinite;
+}
+
+.floating-top-actions .floating-contact-button,
+.floating-top-actions .floating-locale-button {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  animation: none;
+}
+
+.floating-button.floating-contact-button {
+  will-change: transform;
   background: color-mix(in srgb, var(--color-border-inverse-strong) 12%, transparent);
   box-shadow:
     inset 0 0 0 2px var(--color-border-inverse-strong),
     0 0 10px color-mix(in srgb, var(--color-border-inverse-strong) 72%, transparent);
+}
+
+.floating-locale-button {
+  min-width: 52px;
+  min-height: 38px;
+  padding-inline: 0.45rem 0.4rem;
+}
+
+.floating-locale-icon {
+  display: block;
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.floating-locale-dropdown {
+  position: relative;
+}
+
+.floating-locale-dropdown [data-locale-trigger] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.floating-locale-trigger-icons {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.floating-locale-chevron {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+  opacity: 0.72;
+  transition: transform 160ms ease;
+}
+
+.floating-locale-dropdown:hover .floating-locale-chevron,
+.floating-locale-dropdown:focus-within .floating-locale-chevron,
+.floating-locale-dropdown.is-locale-open .floating-locale-chevron {
+  transform: rotate(180deg);
+}
+
+.floating-locale-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding-top: 8px;
+  z-index: 70;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.14s ease,
+    visibility 0.14s ease;
+}
+
+.floating-locale-dropdown:hover .floating-locale-popover,
+.floating-locale-dropdown:focus-within .floating-locale-popover,
+.floating-locale-dropdown.is-locale-open .floating-locale-popover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.floating-locale-menu {
+  position: relative;
+  min-width: 7.25rem;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-background) 92%, white 8%);
+  box-shadow:
+    inset 0 0 0 1px var(--color-border-inverse-strong),
+    0 8px 28px color-mix(in srgb, black 45%, transparent);
+}
+
+.floating-locale-menu li {
+  margin: 0;
+}
+
+.floating-locale-option {
+  display: block;
+  width: 100%;
+  padding: 0.48rem 0.65rem;
+  border-radius: 8px;
+  font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  text-align: center;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+a.floating-locale-option:hover,
+a.floating-locale-option:focus-visible {
+  background: color-mix(in srgb, var(--color-border-inverse-strong) 18%, transparent);
+  outline: none;
+}
+
+.floating-locale-option--current {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .floating-contact-button .floating-more-fill {
@@ -113,6 +240,16 @@
 .floating-base-button > small {
   position: relative;
   z-index: 1;
+}
+
+.floating-nameplate-button small.floating-nameplate-line-en {
+  font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.06em;
+  white-space: normal;
+  max-width: 16em;
+  text-align: center;
+  line-height: 1.2;
+  text-transform: none;
 }
 
 [data-brand-animated-text] {
@@ -250,7 +387,7 @@ small[data-brand-animated-text] {
 
 @media (prefers-reduced-motion: reduce) {
   .floating-brand-cluster,
-  .floating-contact-button,
+  .floating-top-actions,
   .floating-know-more-button {
     animation: none;
   }
@@ -335,6 +472,111 @@ small[data-brand-animated-text] {
   pointer-events: none;
 }
 
+/* ── Institute Overview Overlay ─────────────────────────────────────────── */
+
+.hero-institute-overview {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem) clamp(4rem, 10vh, 7rem);
+  pointer-events: none;
+  opacity: 0;
+  /* initial state — driven by GSAP scroll scrub */
+}
+
+.hero-institute-overview__inner {
+  max-width: min(52rem, 72vw);
+  width: 100%;
+}
+
+.hero-institute-overview__header {
+  margin-bottom: 0.6rem;
+}
+
+.hero-institute-overview__label {
+  font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+  font-size: clamp(0.64rem, 0.9vw, 0.8rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text-primary) 44%, transparent);
+  line-height: 1;
+}
+
+.hero-institute-overview__divider {
+  width: min(7rem, 20vw);
+  height: 1px;
+  margin-bottom: 1.2rem;
+  background: color-mix(in srgb, var(--color-border-inverse-strong) 64%, transparent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  /* GSAP drives this */
+}
+
+.hero-institute-overview__content {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.hero-institute-overview__line {
+  margin: 0;
+  font-family: "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1rem, 1.4vw, 1.22rem);
+  line-height: 1.72;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--color-text-primary) 76%, transparent);
+  -webkit-font-smoothing: antialiased;
+  opacity: 0;
+  /* GSAP drives fade-in per line */
+}
+
+.hero-institute-overview__line--secondary {
+  color: color-mix(in srgb, var(--color-text-primary) 50%, transparent);
+}
+
+.hero-institute-overview__quote {
+  margin: 0.4rem 0 0;
+  padding: 0.7rem 0 0.7rem 1rem;
+  border-left: 2px solid color-mix(in srgb, var(--color-primary) 52%, transparent);
+  opacity: 0;
+  /* GSAP drives fade-in */
+}
+
+.hero-institute-overview__quote-text {
+  display: block;
+  font-family: "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(0.98rem, 1.3vw, 1.16rem);
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  color: color-mix(in srgb, var(--color-primary) 84%, white 16%);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (max-width: 720px) {
+  .hero-institute-overview {
+    align-items: flex-end;
+    padding: 1.5rem max(1rem, calc(env(safe-area-inset-left) + 0.9rem)) max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem));
+  }
+
+  .hero-institute-overview__inner {
+    max-width: 100%;
+  }
+
+  .hero-institute-overview__label {
+    font-size: 0.66rem;
+  }
+
+  .hero-institute-overview__line {
+    font-size: clamp(0.95rem, 3.8vw, 1.12rem);
+  }
+
+  .hero-institute-overview__quote-text {
+    font-size: 0.98rem;
+  }
+}
+
 @media (max-width: 720px) {
   .hero-transition-stage {
     margin-top: -14px; /* cancel page-shell mobile padding-top */
@@ -365,6 +607,11 @@ small[data-brand-animated-text] {
     font-size: 0.94rem;
   }
 
+  .floating-nameplate-button small.floating-nameplate-line-en {
+    letter-spacing: 0.05em;
+    max-width: min(16em, calc(100vw - 2.4rem));
+  }
+
   .floating-base-button small {
     font-size: 0.54rem;
   }
@@ -382,10 +629,26 @@ small[data-brand-animated-text] {
     transform: translateY(-0.5px);
   }
 
-  .floating-contact-button {
+  .floating-top-actions {
     top: max(1rem, calc(env(safe-area-inset-top) + 0.5rem));
-    left: auto;
-    right: calc(max(0.8rem, calc(env(safe-area-inset-right) + 0.35rem)) + 16px);
+    right: max(0.8rem, calc(env(safe-area-inset-right) + 0.35rem));
+    gap: 0.5rem;
+  }
+
+  .floating-locale-button {
+    min-width: 40px;
+    min-height: 34px;
+    padding-inline: 0.45rem;
+  }
+
+  .floating-locale-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .floating-locale-chevron {
+    width: 1rem;
+    height: 1rem;
   }
 
   .floating-know-more-button {

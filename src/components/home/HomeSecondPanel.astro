@@ -4,12 +4,11 @@ import HomeMonolithVisual from './HomeMonolithVisual.astro';
 
 interface Props {
   locale: Locale;
-  coreQuestionLabel: string;
   coreQuestion: string;
   instituteIntro: string;
 }
 
-const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
+const { locale, coreQuestion, instituteIntro } = Astro.props;
 ---
 
 <section class={`landing-second-panel ${locale === 'en' ? 'landing-second-panel--en' : ''}`} data-second-panel>
@@ -18,7 +17,6 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
   <div class="landing-second-panel__veil" aria-hidden="true"></div>
   <div class="landing-second-panel__inner" data-second-panel-inner>
     <article class="landing-second-panel__block landing-second-panel__block--top-right">
-      <p class="landing-second-panel__label">{coreQuestionLabel}</p>
       <h2 class="landing-second-panel__title" data-second-panel-heading>{coreQuestion}</h2>
       <div class="landing-second-panel__divider" data-second-panel-divider aria-hidden="true"></div>
       <div class="landing-second-panel__body" data-second-panel-body>
@@ -73,15 +71,6 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
     line-height: 1.05;
     letter-spacing: -0.04em;
     font-weight: 500;
-  }
-
-  .landing-second-panel__label {
-    margin: 0;
-    font-size: clamp(1.9rem, 2.6vw + 0.5rem, 4.8rem);
-    line-height: 1.05;
-    letter-spacing: -0.04em;
-    font-weight: 500;
-    color: var(--color-secondary-foreground);
   }
 
   .landing-second-panel__body {
@@ -275,8 +264,7 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
   }
 
   @media (max-width: 1024px) {
-    .landing-second-panel__title,
-    .landing-second-panel__label {
+    .landing-second-panel__title {
       font-size: clamp(2.1rem, 2.8vw + 0.5rem, 3.8rem);
     }
 
@@ -322,8 +310,7 @@ const { locale, coreQuestionLabel, coreQuestion, instituteIntro } = Astro.props;
       width: min(52vw, 15rem);
     }
 
-    .landing-second-panel__title,
-    .landing-second-panel__label {
+    .landing-second-panel__title {
       font-size: clamp(1.9rem, 5.6vw, 2.8rem);
       max-width: 11ch;
     }

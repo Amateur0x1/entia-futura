@@ -15,13 +15,17 @@ if (!isLocale(locale)) {
   throw new Error(`Unsupported locale: ${locale}`);
 }
 
+const currentPath = Astro.url.pathname;
+const zhLocalePath = toLocalePath('zh', currentPath);
+const enLocalePath = toLocalePath('en', currentPath);
+const localeDropdownLabel = pickByLocale(locale, '选择语言', 'Choose language');
+
 const pageTitle = pickByLocale(locale, siteMeta.zhName, siteMeta.enName);
 const pageDescription = pickByLocale(
   locale,
   '一个以轨道档案为视觉母题的研究所首页：问题被重新编目，研究通过横向转译链进入现实。',
   'An institute homepage built around an orbital archive: questions are re-indexed and research enters reality through a horizontal chain of translation.',
 );
-const coreQuestionLabel = pickByLocale(locale, '核心问题：', 'Core Question:');
 const coreQuestion = pickByLocale(locale, '未来我们将如何存在？', 'How shall we exist in the future?');
 const instituteIntro = pickByLocale(
   locale,
@@ -69,13 +73,8 @@ const whatWeDoModules = [
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
   <PageLoader />
   <main class="landing-main" data-hero-stage>
-    <HomeHeroScreen />
-    <HomeSecondPanel
-      locale={locale}
-      coreQuestionLabel={coreQuestionLabel}
-      coreQuestion={coreQuestion}
-      instituteIntro={instituteIntro}
-    />
+    <HomeHeroScreen locale={locale} />
+    <HomeSecondPanel locale={locale} coreQuestion={coreQuestion} instituteIntro={instituteIntro} />
     <div class="landing-scroll-spacer" data-landing-scroll-spacer aria-hidden="true"></div>
     <HomeThirdPanel
       locale={locale}
@@ -96,14 +95,75 @@ const whatWeDoModules = [
         data-brand-cluster-button
         href={toLocalePath(locale, '/')}
       >
-        <span data-brand-animated-text>Entia Futura</span>
-        <small data-brand-animated-text>未来人研究所</small>
+        <span data-brand-animated-text>Entia Futura /</span>
+        {locale === 'zh' ? (
+          <small data-brand-animated-text>未来人研究所</small>
+        ) : (
+          <small class="floating-nameplate-line-en" data-brand-animated-text>
+            Institute for future beings
+          </small>
+        )}
       </a>
     </div>
-    <a class="floating-base-button floating-button floating-contact-button" data-brand-contact-button href={toLocalePath(locale, '/contact')}>
-      <i class="floating-more-fill" data-contact-fill aria-hidden="true"></i>
-      <span style="transform: translateY(-0.5px)">Contact</span>
-    </a>
+    <div class="floating-top-actions">
+      <a class="floating-base-button floating-button floating-contact-button" data-brand-contact-button href={toLocalePath(locale, '/contact')}>
+        <i class="floating-more-fill" data-contact-fill aria-hidden="true"></i>
+        <span style="transform: translateY(-0.5px)">Contact</span>
+      </a>
+      <div class="floating-locale-dropdown" data-locale-dropdown>
+        <button
+          type="button"
+          class="floating-base-button floating-button floating-contact-button floating-locale-button"
+          data-locale-trigger
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="floating-locale-menu"
+          aria-label={localeDropdownLabel}
+        >
+          <i class="floating-more-fill" data-locale-fill aria-hidden="true"></i>
+          <div class="floating-locale-trigger-icons">
+            <svg class="floating-locale-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+              <path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+              <path
+                d="M12 3c2.8 3.4 4.5 7.2 4.5 9s-1.7 5.6-4.5 9M12 3c-2.8 3.4-4.5 7.2-4.5 9s1.7 5.6-4.5 9"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"></path>
+            </svg>
+            <svg class="floating-locale-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 16.2 5.8 10l1.4-1.4L12 13.4l4.8-4.8 1.4 1.4z" fill="currentColor"></path>
+            </svg>
+          </div>
+        </button>
+        <div class="floating-locale-popover">
+          <ul class="floating-locale-menu" id="floating-locale-menu" role="listbox" aria-label={localeDropdownLabel}>
+            <li role="presentation">
+              {locale === 'zh' ? (
+                <span class="floating-locale-option floating-locale-option--current" role="option" aria-selected="true">
+                  中文
+                </span>
+              ) : (
+                <a class="floating-locale-option" role="option" href={zhLocalePath}>
+                  中文
+                </a>
+              )}
+            </li>
+            <li role="presentation">
+              {locale === 'en' ? (
+                <span class="floating-locale-option floating-locale-option--current" role="option" aria-selected="true">
+                  英语
+                </span>
+              ) : (
+                <a class="floating-locale-option" role="option" href={enLocalePath}>
+                  英语
+                </a>
+              )}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <button class="floating-know-more-button" data-know-more-button type="button" aria-label={locale === 'en' ? 'Know more' : '了解更多'}>
       <span>{locale === 'en' ? 'KNOW MORE' : '了解更多'}</span>
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">

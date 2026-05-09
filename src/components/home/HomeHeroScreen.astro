@@ -1,7 +1,15 @@
 ---
 import './landing-hero/landingHero.css';
 import { siteMeta } from '../../content/site';
+import type { Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+
 const { assetsUrl } = siteMeta;
+const { locale } = Astro.props;
+const isZh = locale !== 'en';
 ---
 
 <section class="hero-transition-stage" data-hero-transition-root>
@@ -32,6 +40,44 @@ const { assetsUrl } = siteMeta;
       ></video>
       <div class="hero-video-overlay" aria-hidden="true"></div>
       <div class="hero-video-vignette" aria-hidden="true"></div>
+    </div>
+
+    <!-- Institute Overview overlay — revealed after scroll-video ends, during loop-video hold -->
+    <div class="hero-institute-overview" data-institute-overview aria-hidden="true">
+      <div class="hero-institute-overview__inner">
+        <div class="hero-institute-overview__header">
+          <span class="hero-institute-overview__label">{isZh ? '机构概览' : 'Institute Overview'}</span>
+        </div>
+        <div class="hero-institute-overview__divider" data-overview-divider></div>
+        <div class="hero-institute-overview__content">
+          {isZh ? (
+            <>
+              <p class="hero-institute-overview__line" data-overview-line>
+                未来人研究所（ENTIA FUTURA INSTITUT）是一个围绕"未来我们将如何存在？"这一核心问题展开工作的独立研究机构。它既不是传统学院，也不是普通咨询公司、内容平台或松散社群，而是试图在大学之外，建立一种新的研究所形态。
+              </p>
+              <p class="hero-institute-overview__line hero-institute-overview__line--secondary" data-overview-line>
+                我们以高等研究为基础，同时强调研究向现实问题、合作机制与未来项目的持续转化。研究不应只停留在论文与观点层面，而应进入组织实践、空间场景、地方协作、社群机制与社会实验之中。
+              </p>
+            </>
+          ) : (
+            <>
+              <p class="hero-institute-overview__line" data-overview-line>
+                Entia Futura Institut is an independent institute organized around one core question: How shall we exist in the future? It is neither a conventional academic department nor a consulting firm, media platform, or loose social community, but an attempt to build a new institutional form beyond the university.
+              </p>
+              <p class="hero-institute-overview__line hero-institute-overview__line--secondary" data-overview-line>
+                Grounded in advanced research, the institute is equally committed to translating inquiry into real-world problems, collaborative structures, future-oriented projects, and social experimentation.
+              </p>
+            </>
+          )}
+          <blockquote class="hero-institute-overview__quote" data-overview-quote>
+            {isZh ? (
+              <span class="hero-institute-overview__quote-text">研究不是现实的旁观者，而应成为现实中的形成力。</span>
+            ) : (
+              <span class="hero-institute-overview__quote-text">Inquiry should not remain a spectator of reality; it should become a formative force within it.</span>
+            )}
+          </blockquote>
+        </div>
+      </div>
     </div>
   </div>
 </section>
