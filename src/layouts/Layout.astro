@@ -51,9 +51,6 @@ const navLinks = [
     <meta name="theme-color" content="#05070B" />
   </head>
   <body class:list={{ 'theme-landing-dark': theme === 'landing-dark' }}>
-    <div class="dot-bg-clip" aria-hidden="true">
-      <div class="dot-bg-layer"></div>
-    </div>
     <div class:list={['page-shell', { 'page-shell-landing': theme === 'landing-dark' }]}>
       {theme !== 'landing-dark' && (
         <header class="site-header">
@@ -277,45 +274,6 @@ const navLinks = [
     background-color: var(--color-background);
   }
 
-  /* ── Rotating dot grid — HOME only ──────────────────────────────────────── */
-
-  /* Clipping container — fixed, fills viewport, clips overflow */
-  .dot-bg-clip {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* The actual dot layer that rotates inside the clip container */
-  .dot-bg-layer {
-    position: absolute;
-    inset: -5%;
-    background-image: radial-gradient(circle, color-mix(in srgb, var(--color-text-primary) 50%, transparent) 22%, transparent 23%);
-    background-size: 28px 28px;
-    transform-origin: center center;
-    animation: dot-warp 14s ease-in-out infinite;
-  }
-
-  /* Non-home pages: hide the rotating dot grid */
-  body:not(.theme-landing-dark) .dot-bg-clip {
-    display: none;
-  }
-
-  @keyframes dot-warp {
-    0%   { transform: perspective(800px) rotateX(0deg)  rotateY(0deg);  }
-    25%  { transform: perspective(800px) rotateX(10deg) rotateY(-7deg); }
-    50%  { transform: perspective(800px) rotateX(0deg)  rotateY(10deg); }
-    75%  { transform: perspective(800px) rotateX(-8deg) rotateY(-5deg); }
-    100% { transform: perspective(800px) rotateX(0deg)  rotateY(0deg);  }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .dot-bg-layer {
-      animation: none;
-    }
-  }
 
   /* ── Ambient glow — NON-HOME pages ───────────────────────────────────────── */
   /* Top-left: primary (cyan), bottom-right: secondary (violet)                */
