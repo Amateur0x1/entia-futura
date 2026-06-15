@@ -10,6 +10,7 @@ interface SetupSecondPanelRevealArgs {
   secondPanelDivider: Element | null | undefined;
   secondPanelBody: Element | null | undefined;
   secondPanelParagraphs: HTMLElement[];
+  secondPanelCards?: HTMLElement[];
   secondPanelKnowMore?: HTMLElement | null;
   timeline?: gsap.core.Timeline;
   startAt?: number;
@@ -23,6 +24,7 @@ export const setupSecondPanelReveal = ({
   secondPanelDivider,
   secondPanelBody,
   secondPanelParagraphs,
+  secondPanelCards = [],
   secondPanelKnowMore,
   timeline,
   startAt = 0,
@@ -48,6 +50,11 @@ export const setupSecondPanelReveal = ({
   // Hide only divider and body until reveal; label and heading stay visible.
   gsap.set(secondPanelBody, { autoAlpha: 0 });
   gsap.set(secondPanelDivider, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
+
+  // Cards start hidden + slightly below; revealed one-by-one AFTER the body text.
+  if (secondPanelCards.length > 0) {
+    gsap.set(secondPanelCards, { autoAlpha: 0, y: 28 });
+  }
 
   const tl =
     timeline ??
@@ -90,6 +97,21 @@ export const setupSecondPanelReveal = ({
     );
     paragraphOffset += text.length * 0.018 + 0.12;
   });
+
+  // Cards reveal — after all body paragraphs finish, lift-and-fade in, staggered.
+  if (secondPanelCards.length > 0) {
+    tl.to(
+      secondPanelCards,
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.5,
+        ease: 'power3.out',
+        stagger: { each: 0.12, from: 'start' },
+      },
+      paragraphOffset + 0.18,
+    );
+  }
 
   // Know More button — show immediately when panel slides in.
   if (secondPanelKnowMore instanceof HTMLElement) {

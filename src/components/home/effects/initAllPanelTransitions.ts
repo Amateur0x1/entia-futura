@@ -1,5 +1,6 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SplitText } from 'gsap/SplitText';
 
 import { addHeroMediaDriftSegment } from './addHeroMediaDriftSegment';
 import type { HomeHeroElements } from './getHomeHeroElements';
@@ -21,9 +22,10 @@ export const HERO_TO_INTRO_TIMING = {
   videoPlaybackDuration: 4.1,
   // After scroll-video ends, loop-video holds for this many timeline units
   // before the panel-push begins. During this window the Institute Overview
-  // overlay is revealed and readable.
-  loopVideoHoldDuration: 5.2,
-  panelRevealDelayAfterVideoEnd: 0.52,
+  // overlay is revealed and readable. Lower value = shorter scroll distance
+  // between the overview text appearing and the next panel.
+  loopVideoHoldDuration: 2.6,
+  panelRevealDelayAfterVideoEnd: 0.4,
   transitionScrollDistanceDesktop: 3600,
   transitionScrollDistanceMobile: 2500,
   heroHideAtProgress: 0.985,
@@ -312,8 +314,31 @@ const initFullTransitions = ({
       if (overviewLines.length > 0) {
         gsap.set(overviewLines, { opacity: 0, y: 14 });
       }
+      // Split the quote into characters for a per-char reveal.
+      let overviewQuoteChars: Element[] = [];
+      const overviewQuoteText = overviewQuote?.querySelector<HTMLElement>(
+        '.hero-institute-overview__quote-text',
+      );
       if (overviewQuote) {
-        gsap.set(overviewQuote, { opacity: 0 });
+        gsap.set(overviewQuote, { opacity: 1 });
+        if (overviewQuoteText) {
+          const split = SplitText.create(overviewQuoteText, {
+            type: 'words, chars',
+            charsClass: 'overview-quote-char',
+            // Keep CJK from breaking mid-phrase oddly while chars are split.
+            smartWrap: true,
+          });
+          overviewQuoteChars = split.chars;
+          gsap.set(overviewQuoteChars, {
+            opacity: 0,
+            y: 44,
+            scale: 0.6,
+            rotationX: -90,
+            transformOrigin: '50% 100% -24',
+          });
+        } else {
+          gsap.set(overviewQuote, { opacity: 0 });
+        }
       }
 
       // Signal cards fade out early so they don't overlap the overview overlay
@@ -345,13 +370,30 @@ const initFullTransitions = ({
         );
       }
 
-      // Quote fades in last
+      // Quote reveals last — character by character for a stronger accent.
       if (overviewQuote) {
-        heroTimeline.to(
-          overviewQuote,
-          { opacity: 1, duration: 0.45, ease: 'power2.out' },
-          loopHoldStart + 0.35 + overviewLines.length * 0.22 + 0.3,
-        );
+        const quoteRevealAt = loopHoldStart + 0.35 + overviewLines.length * 0.22 + 0.3;
+        if (overviewQuoteChars.length > 0) {
+          heroTimeline.to(
+            overviewQuoteChars,
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              rotationX: 0,
+              duration: 0.5,
+              ease: 'back.out(1.7)',
+              stagger: { each: 0.035, from: 'start' },
+            },
+            quoteRevealAt,
+          );
+        } else {
+          heroTimeline.to(
+            overviewQuote,
+            { opacity: 1, duration: 0.45, ease: 'power2.out' },
+            quoteRevealAt,
+          );
+        }
       }
 
       // Fade overlay OUT just before the panel-push starts
@@ -405,6 +447,7 @@ const initFullTransitions = ({
       secondPanelDivider: elements.secondPanelDivider,
       secondPanelBody: elements.secondPanelBody,
       secondPanelParagraphs: elements.secondPanelParagraphs,
+      secondPanelCards: elements.secondPanelCards,
       secondPanelKnowMore: elements.secondPanelKnowMore,
       timeline: heroTimeline,
       startAt: panelTextRevealStart,

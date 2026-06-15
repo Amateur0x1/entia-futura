@@ -14,6 +14,7 @@ export interface HomeHeroElements {
   secondPanelDivider: HTMLElement | null;
   secondPanelBody: HTMLElement | null;
   secondPanelParagraphs: HTMLElement[];
+  secondPanelCards: HTMLElement[];
   secondPanelKnowMore: HTMLElement | null;
   knowMoreButton: HTMLElement | null;
   primaryVisual: HTMLElement | null;
@@ -31,6 +32,9 @@ const getVideoElement = (root: ParentNode | null, selector: string) => {
 
 const getParagraphs = (root: HTMLElement | null) =>
   root ? Array.from(root.querySelectorAll<HTMLElement>('.landing-second-panel__paragraph')) : [];
+
+const getCards = (root: HTMLElement | null) =>
+  root ? Array.from(root.querySelectorAll<HTMLElement>('.landing-second-panel__card')) : [];
 
 export const getHomeHeroElements = (): HomeHeroElements => {
   const heroTransitionRoot = getHTMLElement(document, '[data-hero-transition-root]');
@@ -65,6 +69,7 @@ export const getHomeHeroElements = (): HomeHeroElements => {
     secondPanelDivider,
     secondPanelBody,
     secondPanelParagraphs: getParagraphs(secondPanelBody),
+    secondPanelCards: getCards(secondPanel),
     secondPanelKnowMore: getHTMLElement(secondPanel, '[data-second-panel-know-more]'),
     knowMoreButton: getHTMLElement(document, '[data-know-more-button]'),
     primaryVisual: portalShell ?? heroVideoShell,

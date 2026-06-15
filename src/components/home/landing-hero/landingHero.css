@@ -571,6 +571,17 @@ small[data-brand-animated-text] {
   letter-spacing: 0.03em;
   color: color-mix(in srgb, var(--color-primary) 84%, white 16%);
   -webkit-font-smoothing: antialiased;
+  /* 3D depth so the per-char rotationX reveal reads clearly */
+  perspective: 600px;
+  /* Avoid kerning shift when SplitText wraps each character */
+  font-kerning: none;
+}
+
+/* Per-character units produced by SplitText for the quote reveal */
+.overview-quote-char {
+  display: inline-block;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
 }
 
 :lang(zh) .hero-institute-overview__quote-text {

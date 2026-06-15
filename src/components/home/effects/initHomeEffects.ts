@@ -1,5 +1,6 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
 
 import { getHomeHeroElements } from './getHomeHeroElements';
@@ -27,7 +28,7 @@ const initSmoothScrolling = () => {
 };
 
 export const initHomeEffects = () => {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, SplitText);
 
   // Expose ScrollTrigger.refresh globally so deferred video scrub segments
   // (e.g. when R2 video metadata arrives late) can trigger a re-measure.
