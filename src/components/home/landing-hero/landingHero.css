@@ -525,9 +525,9 @@ small[data-brand-animated-text] {
   width: clamp(10.4rem, 20.5vw, 17.2rem);
   height: clamp(10.4rem, 20.5vw, 17.2rem);
   margin: clamp(0.1rem, 1vh, 0.8rem) clamp(-0.6rem, -0.8vw, -0.2rem) 0.9rem 1.2rem;
-  border: 1px solid color-mix(in srgb, var(--color-border-inverse-strong) 24%, transparent);
-  border-radius: 999px;
+  border: 0;
   background: transparent;
+  /* shape-outside keeps the circular text-wrap, but the ring is no longer drawn */
   shape-outside: circle(50%);
   shape-margin: clamp(0.55rem, 1.4vw, 1.05rem);
   pointer-events: none;

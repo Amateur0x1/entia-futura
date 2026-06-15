@@ -2,13 +2,21 @@
 import type { Locale } from '../../i18n/config';
 import HomeMonolithVisual from './HomeMonolithVisual.astro';
 
+interface PrincipleCard {
+  readonly zhTitle: string;
+  readonly enTitle: string;
+  readonly zhBody: string;
+  readonly enBody: string;
+}
+
 interface Props {
   locale: Locale;
   coreQuestion: string;
   instituteIntro: string;
+  principleCards?: readonly PrincipleCard[];
 }
 
-const { locale, coreQuestion, instituteIntro } = Astro.props;
+const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
 ---
 
 <section class={`landing-second-panel ${locale === 'en' ? 'landing-second-panel--en' : ''}`} data-second-panel>
@@ -24,6 +32,22 @@ const { locale, coreQuestion, instituteIntro } = Astro.props;
           <p class="landing-second-panel__paragraph">{paragraph}</p>
         ))}
       </div>
+      {principleCards && principleCards.length > 0 && (
+        <div class="landing-second-panel__cards" data-second-panel-body>
+          {principleCards.map((card, i) => (
+            <div class="landing-second-panel__card" data-card-index={i}>
+              <p class="landing-second-panel__card-label">{String(i + 1).padStart(2, '0')}</p>
+              <h3 class="landing-second-panel__card-title">
+                {locale === 'zh' ? card.zhTitle : card.enTitle}
+              </h3>
+              <div class="landing-second-panel__card-divider" aria-hidden="true"></div>
+              <p class="landing-second-panel__card-body">
+                {locale === 'zh' ? card.zhBody : card.enBody}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </article>
     <HomeMonolithVisual />
   </div>
@@ -67,37 +91,110 @@ const { locale, coreQuestion, instituteIntro } = Astro.props;
   .landing-second-panel__title {
     margin: 0;
     max-width: 18ch;
-    font-size: clamp(1.9rem, 2.6vw + 0.5rem, 4.8rem);
+    font-size: clamp(1.5rem, 1.8vw + 0.4rem, 3.2rem);
     line-height: 1.05;
     letter-spacing: -0.04em;
     font-weight: 500;
   }
 
+  /* Cards grid — sits below the mission/vision body text */
+  .landing-second-panel__cards {
+    margin-top: clamp(1.4rem, 2.2vw, 2.4rem);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(0.6rem, 1vw, 1rem);
+  }
+
+  .landing-second-panel__card {
+    position: relative;
+    padding: 1.5rem 1.6rem 1.4rem;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 28%, transparent);
+    border-radius: 1.2rem;
+    background: color-mix(in srgb, var(--color-background) 55%, transparent);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+      0 0 48px color-mix(in srgb, var(--color-primary) 10%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 8%, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+  }
+
+  .landing-second-panel__card:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+    box-shadow:
+      0 0 64px color-mix(in srgb, var(--color-primary) 18%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 14%, transparent);
+  }
+
+  /* Label tag above title — mirrors fourth panel label style */
+  .landing-second-panel__card-label {
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.58rem, 0.42vw + 0.4rem, 0.72rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    opacity: 0.75;
+    line-height: 1;
+  }
+
+  .landing-second-panel__card-title {
+    margin: 0;
+    font-size: clamp(0.86rem, 0.6vw + 0.42rem, 1.06rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--color-foreground, #f0f4f8);
+  }
+
+  /* Thin divider between title and body — mirrors fourth panel divider */
+  .landing-second-panel__card-divider {
+    width: 2rem;
+    height: 1px;
+    background: color-mix(in srgb, var(--color-primary) 55%, transparent);
+    flex-shrink: 0;
+  }
+
+  .landing-second-panel__card-body {
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.75;
+    letter-spacing: 0.02em;
+    color: color-mix(in srgb, var(--color-foreground, #f0f4f8) 70%, transparent);
+  }
+
+  .landing-second-panel--en .landing-second-panel__card-body {
+    font-size: clamp(0.64rem, 0.38vw + 0.44rem, 0.78rem);
+  }
+
+  .landing-second-panel:not(.landing-second-panel--en) .landing-second-panel__card-body {
+    font-size: clamp(0.66rem, 0.42vw + 0.46rem, 0.8rem);
+  }
+
+  /* Fallback: plain body paragraphs (no cards) */
   .landing-second-panel__body {
     margin: 0;
-    max-width: calc(42rem + 20px);
+    max-width: calc(60rem + 20px);
     display: grid;
     gap: 24px;
     line-height: 1.74;
   }
 
-  /* EN body text */
   .landing-second-panel--en .landing-second-panel__body {
-    font-size: clamp(1.4rem, 0.8vw + 1.0rem, 1.76rem);
+    font-size: clamp(1.1rem, 0.75vw + 0.82rem, 1.52rem);
   }
 
-  /* Chinese body text — noticeably larger */
   .landing-second-panel:not(.landing-second-panel--en) .landing-second-panel__body {
-    font-size: clamp(1.5rem, 1.2vw + 0.9rem, 2.2rem);
+    font-size: clamp(1.2rem, 0.9vw + 0.86rem, 1.68rem);
     color: color-mix(in srgb, var(--color-secondary-foreground) 84%, transparent);
   }
 
   .landing-second-panel__paragraph {
     margin: 0;
-  }
-
-  .landing-second-panel--en .landing-second-panel__body {
-    gap: 30px;
   }
 
   .landing-second-panel__body::before {
@@ -118,7 +215,7 @@ const { locale, coreQuestion, instituteIntro } = Astro.props;
   }
 
   .landing-second-panel__block--top-right {
-    width: min(48rem, 100%);
+    width: min(64rem, 100%);
     text-align: left;
     justify-items: start;
     padding-left: clamp(1.5rem, 3.2vw, 3.125rem);
@@ -265,15 +362,19 @@ const { locale, coreQuestion, instituteIntro } = Astro.props;
 
   @media (max-width: 1024px) {
     .landing-second-panel__title {
-      font-size: clamp(2.1rem, 2.8vw + 0.5rem, 3.8rem);
+      font-size: clamp(1.3rem, 1.6vw + 0.36rem, 2.6rem);
     }
 
     .landing-second-panel--en .landing-second-panel__body {
-      font-size: clamp(1.36rem, 0.8vw + 0.96rem, 1.68rem);
+      font-size: clamp(1rem, 0.7vw + 0.76rem, 1.4rem);
     }
 
     .landing-second-panel:not(.landing-second-panel--en) .landing-second-panel__body {
-      font-size: clamp(1.4rem, 1vw + 0.82rem, 2rem);
+      font-size: clamp(1.1rem, 0.8vw + 0.8rem, 1.56rem);
+    }
+
+    .landing-second-panel__cards {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -321,6 +422,16 @@ const { locale, coreQuestion, instituteIntro } = Astro.props;
 
     .landing-second-panel:not(.landing-second-panel--en) .landing-second-panel__body {
       font-size: clamp(1rem, 3.4vw, 1.18rem);
+    }
+
+    .landing-second-panel__cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .landing-second-panel__cards {
+      grid-template-columns: 1fr;
     }
   }
 </style>

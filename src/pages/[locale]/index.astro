@@ -33,6 +33,44 @@ const instituteIntro = pickByLocale(
   '使命：围绕"未来我们将如何存在？"这一核心问题，连接研究、社群、产业与现实实验。\n愿景：在大学之外，建立一种更开放、更现实、也更具协作能力的新型研究机构。',
   'Mission: To organize research, community, industry, and real-world experimentation around one central question: How shall we exist in the future?\nVision: To build a new kind of institute beyond the university — more open, more grounded, and more capable of collaboration.',
 );
+const principleCards = [
+  {
+    zhTitle: '严肃思考，进入现实',
+    enTitle: 'Serious thought, grounded in reality',
+    zhBody: '坚持问题意识与现实触感并重，让研究进入组织、地方与合作之中。',
+    enBody: 'We hold firm to both critical rigor and real-world contact, bringing research into organizations, localities, and collaborations.',
+  },
+  {
+    zhTitle: '跨界连接，拒绝空转',
+    enTitle: 'Cross-boundary connection, not empty posturing',
+    zhBody: '连接研究者、创作者、技术实践者、企业与空间，但跨界不是姿态，而是共同承担问题。',
+    enBody: 'We connect researchers, makers, practitioners, enterprises, and spaces — but cross-boundary work is not a stance; it is shared responsibility for a problem.',
+  },
+  {
+    zhTitle: '长期主义，反对速成',
+    enTitle: 'Long-termism against quick fixes',
+    zhBody: '重视积累、节奏与信任，不追逐即时热度或短期流量。',
+    enBody: 'We value accumulation, rhythm, and trust. We do not chase instant attention or short-term reach.',
+  },
+  {
+    zhTitle: '开放合作，保持判断',
+    enTitle: 'Open to collaboration, firm in judgment',
+    zhBody: '欢迎合作，同时珍视研究的独立性与复杂度。',
+    enBody: 'We welcome collaboration while preserving the independence and complexity of our inquiry.',
+  },
+  {
+    zhTitle: '共同建设，而非被动消费',
+    enTitle: 'Build together, not consume passively',
+    zhBody: '研究所不是一个供人消费的品牌，而是一项需要共同建设的事业。',
+    enBody: 'The institute is not a brand to be consumed, but a project to be built together.',
+  },
+  {
+    zhTitle: '有思想，也能做事',
+    enTitle: 'Thinkers who can act',
+    zhBody: '反对把思想与行动切开，强调研究深度与现实能力并存。',
+    enBody: 'We reject the separation of thought and action, insisting on both depth of inquiry and capacity for real-world work.',
+  },
+] as const;
 
 const whatWeDoTitle = pickByLocale(locale, '我们做什么？', 'What We Do?');
 const whatWeDoIntro = pickByLocale(
@@ -76,7 +114,7 @@ const whatWeDoModules = [
   <PageLoader />
   <main class="landing-main" data-hero-stage>
     <HomeHeroScreen locale={locale} />
-    <HomeSecondPanel locale={locale} coreQuestion={coreQuestion} instituteIntro={instituteIntro} />
+    <HomeSecondPanel locale={locale} coreQuestion={coreQuestion} instituteIntro={instituteIntro} principleCards={principleCards} />
     <div class="landing-scroll-spacer" data-landing-scroll-spacer aria-hidden="true"></div>
     <HomeThirdPanel
       locale={locale}

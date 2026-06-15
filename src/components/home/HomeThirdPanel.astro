@@ -30,9 +30,11 @@ const { locale, title, intro, modules } = Astro.props;
         <div class="landing-third-panel__divider" aria-hidden="true" data-tp-divider></div>
       </header>
       <div class="landing-third-panel__grid">
-        {modules.map((item) => (
+        {modules.map((item, i) => (
           <article class="field-card landing-third-panel__card" data-tp-card>
+            <p class="landing-third-panel__card-label">{String(i + 1).padStart(2, '0')}</p>
             <h3>{pickByLocale(locale, item.zhTitle, item.enTitle)}</h3>
+            <div class="landing-third-panel__card-divider" aria-hidden="true"></div>
             <p>{pickByLocale(locale, item.zhBody, item.enBody)}</p>
           </article>
         ))}
@@ -159,29 +161,73 @@ const { locale, title, intro, modules } = Astro.props;
   }
 
   .landing-third-panel__card {
+    position: relative;
     margin: 0;
-    border: 1px solid color-mix(in srgb, var(--color-secondary-foreground) 12%, transparent);
-    background: color-mix(in srgb, #0a111d 86%, transparent);
-    backdrop-filter: blur(3px);
-    border-radius: 14px;
-    padding: clamp(0.9rem, 1.4vw, 1.2rem);
-    display: grid;
+    padding: 1.5rem 1.6rem 1.4rem;
+    border: 1px solid color-mix(in srgb, var(--color-secondary) 28%, transparent);
+    border-radius: 1.2rem;
+    background: color-mix(in srgb, var(--color-background) 55%, transparent);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+      0 0 48px color-mix(in srgb, var(--color-secondary) 10%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 8%, transparent);
+    display: flex;
+    flex-direction: column;
     gap: 0.6rem;
     align-content: start;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+  }
+
+  .landing-third-panel__card:hover {
+    border-color: color-mix(in srgb, var(--color-secondary) 50%, transparent);
+    box-shadow:
+      0 0 64px color-mix(in srgb, var(--color-secondary) 18%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 14%, transparent);
+  }
+
+  .landing-third-panel__card-label {
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.58rem, 0.42vw + 0.4rem, 0.72rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    opacity: 0.75;
+    line-height: 1;
   }
 
   .landing-third-panel__card h3 {
     margin: 0;
-    font-size: clamp(1.04rem, 0.7vw + 0.44rem, 1.44rem);
-    line-height: 1.25;
+    font-size: clamp(0.86rem, 0.6vw + 0.42rem, 1.06rem);
+    line-height: 1.2;
     font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-foreground, #f0f4f8);
+  }
+
+  .landing-third-panel__card-divider {
+    width: 2rem;
+    height: 1px;
+    background: color-mix(in srgb, var(--color-secondary) 55%, transparent);
+    flex-shrink: 0;
   }
 
   .landing-third-panel__card p {
     margin: 0;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 80%, transparent);
-    line-height: 1.7;
-    font-size: clamp(0.9rem, 0.35vw + 0.62rem, 1.1rem);
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.75;
+    letter-spacing: 0.02em;
+    color: color-mix(in srgb, var(--color-foreground, #f0f4f8) 70%, transparent);
+  }
+
+  .landing-third-panel--en .landing-third-panel__card p:not(.landing-third-panel__card-label) {
+    font-size: clamp(0.64rem, 0.38vw + 0.44rem, 0.78rem);
+  }
+
+  .landing-third-panel:not(.landing-third-panel--en) .landing-third-panel__card p:not(.landing-third-panel__card-label) {
+    font-size: clamp(0.66rem, 0.42vw + 0.46rem, 0.8rem);
   }
 
   /* ── Tablet: full width, centered content ── */
@@ -198,11 +244,7 @@ const { locale, title, intro, modules } = Astro.props;
     }
 
     .landing-third-panel__card h3 {
-      font-size: clamp(1rem, 0.9vw + 0.4rem, 1.26rem);
-    }
-
-    .landing-third-panel__card p {
-      font-size: clamp(0.9rem, 0.46vw + 0.57rem, 1.05rem);
+      font-size: clamp(0.82rem, 0.55vw + 0.38rem, 1rem);
     }
   }
 
@@ -245,11 +287,7 @@ const { locale, title, intro, modules } = Astro.props;
     }
 
     .landing-third-panel__card h3 {
-      font-size: clamp(0.96rem, 4vw, 1.14rem);
-    }
-
-    .landing-third-panel__card p {
-      font-size: clamp(0.82rem, 3vw, 0.94rem);
+      font-size: clamp(0.82rem, 3.2vw, 1rem);
     }
   }
 </style>
