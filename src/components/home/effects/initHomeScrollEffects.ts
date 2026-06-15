@@ -21,6 +21,8 @@ export const initHomeScrollEffects = ({
     heroTransitionRoot: homeHeroElements.heroTransitionRoot,
   });
 
+  const overviewScrollSpacer = document.querySelector<HTMLElement>('[data-landing-scroll-spacer-overview]');
+
   const thirdPanel = document.querySelector<HTMLElement>('[data-third-panel]');
   const scrollSpacer = document.querySelector<HTMLElement>('[data-landing-scroll-spacer]');
 
@@ -30,6 +32,7 @@ export const initHomeScrollEffects = ({
   if (thirdPanel && scrollSpacer) {
     initAllPanelTransitions({
       elements: homeHeroElements,
+      overviewScrollSpacer,
       thirdPanel,
       scrollSpacer,
       fourthPanel,

@@ -2,6 +2,7 @@
 import HomeEffects from '../../components/home/HomeEffects.astro';
 import HomeFourthPanel from '../../components/home/HomeFourthPanel.astro';
 import HomeHeroScreen from '../../components/home/HomeHeroScreen.astro';
+import HomeOverviewPanel from '../../components/home/HomeOverviewPanel.astro';
 import HomeSecondPanel from '../../components/home/HomeSecondPanel.astro';
 import HomeThirdPanel from '../../components/home/HomeThirdPanel.astro';
 import PageLoader from '../../components/home/PageLoader.astro';
@@ -26,6 +27,14 @@ const pageDescription = pickByLocale(
   '一个以轨道档案为视觉母题的研究所首页：问题被重新编目，研究通过横向转译链进入现实。',
   'An institute homepage built around an orbital archive: questions are re-indexed and research enters reality through a horizontal chain of translation.',
 );
+// ── Overview panel: Institute Overview ──────────────────────────────────────
+const overviewLabel = pickByLocale(locale, '机构概览', 'Institute Overview');
+const overviewBody = pickByLocale(
+  locale,
+  '未来人研究所（ENTIA FUTURA INSTITUT）是一个围绕"未来我们将如何存在？"这一核心问题展开工作的独立研究机构。它既不是传统学院，也不是普通咨询公司、内容平台或松散社群，而是试图在大学之外，建立一种新的研究所形态。\n我们以高等研究为基础，同时强调研究向现实问题、合作机制与未来项目的持续转化。研究不应只停留在论文与观点层面，而应进入组织实践、空间场景、地方协作、社群机制与社会实验之中。',
+  'Entia Futura Institut is an independent institute organized around one core question: How shall we exist in the future? It is neither a conventional academic department nor a consulting firm, media platform, or loose social community, but an attempt to build a new institutional form beyond the university.\nGrounded in advanced research, the institute is equally committed to translating inquiry into real-world problems, collaborative structures, future-oriented projects, and social experimentation.',
+);
+
 // ── Second panel: Mission & Vision ──────────────────────────────────────────
 const coreQuestion = pickByLocale(locale, '使命、愿景与价值观', 'Mission, Vision & Values');
 const instituteIntro = pickByLocale(
@@ -114,6 +123,9 @@ const whatWeDoModules = [
   <PageLoader />
   <main class="landing-main" data-hero-stage>
     <HomeHeroScreen locale={locale} />
+    <HomeOverviewPanel locale={locale} label={overviewLabel} body={overviewBody} />
+    <!-- Scroll spacer driving the overview → second panel push transition -->
+    <div class="landing-scroll-spacer-overview" data-landing-scroll-spacer-overview aria-hidden="true"></div>
     <HomeSecondPanel locale={locale} coreQuestion={coreQuestion} instituteIntro={instituteIntro} principleCards={principleCards} />
     <div class="landing-scroll-spacer" data-landing-scroll-spacer aria-hidden="true"></div>
     <HomeThirdPanel
@@ -246,6 +258,14 @@ const whatWeDoModules = [
     pointer-events: none;
   }
 
+  /* Spacer driving the overview → second panel push. Height calibrated by GSAP
+     at runtime; this floor covers PUSH_DURATION(1.6) + buffer before JS runs. */
+  .landing-scroll-spacer-overview {
+    height: 280svh;
+    width: 100%;
+    pointer-events: none;
+  }
+
   /* Spacer for panel 4 — height calibrated by GSAP at runtime (buildPushTimeline).
      Set an initial floor that covers PUSH_DURATION(1.6) + buffer(0.4) + extra = 280svh
      so layout is never under-estimated before JS runs. */
@@ -279,6 +299,10 @@ const whatWeDoModules = [
   @media (max-width: 720px) {
     .landing-scroll-spacer {
       height: 320svh;
+    }
+
+    .landing-scroll-spacer-overview {
+      height: 220svh;
     }
 
     .landing-scroll-spacer-extra {

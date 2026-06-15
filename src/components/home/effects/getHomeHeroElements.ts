@@ -7,6 +7,11 @@ export interface HomeHeroElements {
   heroVideoLoading: HTMLElement | null;
   portalShell: HTMLElement | null;
   signalCards: HTMLElement[];
+  overviewPanel: HTMLElement | null;
+  overviewPanelInner: HTMLElement | null;
+  overviewPanelLabel: HTMLElement | null;
+  overviewPanelDivider: HTMLElement | null;
+  overviewPanelLines: HTMLElement[];
   secondPanel: HTMLElement | null;
   secondPanelInner: HTMLElement | null;
   secondPanelLabel: HTMLElement | null;
@@ -47,6 +52,13 @@ export const getHomeHeroElements = (): HomeHeroElements => {
   const signalCards = heroTransitionRoot
     ? Array.from(heroTransitionRoot.querySelectorAll<HTMLElement>('[data-signal-note]'))
     : [];
+  const overviewPanel = getHTMLElement(document, '[data-overview-panel]');
+  const overviewPanelInner = getHTMLElement(overviewPanel, '[data-overview-panel-inner]');
+  const overviewPanelLabel = getHTMLElement(overviewPanel, '.landing-overview-panel__label');
+  const overviewPanelDivider = getHTMLElement(overviewPanel, '[data-overview-divider]');
+  const overviewPanelLines = overviewPanel
+    ? Array.from(overviewPanel.querySelectorAll<HTMLElement>('[data-overview-line]'))
+    : [];
   const secondPanel = getHTMLElement(document, '[data-second-panel]');
   const secondPanelInner = getHTMLElement(secondPanel, '[data-second-panel-inner]');
   const secondPanelLabel = getHTMLElement(secondPanel, '.landing-second-panel__label');
@@ -62,6 +74,11 @@ export const getHomeHeroElements = (): HomeHeroElements => {
     heroVideoLoading,
     portalShell,
     signalCards,
+    overviewPanel,
+    overviewPanelInner,
+    overviewPanelLabel,
+    overviewPanelDivider,
+    overviewPanelLines,
     secondPanel,
     secondPanelInner,
     secondPanelLabel,

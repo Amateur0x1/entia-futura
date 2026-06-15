@@ -54,6 +54,13 @@ export const initHomeEffects = () => {
   });
 
   initMonolithBinaryVisuals(prefersReducedMotion);
+
+  const overviewPanel = document.querySelector<HTMLElement>('[data-overview-panel]');
+  initThirdPanelNebulaBackground({
+    panel: overviewPanel,
+    prefersReducedMotion,
+  });
+
   initThirdPanelNebulaBackground({
     panel: homeHeroElements.secondPanel,
     prefersReducedMotion,

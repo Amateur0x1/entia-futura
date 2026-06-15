@@ -472,147 +472,61 @@ small[data-brand-animated-text] {
   pointer-events: none;
 }
 
-/* ── Institute Overview Overlay ─────────────────────────────────────────── */
+/* ── Act 1: Slogan stage (bottom-centered) ──────────────────────────────── */
 
-.hero-institute-overview {
+.hero-slogan-stage {
   position: absolute;
   inset: 0;
   z-index: 4;
   display: flex;
   align-items: flex-end;
-  justify-content: flex-start;
-  padding: clamp(3rem, 8vh, 6rem) clamp(2rem, 10vw, 12rem) clamp(5.2rem, 12vh, 8.4rem) clamp(1rem, 3vw, 2.5rem);
+  justify-content: center;
+  padding: clamp(3rem, 8vh, 6rem) clamp(1.5rem, 6vw, 5rem) clamp(5.2rem, 12vh, 8.4rem);
   pointer-events: none;
   opacity: 0;
   /* initial state — driven by GSAP scroll scrub */
 }
 
-.hero-institute-overview__inner {
-  max-width: min(50rem, 64vw);
-  width: 100%;
+.hero-slogan {
+  margin: 0;
+  padding: 0;
+  max-width: min(54rem, 86vw);
+  text-align: center;
+  /* 3D depth so the per-char rotationX reveal reads clearly */
+  perspective: 700px;
 }
 
-.hero-institute-overview__header {
-  margin-bottom: 0.6rem;
-}
-
-.hero-institute-overview__label {
-  font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", sans-serif;
-  font-size: clamp(0.64rem, 0.9vw, 0.8rem);
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text-primary) 44%, transparent);
-  line-height: 1;
-}
-
-.hero-institute-overview__divider {
-  width: min(7rem, 20vw);
-  height: 1px;
-  margin-bottom: 1.2rem;
-  background: color-mix(in srgb, var(--color-border-inverse-strong) 64%, transparent);
-  transform-origin: left center;
-  transform: scaleX(0);
-  /* GSAP drives this */
-}
-
-.hero-institute-overview__content {
-  position: relative;
-  display: block;
-}
-
-.hero-institute-overview__void {
-  float: right;
-  width: clamp(10.4rem, 20.5vw, 17.2rem);
-  height: clamp(10.4rem, 20.5vw, 17.2rem);
-  margin: clamp(0.1rem, 1vh, 0.8rem) clamp(-0.6rem, -0.8vw, -0.2rem) 0.9rem 1.2rem;
-  border: 0;
-  background: transparent;
-  /* shape-outside keeps the circular text-wrap, but the ring is no longer drawn */
-  shape-outside: circle(50%);
-  shape-margin: clamp(0.55rem, 1.4vw, 1.05rem);
-  pointer-events: none;
-}
-
-.hero-institute-overview__line {
-  margin: 0 0 0.9rem;
-  font-family: "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.08rem, 1.62vw, 1.38rem);
-  line-height: 1.72;
-  letter-spacing: 0.02em;
-  color: color-mix(in srgb, var(--color-text-primary) 76%, transparent);
-  -webkit-font-smoothing: antialiased;
-  opacity: 0;
-  /* GSAP drives fade-in per line */
-}
-
-:lang(zh) .hero-institute-overview__line {
-  line-height: 1.92;
-  letter-spacing: 0.05em;
-}
-
-.hero-institute-overview__line--secondary {
-  color: color-mix(in srgb, var(--color-text-primary) 50%, transparent);
-}
-
-.hero-institute-overview__quote {
-  clear: both;
-  margin: 0.5rem 0 0;
-  padding: 0.7rem 0 0.7rem 1rem;
-  border-left: 2px solid color-mix(in srgb, var(--color-primary) 52%, transparent);
-  opacity: 0;
-  /* GSAP drives fade-in */
-}
-
-.hero-institute-overview__quote-text {
+.hero-slogan__text {
   display: block;
   font-family: "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.04rem, 1.46vw, 1.28rem);
-  line-height: 1.6;
-  letter-spacing: 0.03em;
+  font-size: clamp(1.18rem, 2vw, 1.62rem);
+  line-height: 1.62;
+  letter-spacing: 0.04em;
   color: color-mix(in srgb, var(--color-primary) 84%, white 16%);
   -webkit-font-smoothing: antialiased;
-  /* 3D depth so the per-char rotationX reveal reads clearly */
-  perspective: 600px;
   /* Avoid kerning shift when SplitText wraps each character */
   font-kerning: none;
 }
 
-/* Per-character units produced by SplitText for the quote reveal */
+:lang(zh) .hero-slogan__text {
+  line-height: 1.82;
+  letter-spacing: 0.08em;
+}
+
+/* Per-character units produced by SplitText for the slogan reveal */
 .overview-quote-char {
   display: inline-block;
   will-change: transform, opacity;
   transform-style: preserve-3d;
 }
 
-:lang(zh) .hero-institute-overview__quote-text {
-  line-height: 1.78;
-  letter-spacing: 0.06em;
-}
-
 @media (max-width: 720px) {
-  .hero-institute-overview {
-    align-items: flex-end;
+  .hero-slogan-stage {
     padding: 1.5rem max(1rem, calc(env(safe-area-inset-left) + 0.9rem)) max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem));
   }
 
-  .hero-institute-overview__inner {
-    max-width: 100%;
-  }
-
-  .hero-institute-overview__void {
-    display: none;
-  }
-
-  .hero-institute-overview__label {
-    font-size: 0.66rem;
-  }
-
-  .hero-institute-overview__line {
-    font-size: clamp(1rem, 4.2vw, 1.2rem);
-  }
-
-  .hero-institute-overview__quote-text {
-    font-size: 1.05rem;
+  .hero-slogan__text {
+    font-size: clamp(1.1rem, 4.6vw, 1.34rem);
   }
 }
 

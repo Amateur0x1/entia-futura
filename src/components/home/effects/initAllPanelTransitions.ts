@@ -11,6 +11,7 @@ import {
   createTransitionShade,
   getPanelFakeScrollDistance,
 } from './panelPushTransition';
+import { setupOverviewPanelReveal } from './setupOverviewPanelReveal';
 import { setupSecondPanelReveal } from './setupSecondPanelReveal';
 import { setupThirdPanelReveal } from './setupThirdPanelReveal';
 
@@ -21,9 +22,10 @@ export const HERO_TO_INTRO_TIMING = {
   videoPlaybackStart: 0,
   videoPlaybackDuration: 4.1,
   // After scroll-video ends, loop-video holds for this many timeline units
-  // before the panel-push begins. During this window the Institute Overview
-  // overlay is revealed and readable. Lower value = shorter scroll distance
-  // between the overview text appearing and the next panel.
+  // before the panel-push begins. During this window the bottom-centered
+  // slogan reveals per-char, holds, then fades. The Institute Overview is now
+  // a standalone panel (HomeOverviewPanel), so only the slogan plays here.
+  // Lower value = shorter scroll distance for the slogan act.
   loopVideoHoldDuration: 2.6,
   panelRevealDelayAfterVideoEnd: 0.4,
   transitionScrollDistanceDesktop: 3600,
@@ -36,6 +38,7 @@ export const HERO_TO_INTRO_TIMING = {
 // ---------------------------------------------------------------------------
 interface InitAllPanelTransitionsOptions {
   elements: HomeHeroElements;
+  overviewScrollSpacer: HTMLElement | null;
   thirdPanel: HTMLElement;
   scrollSpacer: HTMLElement;
   fourthPanel: HTMLElement | null;
@@ -49,6 +52,7 @@ interface InitAllPanelTransitionsOptions {
 // ---------------------------------------------------------------------------
 const initReducedMotionTransitions = ({
   elements,
+  overviewScrollSpacer,
   thirdPanel,
   scrollSpacer,
   fourthPanel,
@@ -56,36 +60,37 @@ const initReducedMotionTransitions = ({
 }: Pick<
   InitAllPanelTransitionsOptions,
   | 'elements'
+  | 'overviewScrollSpacer'
   | 'thirdPanel'
   | 'scrollSpacer'
   | 'fourthPanel'
   | 'fourthScrollSpacer'
 >) => {
-  const { heroTransitionRoot, secondPanel } = elements;
+  const { heroTransitionRoot, overviewPanel, secondPanel } = elements;
   if (!heroTransitionRoot || !secondPanel) return;
 
-  // Reduced-motion: show institute overview immediately (no animation)
-  const overviewElRM = heroTransitionRoot.querySelector<HTMLElement>('[data-institute-overview]');
-  if (overviewElRM) {
-    const overviewLines = Array.from(overviewElRM.querySelectorAll<HTMLElement>('[data-overview-line]'));
-    const overviewQuote = overviewElRM.querySelector<HTMLElement>('[data-overview-quote]');
-    const overviewDivider = overviewElRM.querySelector<HTMLElement>('[data-overview-divider]');
-    gsap.set(overviewElRM, { opacity: 1 });
-    if (overviewDivider) gsap.set(overviewDivider, { scaleX: 1 });
-    if (overviewLines.length > 0) gsap.set(overviewLines, { opacity: 1, y: 0 });
-    if (overviewQuote) gsap.set(overviewQuote, { opacity: 1 });
-    // Hide when hero scrolls past ~60%
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: heroTransitionRoot,
-        start: 'top -55%',
-        end: 'top -70%',
-        toggleActions: 'play none reverse reverse',
-      },
-    }).to(overviewElRM, { opacity: 0, duration: 0.01 });
+  // Reduced-motion: show the slogan immediately (no animation).
+  const sloganStageRM = heroTransitionRoot.querySelector<HTMLElement>('[data-hero-slogan]');
+  const sloganQuoteRM = heroTransitionRoot.querySelector<HTMLElement>('[data-overview-quote]');
+
+  if (sloganStageRM) {
+    gsap.set(sloganStageRM, { opacity: 1 });
+    if (sloganQuoteRM) gsap.set(sloganQuoteRM, { opacity: 1 });
   }
 
-  // 1→2: fade in secondPanel when hero scrolls out
+  // Reduced-motion: reveal the overview panel content immediately (no animation).
+  if (overviewPanel) {
+    setupOverviewPanelReveal({
+      prefersReducedMotion: true,
+      overviewPanel,
+      overviewDivider: elements.overviewPanelDivider,
+      overviewLines: elements.overviewPanelLines,
+    });
+  }
+
+  // 1→2: fade in the overview panel when hero scrolls out. If the overview
+  // panel is missing, fall back to fading in the second panel directly.
+  const firstIncomingRM = overviewPanel ?? secondPanel;
   gsap.timeline({
     scrollTrigger: {
       trigger: heroTransitionRoot,
@@ -95,10 +100,29 @@ const initReducedMotionTransitions = ({
     },
   })
     .fromTo(
-      secondPanel,
+      firstIncomingRM,
       { autoAlpha: 0, y: 22, filter: 'blur(8px)', pointerEvents: 'none' },
       { autoAlpha: 1, y: 0, filter: 'blur(0px)', visibility: 'visible', pointerEvents: 'auto', duration: 0.42, ease: 'power3.out' },
     );
+
+  // overview→2: swap overview panel for the second panel.
+  if (overviewPanel && overviewScrollSpacer) {
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: overviewScrollSpacer,
+        start: 'top -56%',
+        end: 'top -92%',
+        toggleActions: 'play none reverse reverse',
+      },
+    })
+      .to(overviewPanel, { autoAlpha: 0, visibility: 'hidden', pointerEvents: 'none', duration: 0.01, ease: 'none' })
+      .fromTo(
+        secondPanel,
+        { autoAlpha: 0, y: 22, filter: 'blur(8px)', pointerEvents: 'none' },
+        { autoAlpha: 1, y: 0, filter: 'blur(0px)', visibility: 'visible', pointerEvents: 'auto', duration: 0.42, ease: 'power3.out' },
+        0,
+      );
+  }
 
   const secondPanelKnowMoreRM = elements.secondPanelKnowMore;
 
@@ -153,6 +177,7 @@ const initReducedMotionTransitions = ({
 // ---------------------------------------------------------------------------
 const initFullTransitions = ({
   elements,
+  overviewScrollSpacer,
   thirdPanel,
   scrollSpacer,
   fourthPanel,
@@ -164,6 +189,8 @@ const initFullTransitions = ({
     heroTransitionFrame,
     heroTransitionRoot,
     heroVideoShell,
+    overviewPanel,
+    overviewPanelInner,
     secondPanel,
     secondPanelInner,
     scrollVideo,
@@ -171,12 +198,20 @@ const initFullTransitions = ({
 
   if (!heroTransitionRoot || !secondPanel) return;
 
+  // The overview panel sits between hero and second panel. If it (or its
+  // driving spacer) is missing, the hero pushes straight to the second panel.
+  const heroIncomingPanel = overviewPanel ?? secondPanel;
+  const hasOverviewStage = Boolean(overviewPanel && overviewScrollSpacer);
+
   // ── shared layers ──────────────────────────────────────────────────────────
   const heroShade = createTransitionShade('data-hero-panel-transition-shade', heroTransitionRoot);
+  const overviewShade = overviewPanel
+    ? createTransitionShade('data-overview-panel-transition-shade', overviewPanel)
+    : null;
   const secondShade = createTransitionShade('data-second-panel-transition-shade', secondPanel);
   const thirdShade = createTransitionShade('data-third-panel-transition-shade', thirdPanel);
 
-  gsap.set([heroShade, secondShade, thirdShade], { opacity: 0 });
+  gsap.set([heroShade, overviewShade, secondShade, thirdShade].filter(Boolean), { opacity: 0 });
 
   // ── initial states ─────────────────────────────────────────────────────────
   const outgoingHeroPanel = heroTransitionRoot;
@@ -196,8 +231,8 @@ const initFullTransitions = ({
     borderBottomRightRadius: 0,
   });
 
-  // Set panel 4 to its initial hidden-below state
-  for (const p of [fourthPanel]) {
+  // Set panel 4 and the overview panel to their initial hidden-below state
+  for (const p of [overviewPanel, fourthPanel]) {
     if (!p) continue;
     gsap.set(p, {
       opacity: 0,
@@ -213,6 +248,10 @@ const initFullTransitions = ({
       borderBottomLeftRadius: 0,
       borderBottomRightRadius: 0,
     });
+  }
+
+  if (overviewPanelInner) {
+    gsap.set(overviewPanelInner, { y: 0, willChange: 'transform' });
   }
 
   gsap.set(secondPanel, {
@@ -299,116 +338,25 @@ const initFullTransitions = ({
 
     const heroPanelExitStart = loopHoldEnd;
     const heroPanelPushDuration = 1.6;
-    const panelTextRevealStart = heroPanelExitStart + heroPanelPushDuration + 0.16;
 
-    // ── Institute Overview reveal during loop-video hold ─────────────────
-    const overviewEl = heroTransitionRoot.querySelector<HTMLElement>('[data-institute-overview]');
-    const overviewDivider = heroTransitionRoot.querySelector<HTMLElement>('[data-overview-divider]');
-    const overviewLines = heroTransitionRoot
-      ? Array.from(heroTransitionRoot.querySelectorAll<HTMLElement>('[data-overview-line]'))
-      : [];
-    const overviewQuote = heroTransitionRoot.querySelector<HTMLElement>('[data-overview-quote]');
+    // ── Single-act reveal during loop-video hold: the slogan ──────────────
+    //   The bottom-centered slogan reveals per-char, then stays visible until
+    //   the incoming panel push naturally covers it.
+    const sloganStage = heroTransitionRoot.querySelector<HTMLElement>('[data-hero-slogan]');
+    const sloganQuote = heroTransitionRoot.querySelector<HTMLElement>('[data-overview-quote]');
 
-    if (overviewEl) {
-      // Set initial states: lines start slightly below with opacity 0
-      if (overviewLines.length > 0) {
-        gsap.set(overviewLines, { opacity: 0, y: 14 });
-      }
-      // Split the quote into characters for a per-char reveal.
-      let overviewQuoteChars: Element[] = [];
-      const overviewQuoteText = overviewQuote?.querySelector<HTMLElement>(
-        '.hero-institute-overview__quote-text',
-      );
-      if (overviewQuote) {
-        gsap.set(overviewQuote, { opacity: 1 });
-        if (overviewQuoteText) {
-          const split = SplitText.create(overviewQuoteText, {
-            type: 'words, chars',
-            charsClass: 'overview-quote-char',
-            // Keep CJK from breaking mid-phrase oddly while chars are split.
-            smartWrap: true,
-          });
-          overviewQuoteChars = split.chars;
-          gsap.set(overviewQuoteChars, {
-            opacity: 0,
-            y: 44,
-            scale: 0.6,
-            rotationX: -90,
-            transformOrigin: '50% 100% -24',
-          });
-        } else {
-          gsap.set(overviewQuote, { opacity: 0 });
-        }
-      }
+    const sloganRevealAt = loopHoldStart;
 
-      // Signal cards fade out early so they don't overlap the overview overlay
+    if (sloganStage) {
+      // Signal cards fade out early so they don't overlap the slogan.
       const signalCardsFadeOutAt = loopHoldStart - 0.3;
       heroTimeline.to(
         elements.signalCards,
         { autoAlpha: 0, y: -38, duration: 0.28, stagger: 0.02 },
         signalCardsFadeOutAt,
       );
-
-      // Fade the whole overlay in at loopHoldStart
-      heroTimeline.to(overviewEl, { opacity: 1, duration: 0.5, ease: 'power2.out' }, loopHoldStart);
-
-      // Divider scale-in
-      if (overviewDivider) {
-        heroTimeline.to(
-          overviewDivider,
-          { scaleX: 1, duration: 0.45, ease: 'power2.out' },
-          loopHoldStart + 0.18,
-        );
-      }
-
-      // Lines fade in staggered
-      if (overviewLines.length > 0) {
-        heroTimeline.to(
-          overviewLines,
-          { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out', stagger: 0.22 },
-          loopHoldStart + 0.35,
-        );
-      }
-
-      // Quote reveals last — character by character for a stronger accent.
-      if (overviewQuote) {
-        const quoteRevealAt = loopHoldStart + 0.35 + overviewLines.length * 0.22 + 0.3;
-        if (overviewQuoteChars.length > 0) {
-          heroTimeline.to(
-            overviewQuoteChars,
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              rotationX: 0,
-              duration: 0.5,
-              ease: 'back.out(1.7)',
-              stagger: { each: 0.035, from: 'start' },
-            },
-            quoteRevealAt,
-          );
-        } else {
-          heroTimeline.to(
-            overviewQuote,
-            { opacity: 1, duration: 0.45, ease: 'power2.out' },
-            quoteRevealAt,
-          );
-        }
-      }
-
-      // Fade overlay OUT just before the panel-push starts
-      const overviewFadeOutStart = heroPanelExitStart - 0.55;
-      heroTimeline.to(
-        overviewEl,
-        { opacity: 0, duration: 0.45, ease: 'power2.in' },
-        overviewFadeOutStart,
-      );
-    }
-
-    // ─────────────────────────────────────────────────────────────────────
-    // Signal cards already handled above when overviewEl exists; this handles
-    // the fallback case where there is no overview overlay.
-    if (!overviewEl) {
+    } else {
+      // Fallback: no slogan present — just clear the signal cards before the push.
       heroTimeline.to(
         elements.signalCards,
         { autoAlpha: 0, y: -58, duration: 0.32, stagger: 0.02 },
@@ -416,9 +364,58 @@ const initFullTransitions = ({
       );
     }
 
+    // ── Slogan reveal ─────────────────────────────────────────────────────
+    if (sloganStage) {
+      // Split the slogan into characters for a per-char reveal.
+      let sloganChars: Element[] = [];
+      const sloganText = sloganQuote?.querySelector<HTMLElement>('.hero-slogan__text');
+      if (sloganQuote) {
+        gsap.set(sloganQuote, { opacity: 1 });
+        if (sloganText) {
+          const split = SplitText.create(sloganText, {
+            type: 'words, chars',
+            charsClass: 'overview-quote-char',
+            // Keep CJK from breaking mid-phrase oddly while chars are split.
+            smartWrap: true,
+          });
+          sloganChars = split.chars;
+          gsap.set(sloganChars, {
+            opacity: 0,
+            y: 44,
+            scale: 0.6,
+            rotationX: -90,
+            transformOrigin: '50% 100% -24',
+          });
+        }
+      }
+
+      // Fade the slogan stage in.
+      heroTimeline.to(sloganStage, { opacity: 1, duration: 0.4, ease: 'power2.out' }, sloganRevealAt);
+
+      // Per-character reveal with a back.out bounce.
+      if (sloganChars.length > 0) {
+        heroTimeline.to(
+          sloganChars,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotationX: 0,
+            duration: 0.5,
+            ease: 'back.out(1.7)',
+            stagger: { each: 0.035, from: 'start' },
+          },
+          sloganRevealAt + 0.12,
+        );
+      }
+
+    }
+
+    // Hero pushes up to the standalone overview panel (or directly to the
+    // second panel if the overview panel is absent).
     addPanelPushTransitionSegment({
       duration: heroPanelPushDuration,
-      incomingPanel: secondPanel,
+      incomingPanel: heroIncomingPanel,
       liftDistance: () => 0,
       outgoingPanel: outgoingHeroPanel,
       outgoingScale: 0.72,
@@ -438,20 +435,33 @@ const initFullTransitions = ({
       );
     }
 
-    setupSecondPanelReveal({
-      prefersReducedMotion: false,
-      splitTextAvailable,
-      secondPanel,
-      secondPanelLabel: elements.secondPanelLabel,
-      secondPanelHeading: elements.secondPanelHeading,
-      secondPanelDivider: elements.secondPanelDivider,
-      secondPanelBody: elements.secondPanelBody,
-      secondPanelParagraphs: elements.secondPanelParagraphs,
-      secondPanelCards: elements.secondPanelCards,
-      secondPanelKnowMore: elements.secondPanelKnowMore,
-      timeline: heroTimeline,
-      startAt: panelTextRevealStart,
-    });
+    // Reveal the overview panel content (divider + lines) right after the push.
+    if (overviewPanel) {
+      setupOverviewPanelReveal({
+        prefersReducedMotion: false,
+        overviewPanel,
+        overviewDivider: elements.overviewPanelDivider,
+        overviewLines: elements.overviewPanelLines,
+        timeline: heroTimeline,
+        startAt: heroPanelExitStart + heroPanelPushDuration + 0.16,
+      });
+    } else {
+      // No overview panel — reveal the second panel directly (legacy fallback).
+      setupSecondPanelReveal({
+        prefersReducedMotion: false,
+        splitTextAvailable,
+        secondPanel,
+        secondPanelLabel: elements.secondPanelLabel,
+        secondPanelHeading: elements.secondPanelHeading,
+        secondPanelDivider: elements.secondPanelDivider,
+        secondPanelBody: elements.secondPanelBody,
+        secondPanelParagraphs: elements.secondPanelParagraphs,
+        secondPanelCards: elements.secondPanelCards,
+        secondPanelKnowMore: elements.secondPanelKnowMore,
+        timeline: heroTimeline,
+        startAt: heroPanelExitStart + heroPanelPushDuration + 0.16,
+      });
+    }
 
     // Video scrub: scroll-video plays until videoPlaybackEnd (NOT heroPanelExitStart).
     // The loop-video cross-fade already happens inside addHeroVideoTransitionSegment
@@ -482,6 +492,156 @@ const initFullTransitions = ({
     scrollVideo.addEventListener('error', initOnce, { once: true });
   } else {
     createHeroTimeline();
+  }
+
+  // ── overview→2 scrub timeline ─────────────────────────────────────────────
+  // A genuinely separate screen sitting between the hero and the second panel.
+  // Mirrors the 2→3 secondTimeline exactly: optional inner scroll on the
+  // overview panel, then a panel-push that shrinks the overview away and lifts
+  // the second panel in, followed by the second panel's content reveal.
+  if (hasOverviewStage && overviewPanel && overviewScrollSpacer) {
+    const overviewFakeScrollDistance = overviewPanelInner
+      ? getPanelFakeScrollDistance(overviewPanel, overviewPanelInner)
+      : 0;
+    const overviewFakeScrollDuration =
+      overviewFakeScrollDistance > 1
+        ? Math.min(Math.max(overviewFakeScrollDistance / window.innerHeight, 0.45), 1.55)
+        : 0;
+    const overviewPushStart = overviewFakeScrollDuration;
+    const overviewPushDuration = 1.6;
+
+    let overviewPanelResetCall: gsap.core.Tween | null = null;
+    let secondPanelRevealScrollExtra = Math.round(window.innerHeight * 1.5);
+
+    const overviewTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: overviewScrollSpacer,
+        start: 'top top',
+        end: () =>
+          `+=${Math.round(
+            window.innerHeight +
+              (overviewPanelInner ? getPanelFakeScrollDistance(overviewPanel, overviewPanelInner) : 0) +
+              secondPanelRevealScrollExtra,
+          )}`,
+        invalidateOnRefresh: true,
+        scrub: 0.35,
+        onEnter: () => {
+          overviewPanelResetCall?.kill();
+          overviewPanelResetCall = null;
+          gsap.set(secondPanel, {
+            opacity: 0,
+            visibility: 'visible',
+            pointerEvents: 'none',
+            yPercent: 100,
+            y: 0,
+            scale: 1,
+            zIndex: 38,
+          });
+          gsap.set(overviewPanel, { autoAlpha: 1, visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
+        },
+        onEnterBack: () => {
+          overviewPanelResetCall?.kill();
+          overviewPanelResetCall = null;
+          gsap.set(secondPanel, {
+            visibility: 'visible',
+            pointerEvents: 'none',
+            zIndex: 38,
+          });
+          gsap.set(overviewPanel, { visibility: 'visible', pointerEvents: 'auto', zIndex: 36 });
+        },
+        onLeave: () => {
+          gsap.set(secondPanel, { pointerEvents: 'auto', zIndex: 36 });
+          gsap.set(overviewPanel, { pointerEvents: 'none', zIndex: 30 });
+        },
+        onLeaveBack: () => {
+          gsap.set(secondPanel, {
+            opacity: 0,
+            visibility: 'visible',
+            pointerEvents: 'none',
+            yPercent: 100,
+            y: 0,
+            zIndex: 30,
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+          });
+          gsap.set(overviewPanel, { pointerEvents: 'auto', zIndex: 36 });
+          if (overviewShade) gsap.set(overviewShade, { opacity: 0 });
+          overviewPanelResetCall = gsap.delayedCall(0.75, () => {
+            gsap.set(overviewPanel, {
+              autoAlpha: 1,
+              visibility: 'visible',
+              scale: 1,
+              y: 0,
+              yPercent: 0,
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 0,
+            });
+            if (overviewShade) gsap.set(overviewShade, { opacity: 0 });
+          });
+        },
+      },
+    });
+
+    if (overviewFakeScrollDistance > 1 && overviewPanelInner) {
+      overviewTimeline.to(
+        overviewPanelInner,
+        {
+          y: () => -getPanelFakeScrollDistance(overviewPanel, overviewPanelInner),
+          duration: overviewFakeScrollDuration,
+          ease: 'none',
+        },
+        0,
+      );
+    }
+
+    addPanelPushTransitionSegment({
+      duration: overviewPushDuration,
+      incomingPanel: secondPanel,
+      liftDistance: () => 0,
+      outgoingPanel: overviewPanel,
+      outgoingScale: 0.72,
+      shade: overviewShade,
+      shadeOpacity: 0.58,
+      startAt: overviewPushStart,
+      timeline: overviewTimeline,
+    });
+
+    // Reveal the second panel content right after the push completes.
+    const secondPanelRevealStart = overviewPushStart + overviewPushDuration + 0.2;
+    setupSecondPanelReveal({
+      prefersReducedMotion: false,
+      splitTextAvailable,
+      secondPanel,
+      secondPanelLabel: elements.secondPanelLabel,
+      secondPanelHeading: elements.secondPanelHeading,
+      secondPanelDivider: elements.secondPanelDivider,
+      secondPanelBody: elements.secondPanelBody,
+      secondPanelParagraphs: elements.secondPanelParagraphs,
+      secondPanelCards: elements.secondPanelCards,
+      secondPanelKnowMore: elements.secondPanelKnowMore,
+      timeline: overviewTimeline,
+      startAt: secondPanelRevealStart,
+    });
+
+    // Calibrate the driving spacer height — same pattern as 2→3.
+    {
+      const vh = window.innerHeight;
+      const totalDuration = overviewTimeline.totalDuration();
+      const totalScrollPixels = Math.ceil(totalDuration * vh);
+      const basePixels =
+        vh + (overviewPanelInner ? getPanelFakeScrollDistance(overviewPanel, overviewPanelInner) : 0);
+      secondPanelRevealScrollExtra = Math.max(0, totalScrollPixels - basePixels);
+
+      const neededSvh = Math.ceil((totalScrollPixels / vh) * 100) + 160;
+      overviewScrollSpacer.style.height = `${neededSvh}svh`;
+
+      gsap.ticker.add(function refreshOverview() {
+        ScrollTrigger.refresh();
+        gsap.ticker.remove(refreshOverview);
+      });
+    }
   }
 
   // ── 2→3 scrub timeline ────────────────────────────────────────────────────
@@ -736,6 +896,7 @@ const initFullTransitions = ({
 // ---------------------------------------------------------------------------
 export const initAllPanelTransitions = ({
   elements,
+  overviewScrollSpacer,
   thirdPanel,
   scrollSpacer,
   fourthPanel,
@@ -746,6 +907,7 @@ export const initAllPanelTransitions = ({
   if (prefersReducedMotion) {
     initReducedMotionTransitions({
       elements,
+      overviewScrollSpacer,
       thirdPanel,
       scrollSpacer,
       fourthPanel,
@@ -756,6 +918,7 @@ export const initAllPanelTransitions = ({
 
   initFullTransitions({
     elements,
+    overviewScrollSpacer,
     thirdPanel,
     scrollSpacer,
     fourthPanel,
