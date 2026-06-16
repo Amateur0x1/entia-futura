@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 
 import { addHeroMediaDriftSegment } from './addHeroMediaDriftSegment';
 import type { HomeHeroElements } from './getHomeHeroElements';
@@ -350,46 +350,62 @@ const initFullTransitions = ({
       );
     }
 
-    // ── Slogan reveal ─────────────────────────────────────────────────────
+    // ── Slogan reveal (ScrambleText decryption effect) ─────────────────────
+    // The scramble animation is TIME-BASED (not scrub-driven). We use an
+    // onStart callback on a tiny scrub placeholder to fire an independent
+    // gsap.to() that auto-plays regardless of further scroll activity.
     if (sloganStage) {
-      // Split the slogan into characters for a per-char reveal.
-      let sloganChars: Element[] = [];
+      gsap.registerPlugin(ScrambleTextPlugin);
+
       const sloganText = sloganQuote?.querySelector<HTMLElement>('.hero-slogan__text');
+      const originalText = sloganText?.textContent ?? '';
+
       if (sloganQuote) {
         gsap.set(sloganQuote, { opacity: 1 });
-        if (sloganText) {
-          const split = SplitText.create(sloganText, {
-            type: 'words, chars',
-            charsClass: 'overview-quote-char',
-            // Keep CJK from breaking mid-phrase oddly while chars are split.
-            smartWrap: true,
-          });
-          sloganChars = split.chars;
-          gsap.set(sloganChars, {
-            opacity: 0,
-            y: 44,
-            scale: 0.6,
-            rotationX: -90,
-            transformOrigin: '50% 100% -24',
-          });
-        }
+      }
+      // Clear the text — ScrambleText will type it in from empty.
+      if (sloganText) {
+        sloganText.textContent = '';
       }
 
-      // Fade the slogan stage in.
+      // Fade the slogan stage in (still scrub-driven — quick opacity reveal).
       heroTimeline.to(sloganStage, { opacity: 1, duration: 0.4, ease: 'power2.out' }, sloganRevealAt);
 
-      // Per-character reveal with a back.out bounce.
-      if (sloganChars.length > 0) {
+      // Fire the time-based scramble each time the scrub enters this point.
+      // On reverse (scroll back up past the trigger), clear the text so the
+      // next forward pass replays the animation from scratch.
+      let scrambleTween: gsap.core.Tween | null = null;
+      if (sloganText && originalText) {
         heroTimeline.to(
-          sloganChars,
+          sloganText,
           {
+            // A zero-visual-change placeholder so we can hook onStart/onReverseComplete.
+            duration: 0.01,
             opacity: 1,
-            y: 0,
-            scale: 1,
-            rotationX: 0,
-            duration: 0.5,
-            ease: 'back.out(1.7)',
-            stagger: { each: 0.035, from: 'start' },
+            onStart: () => {
+              // Kill any in-flight scramble and replay from empty.
+              if (scrambleTween) scrambleTween.kill();
+              sloganText.textContent = '';
+              scrambleTween = gsap.to(sloganText, {
+                duration: 2,
+                scrambleText: {
+                  text: originalText,
+                  chars: 'upperAndLowerCase',
+                  revealDelay: 0.2,
+                  tweenLength: false,
+                },
+                ease: 'power2.inOut',
+                overwrite: 'auto',
+              });
+            },
+            onReverseComplete: () => {
+              // Scrolled back before this point — reset text so next entry replays.
+              if (scrambleTween) {
+                scrambleTween.kill();
+                scrambleTween = null;
+              }
+              sloganText.textContent = '';
+            },
           },
           sloganRevealAt + 0.12,
         );

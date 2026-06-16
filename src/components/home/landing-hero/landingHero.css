@@ -429,16 +429,17 @@ small[data-brand-animated-text] {
   padding: clamp(3rem, 8vh, 6rem) clamp(1.5rem, 6vw, 5rem) clamp(5.2rem, 12vh, 8.4rem);
   pointer-events: none;
   opacity: 0;
+  overflow: hidden;
   /* initial state — driven by GSAP scroll scrub */
 }
 
 .hero-slogan {
   margin: 0;
   padding: 0;
-  max-width: min(54rem, 86vw);
+  max-width: min(86rem, 96vw);
+  overflow: hidden;
+  overflow-wrap: break-word;
   text-align: center;
-  /* 3D depth so the per-char rotationX reveal reads clearly */
-  perspective: 700px;
 }
 
 .hero-slogan__text {
@@ -453,8 +454,6 @@ small[data-brand-animated-text] {
     0 0 18px color-mix(in srgb, var(--color-primary) 50%, transparent),
     0 0 40px color-mix(in srgb, var(--color-primary) 22%, transparent);
   -webkit-font-smoothing: antialiased;
-  /* Avoid kerning shift when SplitText wraps each character */
-  font-kerning: none;
 }
 
 :lang(zh) .hero-slogan__text {
@@ -494,12 +493,6 @@ small[data-brand-animated-text] {
   line-height: 1;
 }
 
-/* Per-character units produced by SplitText for the slogan reveal */
-.overview-quote-char {
-  display: inline-block;
-  will-change: transform, opacity;
-  transform-style: preserve-3d;
-}
 
 @media (max-width: 720px) {
   .hero-slogan-stage {

@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { TextPlugin } from 'gsap/TextPlugin';
+import { SplitText } from 'gsap/SplitText';
 
 interface SetupThirdPanelRevealArgs {
   prefersReducedMotion: boolean;
@@ -16,7 +16,7 @@ export const setupThirdPanelReveal = ({
 }: SetupThirdPanelRevealArgs) => {
   if (!(thirdPanel instanceof HTMLElement)) return;
 
-  gsap.registerPlugin(TextPlugin);
+  gsap.registerPlugin(SplitText);
 
   const intro   = thirdPanel.querySelector<HTMLElement>('[data-tp-intro]');
   const divider = thirdPanel.querySelector<HTMLElement>('[data-tp-divider]');
@@ -24,56 +24,55 @@ export const setupThirdPanelReveal = ({
 
   if (!intro) return;
 
-  const introText = intro.textContent ?? '';
-  const isEn = thirdPanel.classList.contains('landing-third-panel--en');
-
   if (prefersReducedMotion) {
     gsap.set([intro, divider, ...cards], { autoAlpha: 1, y: 0, scaleX: 1 });
     return;
   }
 
+  // ── Split intro into lines with mask for the slide-up reveal ──
+  const split = SplitText.create(intro, {
+    type: 'lines',
+    linesClass: 'split-line',
+    mask: 'lines',
+  });
+  const introLines = split.lines;
+
   // ── Initial hidden state ──
-  // Clear text so typewriter can write it back char-by-char (both EN and ZH).
-  intro.textContent = '';
-  gsap.set(intro, { autoAlpha: 0 });
+  gsap.set(introLines, { yPercent: 100, opacity: 0 });
+  gsap.set(intro, { autoAlpha: 1 });
   if (divider) gsap.set(divider, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
   gsap.set(cards, { autoAlpha: 0, y: 20 });
 
-  // ── Typewriter for both EN and ZH ──
-  // Match second-panel speed: 0.018s per character.
-  const charDuration = 0.018;
-  const typewriterDuration = introText.length * charDuration;
-
-  // Show container first, then start typing.
-  timeline.to(
-    intro,
-    { autoAlpha: 1, duration: 0.1, ease: 'none' },
-    startAt,
-  );
-
-  timeline.to(
-    intro,
-    {
-      duration: typewriterDuration,
-      text: { value: introText, delimiter: '' },
-      ease: 'none',
-    },
-    startAt + 0.1,
-  );
-
-  const afterIntro = startAt + 0.1 + typewriterDuration + 0.2;
-
+  // ── Scrub-driven reveal (part of the timeline) ──
+  // Divider
   if (divider) {
     timeline.to(
       divider,
       { autoAlpha: 1, scaleX: 1, duration: 0.5, ease: 'power2.out' },
-      afterIntro,
+      startAt,
     );
   }
 
+  // Lines slide-up
   timeline.to(
-    cards,
-    { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.1 },
-    afterIntro + 0.15,
+    introLines,
+    {
+      yPercent: 0,
+      opacity: 1,
+      duration: 0.6,
+      ease: 'expo.out',
+      stagger: 0.1,
+    },
+    startAt + 0.2,
   );
+
+  // Cards reveal after lines
+  if (cards.length > 0) {
+    const linesEnd = startAt + 0.2 + 0.6 + 0.1 * (introLines.length - 1);
+    timeline.to(
+      cards,
+      { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.1 },
+      linesEnd + 0.15,
+    );
+  }
 };

@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { TextPlugin } from 'gsap/TextPlugin';
+import { SplitText } from 'gsap/SplitText';
 
 interface SetupOverviewPanelRevealArgs {
   prefersReducedMotion: boolean;
@@ -13,8 +13,8 @@ interface SetupOverviewPanelRevealArgs {
 /**
  * Reveals the standalone Institute Overview panel:
  *   1. The thin divider scales in from the left.
- *   2. The body paragraphs are typed out one-by-one (typewriter effect),
- *      mirroring the second panel's reveal style.
+ *   2. Each paragraph is split into lines and revealed with a masked
+ *      slide-up (yPercent: 100 → 0) — scrub-driven, same as second panel.
  */
 export const setupOverviewPanelReveal = ({
   prefersReducedMotion,
@@ -24,7 +24,7 @@ export const setupOverviewPanelReveal = ({
   timeline,
   startAt = 0,
 }: SetupOverviewPanelRevealArgs) => {
-  gsap.registerPlugin(TextPlugin);
+  gsap.registerPlugin(SplitText);
 
   if (!(overviewPanel instanceof HTMLElement)) {
     return;
@@ -37,10 +37,6 @@ export const setupOverviewPanelReveal = ({
     return;
   }
 
-  // Store original text, then clear for typewriter.
-  const lineTexts = overviewLines.map((el) => el.textContent ?? '');
-  overviewLines.forEach((el) => { el.textContent = ''; });
-
   // Initial hidden states.
   if (overviewDivider) {
     gsap.set(overviewDivider, { scaleX: 0, transformOrigin: 'left center', autoAlpha: 1 });
@@ -48,6 +44,20 @@ export const setupOverviewPanelReveal = ({
   if (overviewLines.length > 0) {
     gsap.set(overviewLines, { autoAlpha: 1 });
   }
+
+  // Split each paragraph into lines with mask (clip) for the slide-up reveal.
+  const allSplitLines: Element[] = [];
+  overviewLines.forEach((el) => {
+    const split = SplitText.create(el, {
+      type: 'lines',
+      linesClass: 'split-line',
+      mask: 'lines',
+    });
+    allSplitLines.push(...split.lines);
+  });
+
+  // Set initial state: lines hidden below their mask.
+  gsap.set(allSplitLines, { yPercent: 100, opacity: 0 });
 
   const tl =
     timeline ??
@@ -69,21 +79,16 @@ export const setupOverviewPanelReveal = ({
     );
   }
 
-  // Typewriter reveal — each line typed out sequentially.
-  let offset = startAt + 0.2;
-  overviewLines.forEach((el, i) => {
-    const text = lineTexts[i] ?? '';
-    if (!text) return;
-    const duration = text.length * 0.018;
-    tl.to(
-      el,
-      {
-        duration,
-        text: { value: text, delimiter: '' },
-        ease: 'none',
-      },
-      offset,
-    );
-    offset += duration + 0.12;
-  });
+  // Lines slide-up reveal (scrub-driven, part of the timeline).
+  tl.to(
+    allSplitLines,
+    {
+      yPercent: 0,
+      opacity: 1,
+      duration: 0.6,
+      ease: 'expo.out',
+      stagger: 0.1,
+    },
+    startAt + 0.2,
+  );
 };

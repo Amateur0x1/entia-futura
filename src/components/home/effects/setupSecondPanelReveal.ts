@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { TextPlugin } from 'gsap/TextPlugin';
+import { SplitText } from 'gsap/SplitText';
 
 interface SetupSecondPanelRevealArgs {
   prefersReducedMotion: boolean;
@@ -27,7 +27,7 @@ export const setupSecondPanelReveal = ({
   timeline,
   startAt = 0,
 }: SetupSecondPanelRevealArgs) => {
-  gsap.registerPlugin(TextPlugin);
+  gsap.registerPlugin(SplitText);
 
   if (
     prefersReducedMotion ||
@@ -39,15 +39,23 @@ export const setupSecondPanelReveal = ({
     return;
   }
 
-  // Label and heading are always visible — no fade-in, no typewriter.
-  // Only the body paragraphs use typewriter reveal.
-  const paragraphTexts = secondPanelParagraphs.map((p) => p.textContent ?? '');
-
-  secondPanelParagraphs.forEach((p) => { p.textContent = ''; });
-
   // Hide only divider and body until reveal; label and heading stay visible.
-  gsap.set(secondPanelBody, { autoAlpha: 0 });
+  gsap.set(secondPanelBody, { autoAlpha: 1 });
   gsap.set(secondPanelDivider, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
+
+  // Split each paragraph into lines with mask for the slide-up reveal.
+  const allSplitLines: Element[] = [];
+  secondPanelParagraphs.forEach((p) => {
+    const split = SplitText.create(p, {
+      type: 'lines',
+      linesClass: 'split-line',
+      mask: 'lines',
+    });
+    allSplitLines.push(...split.lines);
+  });
+
+  // Set initial state: lines hidden below their mask.
+  gsap.set(allSplitLines, { yPercent: 100, opacity: 0 });
 
   // Cards start hidden + slightly below; revealed one-by-one AFTER the body text.
   if (secondPanelCards.length > 0) {
@@ -72,32 +80,22 @@ export const setupSecondPanelReveal = ({
     startAt,
   );
 
-  // Show body container
+  // Lines slide-up reveal (scrub-driven, part of the timeline)
   tl.to(
-    secondPanelBody,
-    { autoAlpha: 1, duration: 0.1, ease: 'none' },
-    startAt + 0.16,
+    allSplitLines,
+    {
+      yPercent: 0,
+      opacity: 1,
+      duration: 0.6,
+      ease: 'expo.out',
+      stagger: 0.1,
+    },
+    startAt + 0.2,
   );
 
-  // Paragraphs typewriter — staggered one after another
-  let paragraphOffset = startAt + 0.2;
-  secondPanelParagraphs.forEach((p, i) => {
-    const text = paragraphTexts[i] ?? '';
-    if (!text) return;
-    tl.to(
-      p,
-      {
-        duration: text.length * 0.018,
-        text: { value: text, delimiter: '' },
-        ease: 'none',
-      },
-      paragraphOffset,
-    );
-    paragraphOffset += text.length * 0.018 + 0.12;
-  });
-
-  // Cards reveal — after all body paragraphs finish, lift-and-fade in, staggered.
+  // Cards reveal — after lines finish
   if (secondPanelCards.length > 0) {
+    const linesEnd = startAt + 0.2 + 0.6 + 0.1 * (allSplitLines.length - 1);
     tl.to(
       secondPanelCards,
       {
@@ -107,8 +105,7 @@ export const setupSecondPanelReveal = ({
         ease: 'power3.out',
         stagger: { each: 0.12, from: 'start' },
       },
-      paragraphOffset + 0.18,
+      linesEnd + 0.18,
     );
   }
-
 };
