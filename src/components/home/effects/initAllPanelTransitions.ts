@@ -387,7 +387,7 @@ const initFullTransitions = ({
               if (scrambleTween) scrambleTween.kill();
               sloganText.textContent = '';
               scrambleTween = gsap.to(sloganText, {
-                duration: 2,
+                duration: 1,
                 scrambleText: {
                   text: originalText,
                   chars: 'upperAndLowerCase',
