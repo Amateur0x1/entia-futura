@@ -102,11 +102,12 @@ const { locale, title, intro, modules } = Astro.props;
     position: relative;
     z-index: 3;
     width: 50%;
-    height: 100%;
+    min-height: 100%;
     margin-left: auto;
     display: flex;
     align-items: start;
     padding: 10vh clamp(1.2rem, 4vw, 3rem) clamp(4rem, 8vw, 6rem) clamp(1.2rem, 4vw, 3rem);
+    padding-bottom: clamp(6rem, 14vh, 10rem);
   }
 
   .landing-third-panel__content {

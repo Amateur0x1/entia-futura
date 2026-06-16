@@ -1,5 +1,4 @@
 import type { HomeHeroElements } from './getHomeHeroElements';
-import { initHeroKnowMoreInteractionEffects } from './initHeroKnowMoreInteractionEffects';
 import { initAllPanelTransitions } from './initAllPanelTransitions';
 import { revealSection } from './revealSection';
 import gsap from 'gsap';
@@ -15,12 +14,6 @@ export const initHomeScrollEffects = ({
   prefersReducedMotion,
   splitTextAvailable,
 }: InitHomeScrollEffectsOptions) => {
-  initHeroKnowMoreInteractionEffects({
-    knowMoreButton: homeHeroElements.knowMoreButton,
-    secondPanel: homeHeroElements.secondPanel,
-    heroTransitionRoot: homeHeroElements.heroTransitionRoot,
-  });
-
   const overviewScrollSpacer = document.querySelector<HTMLElement>('[data-landing-scroll-spacer-overview]');
 
   const thirdPanel = document.querySelector<HTMLElement>('[data-third-panel]');

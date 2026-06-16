@@ -1,6 +1,5 @@
 ---
 import type { Locale } from '../../i18n/config';
-import HomeMonolithVisual from './HomeMonolithVisual.astro';
 
 interface PrincipleCard {
   readonly zhTitle: string;
@@ -49,7 +48,6 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
         </div>
       )}
     </article>
-    <HomeMonolithVisual />
   </div>
 </section>
 
@@ -82,19 +80,23 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(13rem, 0.78fr);
+    grid-template-columns: 1fr;
     align-items: start;
     gap: clamp(1.5rem, 3.2vw, 4rem);
-    min-height: min(74svh, 760px);
+    max-width: min(64rem, 88vw);
+    padding-bottom: clamp(4rem, 12vh, 8rem);
   }
 
   .landing-second-panel__title {
     margin: 0;
     max-width: 18ch;
-    font-size: clamp(1.5rem, 1.8vw + 0.4rem, 3.2rem);
-    line-height: 1.05;
-    letter-spacing: -0.04em;
-    font-weight: 500;
+    font-family: 'POIRETONE-REGULAR', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    font-size: clamp(0.82rem, 1.1vw, 1.05rem);
+    line-height: 1;
+    letter-spacing: 0.28em;
+    font-weight: normal;
+    color: var(--color-primary);
+    opacity: 0.75;
   }
 
   /* Cards grid — sits below the mission/vision body text */
@@ -224,16 +226,14 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
   :global(.landing-second-panel__visual-column) {
     width: 100%;
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    align-self: end;
-    padding-right: clamp(2rem, 25%, 24rem);
+    justify-content: center;
+    align-items: center;
     pointer-events: none;
   }
 
   :global(.landing-second-panel__visual-shell) {
     position: relative;
-    width: min(100%, clamp(15rem, 28vw, 22rem));
+    width: min(100%, clamp(16rem, 32vw, 26rem));
     aspect-ratio: 642 / 1281;
   }
 
@@ -362,7 +362,7 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
 
   @media (max-width: 1024px) {
     .landing-second-panel__title {
-      font-size: clamp(1.3rem, 1.6vw + 0.36rem, 2.6rem);
+      font-size: clamp(0.76rem, 1vw, 0.95rem);
     }
 
     .landing-second-panel--en .landing-second-panel__body {
@@ -412,8 +412,7 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
     }
 
     .landing-second-panel__title {
-      font-size: clamp(1.9rem, 5.6vw, 2.8rem);
-      max-width: 11ch;
+      font-size: 0.72rem;
     }
 
     .landing-second-panel--en .landing-second-panel__body {

@@ -17,7 +17,7 @@
   position: fixed;
   top: max(1rem, calc(env(safe-area-inset-top) + 0.5rem));
   left: max(1rem, calc(env(safe-area-inset-left) + 0.5rem));
-  z-index: 60;
+  z-index: 10000;
   display: inline-flex;
   align-items: center;
   gap: 0;
@@ -54,7 +54,7 @@
   position: fixed;
   top: max(1.3rem, calc(env(safe-area-inset-top) + 1rem));
   right: max(1rem, calc(env(safe-area-inset-right) + 0.5rem));
-  z-index: 60;
+  z-index: 10000;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -195,47 +195,6 @@ a.floating-locale-option:focus-visible {
   background: var(--color-border-inverse-strong);
 }
 
-.floating-know-more-button {
-  position: fixed;
-  left: 50%;
-  bottom: max(1.8rem, calc(env(safe-area-inset-bottom) + 1.2rem + 20px));
-  z-index: 60;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.62rem 1rem 0.6rem;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary) 62%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  color: var(--color-primary);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--color-primary) 24%, transparent);
-  transform: translateX(-50%);
-  font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
-  letter-spacing: 0.16em;
-  line-height: 1;
-  cursor: pointer;
-  transition: background 180ms ease, box-shadow 180ms ease, color 180ms ease;
-  animation: floating-know-more-bob 4.2s ease-in-out infinite;
-}
-
-.floating-know-more-button span {
-  font-size: 0.84rem;
-}
-
-.floating-know-more-button svg {
-  width: 1rem;
-  height: 1rem;
-  fill: currentColor;
-  transform: translateY(1px);
-}
-
-.floating-know-more-button:hover,
-.floating-know-more-button:focus-visible {
-  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--color-primary) 34%, transparent);
-  color: color-mix(in srgb, var(--color-primary) 86%, white 14%);
-}
-
 .floating-base-button > span,
 .floating-base-button > small {
   position: relative;
@@ -372,23 +331,9 @@ small[data-brand-animated-text] {
   }
 }
 
-@keyframes floating-know-more-bob {
-  0%,
-  22%,
-  100% {
-    transform: translateX(-50%) translateY(0);
-  }
-
-  42%,
-  62% {
-    transform: translateX(-50%) translateY(-6px);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .floating-brand-cluster,
-  .floating-top-actions,
-  .floating-know-more-button {
+  .floating-top-actions {
     animation: none;
   }
 }
@@ -499,18 +444,54 @@ small[data-brand-animated-text] {
 .hero-slogan__text {
   display: block;
   font-family: "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.18rem, 2vw, 1.62rem);
-  line-height: 1.62;
-  letter-spacing: 0.04em;
-  color: color-mix(in srgb, var(--color-primary) 84%, white 16%);
+  font-size: clamp(1.42rem, 2.6vw + 0.2rem, 2.1rem);
+  font-weight: 500;
+  line-height: 1.72;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--color-primary) 60%, white 40%);
+  text-shadow:
+    0 0 18px color-mix(in srgb, var(--color-primary) 50%, transparent),
+    0 0 40px color-mix(in srgb, var(--color-primary) 22%, transparent);
   -webkit-font-smoothing: antialiased;
   /* Avoid kerning shift when SplitText wraps each character */
   font-kerning: none;
 }
 
 :lang(zh) .hero-slogan__text {
-  line-height: 1.82;
-  letter-spacing: 0.08em;
+  line-height: 1.92;
+  letter-spacing: 0.10em;
+}
+
+/* ── Slogan ornament (decorative lines + symbol) ──────────────────────────── */
+.hero-slogan__ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1.2rem;
+  opacity: 0.8;
+}
+
+.hero-slogan__ornament-line {
+  flex: 1;
+  max-width: 10rem;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-primary) 60%, white 40%),
+    transparent
+  );
+}
+
+.hero-slogan__ornament-symbol {
+  font-size: 0.68rem;
+  color: color-mix(in srgb, var(--color-primary) 50%, white 50%);
+  text-shadow:
+    0 0 10px color-mix(in srgb, var(--color-primary) 55%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-primary) 28%, transparent);
+  line-height: 1;
 }
 
 /* Per-character units produced by SplitText for the slogan reveal */
@@ -526,7 +507,7 @@ small[data-brand-animated-text] {
   }
 
   .hero-slogan__text {
-    font-size: clamp(1.1rem, 4.6vw, 1.34rem);
+    font-size: clamp(1.24rem, 5vw, 1.56rem);
   }
 }
 
@@ -604,14 +585,4 @@ small[data-brand-animated-text] {
     height: 1rem;
   }
 
-  .floating-know-more-button {
-    bottom: max(1.2rem, calc(env(safe-area-inset-bottom) + 0.7rem + 20px));
-    padding: 0.54rem 0.84rem 0.52rem;
-    gap: 0.42rem;
-  }
-
-  .floating-know-more-button span {
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-  }
 }

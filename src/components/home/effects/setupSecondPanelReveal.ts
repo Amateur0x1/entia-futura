@@ -11,7 +11,6 @@ interface SetupSecondPanelRevealArgs {
   secondPanelBody: Element | null | undefined;
   secondPanelParagraphs: HTMLElement[];
   secondPanelCards?: HTMLElement[];
-  secondPanelKnowMore?: HTMLElement | null;
   timeline?: gsap.core.Timeline;
   startAt?: number;
 }
@@ -25,7 +24,6 @@ export const setupSecondPanelReveal = ({
   secondPanelBody,
   secondPanelParagraphs,
   secondPanelCards = [],
-  secondPanelKnowMore,
   timeline,
   startAt = 0,
 }: SetupSecondPanelRevealArgs) => {
@@ -113,12 +111,4 @@ export const setupSecondPanelReveal = ({
     );
   }
 
-  // Know More button — show immediately when panel slides in.
-  if (secondPanelKnowMore instanceof HTMLElement) {
-    tl.call(
-      () => { secondPanelKnowMore.classList.add('is-visible'); },
-      [],
-      startAt,
-    );
-  }
 };

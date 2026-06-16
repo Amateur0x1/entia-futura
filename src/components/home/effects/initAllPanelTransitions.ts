@@ -124,8 +124,6 @@ const initReducedMotionTransitions = ({
       );
   }
 
-  const secondPanelKnowMoreRM = elements.secondPanelKnowMore;
-
   // 2→3: swap panels
   gsap.timeline({
     scrollTrigger: {
@@ -133,8 +131,6 @@ const initReducedMotionTransitions = ({
       start: 'top -56%',
       end: 'top -92%',
       toggleActions: 'play none reverse reverse',
-      onEnter: () => { secondPanelKnowMoreRM?.classList.remove('is-visible'); },
-      onLeaveBack: () => { secondPanelKnowMoreRM?.classList.add('is-visible'); },
     },
   })
     .to(secondPanel, { autoAlpha: 0, visibility: 'hidden', pointerEvents: 'none', duration: 0.01, ease: 'none' })
@@ -147,15 +143,6 @@ const initReducedMotionTransitions = ({
     timeline: gsap.timeline(),
     startAt: 0,
   });
-
-  // Know More button — show immediately in reduced-motion, bind click.
-  if (secondPanelKnowMoreRM) {
-    secondPanelKnowMoreRM.classList.add('is-visible');
-    secondPanelKnowMoreRM.addEventListener('click', () => {
-      const target = scrollSpacer.offsetTop + scrollSpacer.offsetHeight;
-      window.scrollTo({ top: target, behavior: 'smooth' });
-    });
-  }
 
   // 3→4: simple fade swap for reduced-motion
   if (fourthPanel && fourthScrollSpacer) {
@@ -184,7 +171,6 @@ const initFullTransitions = ({
   fourthScrollSpacer,
   splitTextAvailable,
 }: Omit<InitAllPanelTransitionsOptions, 'prefersReducedMotion'>) => {
-  const secondPanelKnowMore = elements.secondPanelKnowMore;
   const {
     heroTransitionFrame,
     heroTransitionRoot,
@@ -457,7 +443,6 @@ const initFullTransitions = ({
         secondPanelBody: elements.secondPanelBody,
         secondPanelParagraphs: elements.secondPanelParagraphs,
         secondPanelCards: elements.secondPanelCards,
-        secondPanelKnowMore: elements.secondPanelKnowMore,
         timeline: heroTimeline,
         startAt: heroPanelExitStart + heroPanelPushDuration + 0.16,
       });
@@ -620,7 +605,6 @@ const initFullTransitions = ({
       secondPanelBody: elements.secondPanelBody,
       secondPanelParagraphs: elements.secondPanelParagraphs,
       secondPanelCards: elements.secondPanelCards,
-      secondPanelKnowMore: elements.secondPanelKnowMore,
       timeline: overviewTimeline,
       startAt: secondPanelRevealStart,
     });
@@ -664,7 +648,6 @@ const initFullTransitions = ({
       onEnter: () => {
         secondPanelResetCall?.kill();
         secondPanelResetCall = null;
-        secondPanelKnowMore?.classList.remove('is-visible');
         gsap.set(thirdPanel, {
           opacity: 0,
           visibility: 'visible',
@@ -689,10 +672,8 @@ const initFullTransitions = ({
       onLeave: () => {
         gsap.set(thirdPanel, { pointerEvents: 'auto', zIndex: 36 });
         gsap.set(secondPanel, { pointerEvents: 'none', zIndex: 30 });
-        secondPanelKnowMore?.classList.remove('is-visible');
       },
       onLeaveBack: () => {
-        secondPanelKnowMore?.classList.add('is-visible');
         gsap.set(thirdPanel, {
           opacity: 0,
           visibility: 'visible',
@@ -767,33 +748,16 @@ const initFullTransitions = ({
     });
   }
 
-  if (elements.secondPanelKnowMore) {
-    elements.secondPanelKnowMore.addEventListener('click', () => {
-      const target = scrollSpacer.offsetTop + scrollSpacer.offsetHeight;
-      const startY = window.scrollY;
-      const distance = Math.max(target - startY, 0);
-      if (distance < 4) return;
-
-      const DURATION = 6000;
-      const startTime = performance.now();
-      const easeInOut = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-
-      const step = (now: number) => {
-        const raw = Math.min((now - startTime) / DURATION, 1);
-        window.scrollTo({ top: startY + distance * easeInOut(raw) });
-        if (raw < 1) window.requestAnimationFrame(step);
-      };
-
-      window.requestAnimationFrame(step);
-    });
-  }
-
   // ── 3→4 scrub timeline ────────────────────────────────────────────────────
   // Mirrors the 2→3 secondTimeline exactly: same scrub, same push segment,
   // same spacer calibration pattern.
   if (fourthPanel && fourthScrollSpacer) {
+    const thirdPanelInner = thirdPanel.querySelector<HTMLElement>('.landing-third-panel__inner');
+    const thirdFakeScrollDistance = getPanelFakeScrollDistance(thirdPanel, thirdPanelInner);
+    const thirdFakeScrollDuration =
+      thirdFakeScrollDistance > 1 ? Math.min(Math.max(thirdFakeScrollDistance / window.innerHeight, 0.45), 1.55) : 0;
     const fourthPanelPushDuration = 1.6;
-    const fourthPanelPushStart = 0;
+    const fourthPanelPushStart = thirdFakeScrollDuration;
 
     let fourthPanelResetCall: gsap.core.Tween | null = null;
 
@@ -801,7 +765,7 @@ const initFullTransitions = ({
       scrollTrigger: {
         trigger: fourthScrollSpacer,
         start: 'top top',
-        end: () => `+=${Math.round(fourthTimeline.totalDuration() * window.innerHeight)}`,
+        end: () => `+=${Math.round(window.innerHeight + getPanelFakeScrollDistance(thirdPanel, thirdPanelInner) + Math.round(window.innerHeight * 0.5))}`,
         invalidateOnRefresh: true,
         scrub: 0.35,
         onEnter: () => {
@@ -862,6 +826,16 @@ const initFullTransitions = ({
         },
       },
     });
+
+    // Fake scroll: slide third panel content up before the push.
+    if (thirdFakeScrollDistance > 1 && thirdPanelInner) {
+      gsap.set(thirdPanelInner, { y: 0, willChange: 'transform' });
+      fourthTimeline.to(
+        thirdPanelInner,
+        { y: () => -getPanelFakeScrollDistance(thirdPanel, thirdPanelInner), duration: thirdFakeScrollDuration, ease: 'none' },
+        0,
+      );
+    }
 
     addPanelPushTransitionSegment({
       duration: fourthPanelPushDuration,

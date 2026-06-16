@@ -2,7 +2,6 @@ import gsap from 'gsap';
 
 export const initLandingHeroInteractions = () => {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const knowMoreButton = document.querySelector('[data-know-more-button]');
   const sheenButtons = Array.from(document.querySelectorAll('.floating-sheen-button')).filter(
     (button) => button instanceof HTMLElement,
   );
@@ -405,75 +404,6 @@ export const initLandingHeroInteractions = () => {
       });
     }
 
-    if (knowMoreButton instanceof HTMLElement) {
-      gsap.to(knowMoreButton, {
-        y: 8,
-        duration: 1.25,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-      });
-    }
-  }
-
-  if (knowMoreButton instanceof HTMLElement) {
-    knowMoreButton.addEventListener('click', () => {
-      const heroTransitionRoot = document.querySelector('[data-hero-transition-root]');
-      const scrollSpacer  = document.querySelector('[data-landing-scroll-spacer]');
-      const scrollSpacer4 = document.querySelector('[data-landing-scroll-spacer-4]');
-
-      // Three-stage scroll:
-      //   1. Scroll to scrollSpacer start  (second panel fully visible)  ~4 s
-      //   2. Pause 1 s → scroll to scrollSpacer end (third panel)        ~4 s
-      //   3. Pause 1 s → scroll to scrollSpacer-4 end (fourth panel)     ~4 s
-      const stage1Target = (() => {
-        if (scrollSpacer instanceof HTMLElement) return scrollSpacer.offsetTop;
-        if (heroTransitionRoot instanceof HTMLElement) {
-          const dist = window.innerWidth <= 720 ? 2500 : 3600;
-          return heroTransitionRoot.getBoundingClientRect().top + window.scrollY + dist;
-        }
-        return window.innerHeight;
-      })();
-      const stage2Target = scrollSpacer instanceof HTMLElement
-        ? scrollSpacer.offsetTop + scrollSpacer.offsetHeight
-        : stage1Target;
-      const stage3Target = scrollSpacer4 instanceof HTMLElement
-        ? scrollSpacer4.offsetTop + scrollSpacer4.offsetHeight
-        : stage2Target;
-
-      if (prefersReducedMotion) {
-        window.scrollTo({ top: stage3Target });
-        return;
-      }
-
-      const DURATION = 6000;
-      const PAUSE = 1000;
-      const easeInOut = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-
-      const smoothScroll = (from: number, to: number, onDone: () => void) => {
-        const dist = Math.max(to - from, 0);
-        if (dist < 4) { onDone(); return; }
-        const start = performance.now();
-        const step = (now: number) => {
-          const raw = Math.min((now - start) / DURATION, 1);
-          window.scrollTo({ top: from + dist * easeInOut(raw) });
-          if (raw < 1) window.requestAnimationFrame(step);
-          else onDone();
-        };
-        window.requestAnimationFrame(step);
-      };
-
-      // Stage 1 → pause → Stage 2 → pause → Stage 3
-      smoothScroll(window.scrollY, stage1Target, () => {
-        setTimeout(() => {
-          smoothScroll(window.scrollY, stage2Target, () => {
-            setTimeout(() => {
-              smoothScroll(window.scrollY, stage3Target, () => {});
-            }, PAUSE);
-          });
-        }, PAUSE);
-      });
-    });
   }
 
   const localeDropdownRoot = document.querySelector('[data-locale-dropdown]');

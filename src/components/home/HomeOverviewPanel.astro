@@ -1,5 +1,6 @@
 ---
 import type { Locale } from '../../i18n/config';
+import HomeMonolithVisual from './HomeMonolithVisual.astro';
 
 interface Props {
   locale: Locale;
@@ -17,18 +18,21 @@ const lines = body.split('\n').filter((line) => line.trim().length > 0);
   <!-- Diagonal atmosphere veil: top-left cyan, bottom-right violet -->
   <div class="landing-overview-panel__veil" aria-hidden="true"></div>
   <div class="landing-overview-panel__inner" data-overview-panel-inner>
-    <span class="landing-overview-panel__label">{label}</span>
-    <div class="landing-overview-panel__divider" data-overview-divider aria-hidden="true"></div>
-    <div class="landing-overview-panel__content">
-      {lines.map((line) => (
-        <p
-          class="landing-overview-panel__line"
-          data-overview-line
-        >
-          {line}
-        </p>
-      ))}
+    <div class="landing-overview-panel__text-col">
+      <span class="landing-overview-panel__label">{label}</span>
+      <div class="landing-overview-panel__divider" data-overview-divider aria-hidden="true"></div>
+      <div class="landing-overview-panel__content">
+        {lines.map((line) => (
+          <p
+            class="landing-overview-panel__line"
+            data-overview-line
+          >
+            {line}
+          </p>
+        ))}
+      </div>
     </div>
+    <HomeMonolithVisual />
   </div>
 </section>
 
@@ -38,9 +42,8 @@ const lines = body.split('\n').filter((line) => line.trim().length > 0);
     inset: 0;
     z-index: 30;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(3rem, 10vh, 7rem) clamp(1.5rem, 8vw, 8rem);
+    align-items: flex-start;
+    padding: clamp(5rem, 20vh, 10rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
     background: var(--color-background);
     color: var(--color-secondary-foreground);
     /* Initial hidden state is driven by GSAP (opacity:0, yPercent:100 via transform) */
@@ -84,18 +87,26 @@ const lines = body.split('\n').filter((line) => line.trim().length > 0);
   .landing-overview-panel__inner {
     position: relative;
     z-index: 1;
-    max-width: min(54rem, 80vw);
     width: 100%;
+    max-width: min(90rem, 100%);
+    display: grid;
+    grid-template-columns: 1fr clamp(14rem, 22vw, 22rem);
+    align-items: start;
+    gap: clamp(2.5rem, 5vw, 6rem);
+    padding-left: clamp(1.5rem, 3.2vw, 3.125rem);
+  }
+
+  .landing-overview-panel__text-col {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: flex-start;
+    text-align: left;
   }
 
   .landing-overview-panel__label {
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem;
     font-family: 'POIRETONE-REGULAR', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
-    font-size: clamp(0.64rem, 0.9vw, 0.82rem);
+    font-size: clamp(0.82rem, 1.1vw, 1.05rem);
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--color-primary);
@@ -104,12 +115,12 @@ const lines = body.split('\n').filter((line) => line.trim().length > 0);
   }
 
   .landing-overview-panel__divider {
-    width: min(8rem, 22vw);
+    width: min(10rem, 26vw);
     height: 1px;
-    margin-top: 0.4rem;
-    margin-bottom: 1.8rem;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
     background: color-mix(in srgb, var(--color-border-inverse-strong) 72%, transparent);
-    transform-origin: center center;
+    transform-origin: left center;
     transform: scaleX(0);
     /* GSAP drives the scaleX reveal */
   }
@@ -120,14 +131,13 @@ const lines = body.split('\n').filter((line) => line.trim().length > 0);
   }
 
   .landing-overview-panel__line {
-    margin: 0 0 1.2rem;
+    margin: 0 0 1.4rem;
     font-family: 'Hiragino Sans GB', 'Noto Sans SC', 'PingFang SC', 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.74;
+    line-height: 1.82;
     letter-spacing: 0.02em;
-    color: color-mix(in srgb, var(--color-secondary-foreground) 82%, transparent);
+    color: color-mix(in srgb, var(--color-secondary-foreground) 84%, transparent);
     -webkit-font-smoothing: antialiased;
-    opacity: 0;
-    /* GSAP drives fade-in per line */
+    /* Text starts empty; GSAP typewriter fills it char-by-char */
   }
 
   .landing-overview-panel__line:last-child {
@@ -135,24 +145,29 @@ const lines = body.split('\n').filter((line) => line.trim().length > 0);
   }
 
   .landing-overview-panel--en .landing-overview-panel__line {
-    font-size: clamp(1.04rem, 1.5vw, 1.32rem);
+    font-size: clamp(1.1rem, 0.75vw + 0.82rem, 1.52rem);
   }
 
   .landing-overview-panel:not(.landing-overview-panel--en) .landing-overview-panel__line {
-    font-size: clamp(1.08rem, 1.62vw, 1.38rem);
+    font-size: clamp(1.2rem, 0.9vw + 0.86rem, 1.68rem);
   }
 
   :lang(zh) .landing-overview-panel__line {
-    line-height: 1.92;
-    letter-spacing: 0.05em;
+    line-height: 1.96;
+    letter-spacing: 0.06em;
   }
 
 
   @media (max-width: 720px) {
     .landing-overview-panel {
-      padding: max(4rem, calc(env(safe-area-inset-top) + 3rem))
-        max(1.2rem, calc(env(safe-area-inset-left) + 1rem))
-        max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
+      padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
+      padding-inline: max(1rem, calc(env(safe-area-inset-left) + 0.9rem))
+        max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
+      padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.4rem));
+    }
+
+    .landing-overview-panel__inner {
+      padding-left: 0;
     }
 
     .landing-overview-panel__veil {
@@ -161,6 +176,8 @@ const lines = body.split('\n').filter((line) => line.trim().length > 0);
 
     .landing-overview-panel__inner {
       max-width: 100%;
+      grid-template-columns: 1fr;
+      gap: 2rem;
     }
 
     .landing-overview-panel__label {
@@ -170,6 +187,15 @@ const lines = body.split('\n').filter((line) => line.trim().length > 0);
     .landing-overview-panel--en .landing-overview-panel__line,
     .landing-overview-panel:not(.landing-overview-panel--en) .landing-overview-panel__line {
       font-size: clamp(1rem, 4.2vw, 1.2rem);
+    }
+
+    :global(.landing-second-panel__visual-column) {
+      justify-content: center;
+      padding-right: 0;
+    }
+
+    :global(.landing-second-panel__visual-shell) {
+      width: min(48vw, 13rem);
     }
   }
 </style>

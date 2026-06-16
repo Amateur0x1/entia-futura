@@ -8,7 +8,6 @@ interface Props {
 
 const { locale } = Astro.props;
 
-const title = pickByLocale(locale, '研究方向', 'Research Areas');
 // Left block — Collaboration
 const colTitle  = pickByLocale(locale, '合作方式', 'Collaboration');
 const colBody   = pickByLocale(
@@ -26,64 +25,17 @@ const joinBody  = pickByLocale(
   'Entia Futura Institut welcomes all those who take the future seriously. Joining the institute does not necessarily mean entering a fixed role; it may mean entering a discussion, joining a program, co-creating a project, submitting a proposal, or working alongside the institute for a certain period of time.',
 );
 const joinBtn   = pickByLocale(locale, '了解参与方式', 'Learn How to Participate');
-
-const items = locale === 'zh'
-  ? [
-      'AI 与未来生活',
-      '知识生产\n与新型学习共同体',
-      '社群、空间\n与新的公共生活',
-      '地方文化\n与未来组织形式',
-      '商业世界\n中的研究能力',
-      '未来共同体\n与生活形式实验',
-    ]
-  : [
-      'AI and\nFuture Life',
-      'Knowledge Production\nand New Learning Communities',
-      'Communities, Space,\nand New Public Life',
-      'Local Culture and\nFuture Forms of Organization',
-      'Research Capacity\nin the Commercial World',
-      'Experimenting with\nFuture Forms of Collective Life',
-    ];
 ---
 
 <section
   class={`landing-fourth-panel ${locale === 'en' ? 'landing-fourth-panel--en' : ''}`}
   data-fourth-panel
-  aria-label={title}
 >
   <!-- Nebula particle background (matches third panel) -->
   <canvas class="landing-fourth-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
 
   <!-- Atmosphere veil: top-left cyan, bottom-right violet (matches third panel) -->
   <div class="landing-fourth-panel__veil" aria-hidden="true"></div>
-
-  <!-- Central logo -->
-  <div class="landing-fourth-panel__logo-wrap" aria-hidden="true">
-    <img
-      class="landing-fourth-panel__logo"
-      src="/brand/entia-logo-white-lines.png"
-      alt=""
-      draggable="false"
-    />
-  </div>
-
-  <!-- Orbit items — HTML divs positioned by JS -->
-  <div class="landing-fourth-panel__orbit" data-orbit aria-hidden="true">
-    {items.map((item, i) => (
-      <div class="landing-fourth-panel__orbit-item" data-orbit-item data-index={i}>
-        <span class="landing-fourth-panel__orbit-dot" aria-hidden="true"></span>
-        <span class="landing-fourth-panel__orbit-text" set:html={item.replace(/\n/g, '<br>')} />
-      </div>
-    ))}
-  </div>
-
-  <!-- Screen-reader / no-JS fallback list -->
-  <div class="landing-fourth-panel__sr-list" aria-label={title}>
-    <h2>{title}</h2>
-    <ul>
-      {items.map((item) => <li>{item}</li>)}
-    </ul>
-  </div>
 
   <!-- Left side block: Collaboration (cyan / primary) -->
   <div class="landing-fourth-panel__side landing-fourth-panel__side--left landing-fourth-panel__side--cyan" aria-label={colTitle}>
@@ -160,83 +112,6 @@ const items = locale === 'zh'
         color-mix(in srgb, var(--color-secondary) 6%, transparent) 50%,
         transparent 78%
       );
-  }
-
-  /* ── Logo ── */
-  .landing-fourth-panel__logo-wrap {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 3;
-    pointer-events: none;
-    width: clamp(260px, 34vmin, 480px);
-    height: clamp(260px, 34vmin, 480px);
-  }
-
-  .landing-fourth-panel__logo {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    opacity: 0.88;
-    filter: drop-shadow(0 0 32px color-mix(in srgb, var(--color-primary) 36%, transparent));
-  }
-
-  /* ── Orbit container ── */
-  .landing-fourth-panel__orbit {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    pointer-events: none;
-  }
-
-  /* ── Individual orbit item ── */
-  .landing-fourth-panel__orbit-item {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    pointer-events: none;
-    opacity: 0;
-    will-change: transform, opacity;
-    /* JS sets top/left to 50%/50% and uses translateX/Y to position */
-    top: 50%;
-    left: 50%;
-  }
-
-  .landing-fourth-panel__orbit-dot {
-    flex-shrink: 0;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow:
-      0 0 6px 1px var(--color-primary),
-      0 0 16px 2px color-mix(in srgb, var(--color-primary) 70%, transparent),
-      0 0 1px #fff;
-    opacity: 1;
-  }
-
-  .landing-fourth-panel__orbit-text {
-    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
-    font-size: clamp(0.75rem, 0.7vw + 0.52rem, 1.05rem);
-    letter-spacing: 0.06em;
-    line-height: 1.45;
-    color: #b9cad0;
-    white-space: pre-line;   /* respect <br> / newlines, still wrap naturally */
-    text-shadow: 0 0 12px color-mix(in srgb, var(--color-primary) 30%, transparent);
-  }
-
-  /* .is-right no longer used — dot is always on the left */
-
-  /* ── SR fallback ── */
-  .landing-fourth-panel__sr-list {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
   }
 
   /* ── Side blocks (left = Collaboration / cyan, right = Join Us / violet) ── */
@@ -396,141 +271,3 @@ const items = locale === 'zh'
   }
 
 </style>
-
-<script>
-  (() => {
-    const panel = document.querySelector<HTMLElement>('[data-fourth-panel]');
-    const orbitEls = Array.from(document.querySelectorAll<HTMLElement>('[data-orbit-item]'));
-    if (!panel || orbitEls.length === 0) return;
-
-    // ── Config ──────────────────────────────────────────────────────────────
-    const REPULSE_RADIUS   = 100;    // px
-    const REPULSE_STRENGTH = 0.42;
-    const SPRING           = 0.07;
-    const DAMPING          = 0.80;
-    const ORBIT_RADIUS_SCALE = 0.09; // very tight around logo — fraction of min(W,H)
-    const FADE_IN_DUR      = 900;    // ms
-    const SPIN_SPEED       = 0.000050; // rad/ms
-
-    // ── Per-item state ───────────────────────────────────────────────────────
-    interface Item {
-      el: HTMLElement;
-      baseAngle: number;
-      orbitR: number;
-      x: number; y: number;
-      vx: number; vy: number;
-      hw: number; hh: number; // half-width / half-height of element
-    }
-
-    let W = 0, H = 0;
-    let mouseX = -9999, mouseY = -9999;
-    let items: Item[] = [];
-    let startTime = 0;
-    let active = false;
-    let raf = 0;
-
-    // ── Build item state ─────────────────────────────────────────────────────
-    function build() {
-      const count = orbitEls.length;
-      const logoR    = Math.min(W, H) * 0.16;
-      const orbitR   = Math.min(W, H) * ORBIT_RADIUS_SCALE + logoR;
-      const cx = W / 2, cy = H / 2;
-
-      items = orbitEls.map((el, i) => {
-        const baseAngle = (i / count) * Math.PI * 2 - Math.PI / 2;
-        const px = cx + Math.cos(baseAngle) * orbitR;
-        const py = cy + Math.sin(baseAngle) * orbitR;
-        const rect = el.getBoundingClientRect();
-        return {
-          el,
-          baseAngle,
-          orbitR,
-          x: px, y: py,
-          vx: 0, vy: 0,
-          hw: rect.width  / 2,
-          hh: rect.height / 2,
-        };
-      });
-    }
-
-    // ── Resize ───────────────────────────────────────────────────────────────
-    function resize() {
-      W = panel!.offsetWidth;
-      H = panel!.offsetHeight;
-      build();
-    }
-
-    // ── Draw loop ────────────────────────────────────────────────────────────
-    function draw(ts: number) {
-      if (!startTime) startTime = ts;
-      const elapsed = ts - startTime;
-      const fadeProgress = Math.min(elapsed / FADE_IN_DUR, 1);
-      const spinAngle = elapsed * SPIN_SPEED;
-      const cx = W / 2, cy = H / 2;
-
-      for (const it of items) {
-        // rotating origin
-        const rotAngle = it.baseAngle + spinAngle;
-        const ox = cx + Math.cos(rotAngle) * it.orbitR;
-        const oy = cy + Math.sin(rotAngle) * it.orbitR;
-
-        // mouse repulsion
-        const dx = mouseX - it.x;
-        const dy = mouseY - it.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < REPULSE_RADIUS && dist > 0) {
-          const force = (1 - dist / REPULSE_RADIUS) * REPULSE_STRENGTH;
-          it.vx -= (dx / dist) * force * 14;
-          it.vy -= (dy / dist) * force * 14;
-        }
-
-        // spring back
-        it.vx += (ox - it.x) * SPRING;
-        it.vy += (oy - it.y) * SPRING;
-        it.vx *= DAMPING;
-        it.vy *= DAMPING;
-        it.x += it.vx;
-        it.y += it.vy;
-
-        // dot always on left side — no flip
-
-        // apply transform: offset by -50% to use element centre as anchor
-        it.el.style.transform = `translate(calc(${it.x - W / 2}px - 50%), calc(${it.y - H / 2}px - 50%))`;
-        it.el.style.opacity = String(fadeProgress);
-      }
-
-      if (active) raf = requestAnimationFrame(draw);
-    }
-
-    // ── Mouse ────────────────────────────────────────────────────────────────
-    function onMouseMove(e: MouseEvent) {
-      const r = panel!.getBoundingClientRect();
-      mouseX = e.clientX - r.left;
-      mouseY = e.clientY - r.top;
-    }
-    function onPointerLeave() { mouseX = -9999; mouseY = -9999; }
-
-    // ── Intersection ─────────────────────────────────────────────────────────
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) {
-          if (!active) {
-            active = true;
-            startTime = 0;
-            raf = requestAnimationFrame(draw);
-          }
-        } else {
-          active = false;
-          cancelAnimationFrame(raf);
-        }
-      }
-    }, { threshold: 0.01 });
-
-    io.observe(panel);
-    document.addEventListener('mousemove', onMouseMove, { passive: true });
-    panel.addEventListener('mouseleave', onPointerLeave, { passive: true });
-
-    resize();
-    new ResizeObserver(resize).observe(panel);
-  })();
-</script>

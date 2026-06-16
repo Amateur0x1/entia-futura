@@ -20,8 +20,6 @@ export interface HomeHeroElements {
   secondPanelBody: HTMLElement | null;
   secondPanelParagraphs: HTMLElement[];
   secondPanelCards: HTMLElement[];
-  secondPanelKnowMore: HTMLElement | null;
-  knowMoreButton: HTMLElement | null;
   primaryVisual: HTMLElement | null;
 }
 
@@ -87,8 +85,6 @@ export const getHomeHeroElements = (): HomeHeroElements => {
     secondPanelBody,
     secondPanelParagraphs: getParagraphs(secondPanelBody),
     secondPanelCards: getCards(secondPanel),
-    secondPanelKnowMore: getHTMLElement(secondPanel, '[data-second-panel-know-more]'),
-    knowMoreButton: getHTMLElement(document, '[data-know-more-button]'),
     primaryVisual: portalShell ?? heroVideoShell,
   };
 };
