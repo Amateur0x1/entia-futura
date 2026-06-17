@@ -4,8 +4,7 @@ import HomeFourthPanel from '../../components/home/HomeFourthPanel.astro';
 import HomeMembersPanel from '../../components/home/HomeMembersPanel.astro';
 import HomeHeroScreen from '../../components/home/HomeHeroScreen.astro';
 import HomeOverviewPanel from '../../components/home/HomeOverviewPanel.astro';
-import HomeSecondPanel from '../../components/home/HomeSecondPanel.astro';
-import HomeThirdPanel from '../../components/home/HomeThirdPanel.astro';
+import HomeDirectionsPanel from '../../components/home/HomeDirectionsPanel.astro';
 import LoadingOrbitDevice from '../../components/home/LoadingOrbitDevice.astro';
 import PageLoader from '../../components/home/PageLoader.astro';
 import Layout from '../../layouts/Layout.astro';
@@ -37,19 +36,6 @@ const overviewBody = pickByLocale(
   'Entia Futura Institut is an independent institute organized around one core question: How shall we exist in the future? It is neither a conventional academic department nor a consulting firm, media platform, or loose social community, but an attempt to build a new institutional form beyond the university.\nGrounded in advanced research, the institute is equally committed to translating inquiry into real-world problems, collaborative structures, future-oriented projects, and social experimentation.',
 );
 
-// ── Second panel: Mission & Vision ──────────────────────────────────────────
-const coreQuestion = pickByLocale(locale, '使命、愿景与价值观', 'Mission, Vision & Values');
-const instituteIntro = pickByLocale(
-  locale,
-  '使命：围绕"未来我们将如何存在？"这一核心问题，连接研究、社群、产业与现实实验。\n愿景：在大学之外，建立一种更开放、更现实、也更具协作能力的新型研究机构。',
-  'Mission: To organize research, community, industry, and real-world experimentation around one central question: How shall we exist in the future?\nVision: To build a new kind of institute beyond the university — more open, more grounded, and more capable of collaboration.',
-);
-const whatWeDoTitle = pickByLocale(locale, '我们做什么？', 'What We Do?');
-const whatWeDoIntro = pickByLocale(
-  locale,
-  '我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。',
-  'We are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life.',
-);
 ---
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
@@ -58,12 +44,7 @@ const whatWeDoIntro = pickByLocale(
   <main class="landing-main" data-hero-stage>
     <HomeHeroScreen locale={locale} />
     <HomeOverviewPanel locale={locale} label={overviewLabel} body={overviewBody} />
-    <HomeSecondPanel locale={locale} coreQuestion={coreQuestion} instituteIntro={instituteIntro} />
-    <HomeThirdPanel
-      locale={locale}
-      title={whatWeDoTitle}
-      intro={whatWeDoIntro}
-    />
+    <HomeDirectionsPanel locale={locale} />
     <HomeMembersPanel locale={locale} />
     <HomeFourthPanel locale={locale} />
   </main>

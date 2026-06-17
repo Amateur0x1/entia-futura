@@ -54,9 +54,6 @@ export const initHomeEffects = () => {
 
   initMonolithBinaryVisuals(prefersReducedMotion);
 
-  const thirdPanel = document.querySelector<HTMLElement>('[data-third-panel]');
-  const fourthPanel = document.querySelector<HTMLElement>('[data-fourth-panel]');
-
   // initHomeEffects is called after loader:done. Refresh ScrollTrigger and
   // create all scroll timelines immediately — layout is stable at this point
   // since the loader has been covering the page. Unlock scroll after pin is set.

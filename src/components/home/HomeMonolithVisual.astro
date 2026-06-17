@@ -7,3 +7,98 @@
 <div class="landing-second-panel__visual-scan"></div>
   </div>
 </div>
+
+<style>
+  /* ── Monolith visual styles ──
+   * These were originally in HomeSecondPanel.astro as :global() rules.
+   * Since the monolith is now used by HomeOverviewPanel (and SecondPanel
+   * may not be rendered), the styles must live with the component itself. */
+
+  :global(.landing-second-panel__visual-column) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  :global(.landing-second-panel__visual-shell) {
+    position: relative;
+    width: min(100%, clamp(16rem, 32vw, 26rem));
+    aspect-ratio: 642 / 1281;
+  }
+
+  :global(.landing-second-panel__visual-base),
+  :global(.landing-second-panel__visual-binary),
+  :global(.landing-second-panel__visual-glow),
+  :global(.landing-second-panel__visual-scan) {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: url('/images/home-monolith-mask.png');
+    mask-image: url('/images/home-monolith-mask.png');
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  :global(.landing-second-panel__visual-base) {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.95) 58%, rgba(255, 255, 255, 0.89) 100%);
+    filter: drop-shadow(0 0 16px color-mix(in srgb, white 72%, transparent));
+  }
+
+  :global(.landing-second-panel__visual-binary) {
+    display: grid;
+    place-items: stretch;
+    opacity: 0.9;
+    overflow: hidden;
+    mix-blend-mode: multiply;
+  }
+
+  :global(.landing-second-panel__visual-binary--monolith) {
+    clip-path: inset(0 0 0 34%);
+  }
+
+  :global(.landing-second-panel__visual-binary--human) {
+    clip-path: inset(0 56% 0 0);
+    opacity: 0.74;
+    mix-blend-mode: screen;
+  }
+
+  :global(.landing-second-panel__binary-canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.landing-second-panel__visual-glow) {
+    display: none;
+  }
+
+  :global(.landing-second-panel__visual-scan) {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.landing-second-panel__visual-glow),
+    :global(.landing-second-panel__visual-scan),
+    :global(.landing-second-panel__binary-canvas) {
+      animation: none;
+      transform: none;
+    }
+  }
+
+  @media (max-width: 720px) {
+    :global(.landing-second-panel__visual-column) {
+      justify-content: center;
+      padding-right: 0;
+    }
+
+    :global(.landing-second-panel__visual-shell) {
+      width: min(52vw, 15rem);
+    }
+  }
+</style>

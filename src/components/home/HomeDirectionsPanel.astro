@@ -1,0 +1,439 @@
+---
+import { pickByLocale, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+// ── Section categories (displayed as switching labels) ─────────────────────
+const categories = [
+  {
+    key: 'research-directions',
+    label: pickByLocale(locale, '研究方向', 'Research Directions'),
+    subtitle: pickByLocale(
+      locale,
+      'How shall we exist in the future?',
+      'How shall we exist in the future?',
+    ),
+  },
+  {
+    key: 'project-mechanisms',
+    label: pickByLocale(locale, '项目机制', 'Project Mechanisms'),
+    subtitle: pickByLocale(
+      locale,
+      '未来人研究所 | ENTIA FUTURA INSTITUT',
+      'ENTIA FUTURA INSTITUT',
+    ),
+  },
+  {
+    key: 'research-translation',
+    label: pickByLocale(locale, '研究转化', 'Research Translation'),
+    subtitle: pickByLocale(
+      locale,
+      '让研究进入现实',
+      'Bringing research into reality',
+    ),
+  },
+];
+
+// ── Card data for all three groups ─────────────────────────────────────────
+const cards = [
+  // ── Group 1: 研究方向 (6 cards) ──
+  {
+    group: 0,
+    title: pickByLocale(locale, 'AI 与未来生活', 'AI & Future Living'),
+    body: pickByLocale(
+      locale,
+      '关注 AI 如何重组学习、劳动、表达、情感与日常存在。',
+      'How AI reorganizes learning, labor, expression, emotion, and everyday existence.',
+    ),
+  },
+  {
+    group: 0,
+    title: pickByLocale(locale, '知识生产与新型学习共同体', 'Knowledge Production & New Learning Communities'),
+    body: pickByLocale(
+      locale,
+      '关注大学转型背景下，新的研究机构、学习机制与知识共同体如何形成。',
+      'How new research institutions, learning mechanisms, and knowledge communities emerge amid university transformation.',
+    ),
+  },
+  {
+    group: 0,
+    title: pickByLocale(locale, '社群、空间与新的公共生活', 'Community, Space & New Public Life'),
+    body: pickByLocale(
+      locale,
+      '关注书店、研究所、城市空间与线上网络如何成为新的公共节点。',
+      'How bookstores, institutes, urban spaces, and online networks become new nodes of public life.',
+    ),
+  },
+  {
+    group: 0,
+    title: pickByLocale(locale, '地方文化与未来组织形式', 'Local Culture & Future Organizational Forms'),
+    body: pickByLocale(
+      locale,
+      '关注地方文化、区域产业、青年流动与新型组织机制之间的关系。',
+      'The interplay between local culture, regional industry, youth mobility, and new organizational forms.',
+    ),
+  },
+  {
+    group: 0,
+    title: pickByLocale(locale, '商业世界中的研究能力', 'Research Capacity in the Business World'),
+    body: pickByLocale(
+      locale,
+      '关注企业如何获得更深的社会理解、文化判断与长期研究能力。',
+      'How enterprises can develop deeper social understanding, cultural judgment, and long-term research capacity.',
+    ),
+  },
+  {
+    group: 0,
+    title: pickByLocale(locale, '未来共同体与生活形式实验', 'Future Communities & Life-form Experiments'),
+    body: pickByLocale(
+      locale,
+      '关注新的生活机制、协作关系、空间原型与组织方式如何在现实中成立。',
+      'How new living mechanisms, collaborative relationships, spatial prototypes, and organizational models take root in reality.',
+    ),
+  },
+
+  // ── Group 2: 项目机制 (6 cards) ──
+  {
+    group: 1,
+    title: pickByLocale(locale, '研究项目', 'Research Projects'),
+    body: pickByLocale(
+      locale,
+      '专题研究、访谈、观察、案例档案、研究报告与阶段性发布。',
+      'Thematic research, interviews, observations, case archives, reports, and periodic publications.',
+    ),
+  },
+  {
+    group: 1,
+    title: pickByLocale(locale, '公共活动', 'Public Programs'),
+    body: pickByLocale(
+      locale,
+      '讲座、圆桌、读书会、工作坊、闭门讨论与主题沙龙。',
+      'Lectures, roundtables, reading groups, workshops, closed-door discussions, and thematic salons.',
+    ),
+  },
+  {
+    group: 1,
+    title: pickByLocale(locale, '协作项目', 'Collaborative Projects'),
+    body: pickByLocale(
+      locale,
+      '与企业、地方、空间、品牌、学校及各类实践者共同发起研究与项目。',
+      'Co-initiating research and projects with enterprises, localities, spaces, brands, schools, and practitioners of all kinds.',
+    ),
+  },
+  {
+    group: 1,
+    title: pickByLocale(locale, '驻留与访问', 'Residencies & Visits'),
+    body: pickByLocale(
+      locale,
+      '邀请研究者、写作者、工程师、艺术家、创业者与策展人进行阶段性共同工作。',
+      'Inviting researchers, writers, engineers, artists, entrepreneurs, and curators for collaborative residencies.',
+    ),
+  },
+  {
+    group: 1,
+    title: pickByLocale(locale, '社群机制', 'Community Mechanisms'),
+    body: pickByLocale(
+      locale,
+      '通过讨论网络、成员计划、小组阅读与项目共创，逐步形成真正有质量的共同体。',
+      'Building genuine community through discussion networks, membership programs, group reading, and co-creation.',
+    ),
+  },
+  {
+    group: 1,
+    title: pickByLocale(locale, '实验项目', 'Experimental Projects'),
+    body: pickByLocale(
+      locale,
+      '围绕未来学习、未来空间、未来工具、未来社群与未来生活方式发起现实测试。',
+      'Launching real-world experiments around future learning, spaces, tools, communities, and ways of living.',
+    ),
+  },
+
+  // ── Group 3: 研究转化 (5 cards) ──
+  {
+    group: 2,
+    title: pickByLocale(locale, '应用研究', 'Applied Research'),
+    body: pickByLocale(
+      locale,
+      '围绕企业、品牌、地方或空间的现实问题开展专题调研、案例分析、访谈与研究输出。',
+      'Conducting thematic research, case analysis, interviews, and reports around real-world challenges of enterprises, brands, localities, and spaces.',
+    ),
+  },
+  {
+    group: 2,
+    title: pickByLocale(locale, '策略与叙事支持', 'Strategy & Narrative Support'),
+    body: pickByLocale(
+      locale,
+      '将研究成果转化为品牌叙事、组织语言、公共表达与未来议题框架。',
+      'Translating research into brand narratives, organizational language, public expression, and future-issue frameworks.',
+    ),
+  },
+  {
+    group: 2,
+    title: pickByLocale(locale, '组织与社群设计', 'Organization & Community Design'),
+    body: pickByLocale(
+      locale,
+      '参与设计学习计划、青年项目、驻留机制、讨论网络与共同体结构。',
+      'Designing learning programs, youth projects, residency mechanisms, discussion networks, and community structures.',
+    ),
+  },
+  {
+    group: 2,
+    title: pickByLocale(locale, '空间与场景转化', 'Space & Scene Translation'),
+    body: pickByLocale(
+      locale,
+      '把研究延伸到书店、空间、展览、地方节点与项目现场。',
+      'Extending research into bookstores, spaces, exhibitions, local nodes, and project sites.',
+    ),
+  },
+  {
+    group: 2,
+    title: pickByLocale(locale, '方法与工具实验', 'Methods & Tools Experimentation'),
+    body: pickByLocale(
+      locale,
+      '发展可用于研究、写作、协作、教学、社群与未来生活的工具与流程。',
+      'Developing tools and processes for research, writing, collaboration, teaching, communities, and future living.',
+    ),
+  },
+];
+
+// Gradient accent per group
+const groupAccents = [
+  'var(--color-primary)',    // cyan for research directions
+  '#7b5cff',                // violet for project mechanisms
+  '#c850c0',                // magenta for research translation
+];
+---
+
+<section class="directions-panel" data-directions-panel>
+  <div class="directions-sticky" data-directions-sticky>
+    <!-- Category labels that switch during scroll -->
+    <div class="directions-header" data-directions-header>
+      {categories.map((cat, i) => (
+        <div
+          class={`directions-category ${i === 0 ? 'directions-category--active' : ''}`}
+          data-directions-category={i}
+        >
+          <span class="directions-category__label">{cat.label}</span>
+          <span class="directions-category__subtitle">{cat.subtitle}</span>
+        </div>
+      ))}
+      <!-- Progress indicators -->
+      <div class="directions-progress">
+        {categories.map((_, i) => (
+          <span
+            class={`directions-progress__dot ${i === 0 ? 'directions-progress__dot--active' : ''}`}
+            data-directions-dot={i}
+          />
+        ))}
+      </div>
+    </div>
+
+    <!-- Card track -->
+    <div class="directions-track" data-directions-track>
+      {cards.map((card, i) => (
+        <div
+          class="directions-card"
+          data-directions-card
+          data-card-group={card.group}
+          style={`--card-accent: ${groupAccents[card.group]}`}
+        >
+          <div class="directions-card__inner">
+            <h3 class="directions-card__title">{card.title}</h3>
+            <p class="directions-card__body">{card.body}</p>
+            <span class="directions-card__index">{String(i + 1).padStart(2, '0')}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .directions-panel {
+    position: relative;
+    z-index: 32;
+    background: var(--color-background);
+  }
+
+  .directions-sticky {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header with switching labels ── */
+  .directions-header {
+    position: relative;
+    z-index: 10;
+    padding: clamp(2.5rem, 6vh, 4.5rem) clamp(1.5rem, 4vw, 3.5rem) 0;
+    flex-shrink: 0;
+  }
+
+  .directions-category {
+    position: absolute;
+    top: clamp(2.5rem, 6vh, 4.5rem);
+    left: clamp(1.5rem, 4vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: none; /* GSAP controls this */
+    pointer-events: none;
+  }
+
+  .directions-category--active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .directions-category__label {
+    font-family: 'POIRETONE-REGULAR', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    font-size: clamp(1.6rem, 2.4vw + 0.4rem, 2.8rem);
+    font-weight: normal;
+    letter-spacing: 0.12em;
+    color: var(--color-secondary-foreground);
+    line-height: 1.2;
+  }
+
+  .directions-category__subtitle {
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.58rem, 0.45vw + 0.4rem, 0.72rem);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    opacity: 0.6;
+  }
+
+  /* ── Progress dots ── */
+  .directions-progress {
+    position: absolute;
+    top: clamp(2.5rem, 6vh, 4.5rem);
+    right: clamp(1.5rem, 4vw, 3.5rem);
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .directions-progress__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-secondary-foreground) 25%, transparent);
+    transition: background 0.35s ease, transform 0.35s ease;
+  }
+
+  .directions-progress__dot--active {
+    background: var(--color-primary);
+    transform: scale(1.5);
+  }
+
+  /* ── Card track ── */
+  .directions-track {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Cards are positioned absolutely inside; GSAP moves them */
+    width: clamp(18rem, 24vw, 26rem);
+    aspect-ratio: 3 / 4;
+  }
+
+  .directions-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 1rem;
+    overflow: hidden;
+    will-change: transform, opacity;
+    /* Initial state set by GSAP */
+  }
+
+  .directions-card__inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: clamp(1.8rem, 3vw, 2.8rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    background:
+      linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--card-accent) 8%, var(--color-background)),
+        var(--color-background) 60%
+      );
+    border: 1px solid color-mix(in srgb, var(--card-accent) 18%, transparent);
+    border-radius: 1rem;
+  }
+
+  .directions-card__title {
+    margin: 0;
+    font-family: 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    font-size: clamp(1.1rem, 1.2vw + 0.4rem, 1.5rem);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--color-secondary-foreground);
+  }
+
+  .directions-card__body {
+    margin: 0;
+    font-size: clamp(0.82rem, 0.6vw + 0.5rem, 1rem);
+    line-height: 1.72;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 65%, transparent);
+  }
+
+  .directions-card__index {
+    position: absolute;
+    bottom: clamp(1.2rem, 2vw, 1.8rem);
+    right: clamp(1.2rem, 2vw, 1.8rem);
+    font-family: 'POIRETONE-REGULAR', monospace;
+    font-size: clamp(0.68rem, 0.5vw + 0.4rem, 0.82rem);
+    letter-spacing: 0.1em;
+    color: var(--card-accent);
+    opacity: 0.4;
+  }
+
+  /* ── Mobile adjustments ── */
+  @media (max-width: 720px) {
+    .directions-header {
+      padding: max(2rem, calc(env(safe-area-inset-top) + 1.5rem))
+        max(1rem, calc(env(safe-area-inset-left) + 0.9rem)) 0;
+    }
+
+    .directions-category {
+      top: max(2rem, calc(env(safe-area-inset-top) + 1.5rem));
+      left: max(1rem, calc(env(safe-area-inset-left) + 0.9rem));
+    }
+
+    .directions-category__label {
+      font-size: clamp(1.2rem, 5vw, 1.8rem);
+    }
+
+    .directions-progress {
+      top: max(2rem, calc(env(safe-area-inset-top) + 1.5rem));
+      right: max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
+    }
+
+    .directions-track {
+      width: clamp(14rem, 65vw, 18rem);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .directions-track {
+      width: clamp(12rem, 70vw, 16rem);
+    }
+  }
+</style>

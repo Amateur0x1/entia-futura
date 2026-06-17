@@ -14,20 +14,18 @@ export const initHomeScrollEffects = ({
   prefersReducedMotion,
   splitTextAvailable,
 }: InitHomeScrollEffectsOptions) => {
-  const thirdPanel = document.querySelector<HTMLElement>('[data-third-panel]');
+  const directionsPanel = document.querySelector<HTMLElement>('[data-directions-panel]');
   const membersPanel = document.querySelector<HTMLElement>('[data-members-panel]');
   const fourthPanel = document.querySelector<HTMLElement>('[data-fourth-panel]');
 
-  if (thirdPanel) {
-    initAllPanelTransitions({
-      elements: homeHeroElements,
-      thirdPanel,
-      membersPanel,
-      fourthPanel,
-      prefersReducedMotion,
-      splitTextAvailable,
-    });
-  }
+  initAllPanelTransitions({
+    elements: homeHeroElements,
+    directionsPanel,
+    membersPanel,
+    fourthPanel,
+    prefersReducedMotion,
+    splitTextAvailable,
+  });
 
   gsap.utils.toArray<Element>('[data-reveal]').forEach((section, index) => {
     revealSection(section, index);
