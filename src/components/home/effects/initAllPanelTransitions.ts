@@ -213,7 +213,7 @@ const initFullTransitions = ({
       scrollTrigger: {
         trigger: overviewPanel,
         start: 'top 110%',       // begin when panel top is ~10% below viewport bottom
-        end: 'top 10%',          // finish within ~1 screen of scroll distance
+        end: 'top -12%',         // finish over ~1.22 screens of scroll distance
         scrub: 0.4,
       },
     });
