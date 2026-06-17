@@ -109,28 +109,39 @@ export function initDirectionsCarousel(panel: HTMLElement) {
     '[data-directions-category]',
     panel,
   );
-  const dotEls = gsap.utils.toArray<HTMLElement>(
-    '[data-directions-dot]',
-    panel,
-  );
-
-  // ── Initial state (identical to Members) ──
-  gsap.set(cards, { xPercent: 400, opacity: 0, scale: 0 });
-
-  // Hide all categories except first
+  // Hide all categories except first.
+  // Categories use left:50% in CSS; GSAP manages xPercent:-50 for centring
+  // so that y animations don't conflict with CSS transforms.
   categoryEls.forEach((el, i) => {
     if (i === 0) {
-      gsap.set(el, { autoAlpha: 1, y: 0 });
+      gsap.set(el, { autoAlpha: 1, xPercent: -50, y: 0 });
     } else {
-      gsap.set(el, { autoAlpha: 0, y: 12 });
+      gsap.set(el, { autoAlpha: 0, xPercent: -50, y: 12 });
     }
   });
 
   // Same spacing & scroll distance as Members
   const spacing = 0.1;
+
+  // ── Initial state: hide all cards, then seek loop so first card is centred ──
+  // We must explicitly hide every card BEFORE building the loop, because
+  // buildSeamlessLoop uses immediateRender:false — cards that the timeline
+  // hasn't reached yet would otherwise keep their CSS-default visible state.
+  gsap.set(cards, { xPercent: 400, opacity: 0, scale: 0 });
+
   const seamlessLoop = buildSeamlessLoop(cards, spacing);
   const totalDuration = seamlessLoop.duration();
-  const scrollDistance = Math.round(cards.length * 350);
+
+  // Each card peaks (centre-stage) at time = index * spacing + 0.5.
+  const firstCardPeak = 0 * spacing + 0.5;
+  const lastCardPeak = (cards.length - 1) * spacing + 0.5;
+
+  // Seek the loop so the first card is already centred on load.
+  seamlessLoop.time(firstCardPeak);
+
+  // Scroll distance covers firstCardPeak → lastCardPeak only, so the
+  // section ends as soon as the last card reaches centre.
+  const scrollDistance = Math.round((cards.length - 1) * 350);
 
   // Track current active group for category switching
   let currentGroup = 0;
@@ -147,8 +158,9 @@ export function initDirectionsCarousel(panel: HTMLElement) {
       anticipatePin: 1,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        // Determine which group is currently centred
-        const currentTime = self.progress * totalDuration;
+        // Determine which group is currently centred.
+        // Progress 0→1 maps to firstCardPeak→lastCardPeak in the loop timeline.
+        const currentTime = firstCardPeak + self.progress * (lastCardPeak - firstCardPeak);
         const newGroup = getActiveGroup(cards, spacing, currentTime);
 
         if (newGroup !== currentGroup) {
@@ -179,26 +191,18 @@ export function initDirectionsCarousel(panel: HTMLElement) {
             );
           }
 
-          // Update dots
-          dotEls.forEach((dot, i) => {
-            if (i === newGroup) {
-              dot.classList.add('directions-progress__dot--active');
-            } else {
-              dot.classList.remove('directions-progress__dot--active');
-            }
-          });
-
           currentGroup = newGroup;
         }
       },
     },
   });
 
-  // Drive the seamless loop with scroll
-  scrubTl.to(
+  // Drive the seamless loop with scroll: first card peak → last card peak
+  scrubTl.fromTo(
     seamlessLoop,
+    { time: firstCardPeak },
     {
-      time: totalDuration,
+      time: lastCardPeak,
       duration: 1,
       ease: 'none',
     },

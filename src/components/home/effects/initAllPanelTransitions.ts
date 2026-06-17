@@ -212,24 +212,24 @@ const initFullTransitions = ({
       defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: overviewPanel,
-        start: 'top 150%',
-        end: 'bottom 10%',
+        start: 'top 110%',       // begin when panel top is ~10% below viewport bottom
+        end: 'top 10%',          // finish within ~1 screen of scroll distance
         scrub: 0.4,
       },
     });
 
     // Phase 1: panel fades in.
-    overviewTl.to(overviewPanel, { autoAlpha: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0);
+    overviewTl.to(overviewPanel, { autoAlpha: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0);
 
-    // Phase 2: content reveals (divider + SplitText lines), starting midway
-    // through the panel fade-in so they overlap slightly.
+    // Phase 2: content reveals (divider + SplitText lines), starting early
+    // so the scatter→order animation completes quickly.
     setupOverviewPanelReveal({
       prefersReducedMotion: false,
       overviewPanel,
       overviewDivider: elements.overviewPanelDivider,
       overviewLines: elements.overviewPanelLines,
       timeline: overviewTl,
-      startAt: 0.15,
+      startAt: 0.08,
     });
   }
 

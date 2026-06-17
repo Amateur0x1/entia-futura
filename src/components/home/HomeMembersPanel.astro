@@ -7,12 +7,37 @@ interface Props {
 
 const { locale } = Astro.props;
 
-const sectionLabel = pickByLocale(locale, '核心成员', 'Core Members');
-
 const members = [
-  { src: '/images/members/member-01.jpg', name: pickByLocale(locale, '成员一', 'Member 01') },
-  { src: '/images/members/member-02.jpg', name: pickByLocale(locale, '成员二', 'Member 02') },
-  { src: '/images/members/member-03.jpg', name: pickByLocale(locale, '成员三', 'Member 03') },
+  {
+    src: '/images/members/member-01.jpg',
+    name: pickByLocale(locale, '成员一', 'Member 01'),
+    role: pickByLocale(locale, '创始人 / 研究总监', 'Founder / Research Director'),
+    bio: pickByLocale(
+      locale,
+      '关注未来机构形态、知识生产与社会创新。曾任职于多个跨学科研究机构，致力于在大学之外建立新的研究基础设施。',
+      'Focused on future institutional forms, knowledge production, and social innovation. Previously worked across interdisciplinary research institutions, committed to building new research infrastructure beyond the university.',
+    ),
+  },
+  {
+    src: '/images/members/member-02.jpg',
+    name: pickByLocale(locale, '成员二', 'Member 02'),
+    role: pickByLocale(locale, '研究员 / 社群策划', 'Researcher / Community Curator'),
+    bio: pickByLocale(
+      locale,
+      '专注于社群机制设计、公共活动策划与地方文化研究。相信真正的共同体来自持续的对话与共同实践。',
+      'Specializing in community mechanism design, public program curation, and local culture research. Believes genuine community emerges from sustained dialogue and shared practice.',
+    ),
+  },
+  {
+    src: '/images/members/member-03.jpg',
+    name: pickByLocale(locale, '成员三', 'Member 03'),
+    role: pickByLocale(locale, '技术研究员 / 工具实验', 'Tech Researcher / Tools Lab'),
+    bio: pickByLocale(
+      locale,
+      '探索 AI、协作工具与未来学习系统的交叉地带。关注技术如何重组研究流程、写作方式与知识传播路径。',
+      'Exploring the intersection of AI, collaborative tools, and future learning systems. Investigating how technology reorganizes research workflows, writing practices, and knowledge dissemination.',
+    ),
+  },
 ];
 
 // Gradient border colours per card (cyan, violet, mixed)
@@ -25,20 +50,45 @@ const borderGradients = [
 
 <section class="members-panel" data-members-panel>
   <div class="members-sticky">
-    <p class="members-panel__label">{sectionLabel}</p>
-    <ul class="members-cards">
-      {[...members, ...members, ...members].map((m, i) => (
-        <li class="members-card">
-          <div class="members-card__border" style={`background: ${borderGradients[i % members.length]}`}>
-            <img class="members-card__img" src={m.src} alt={m.name} loading="lazy" draggable="false" />
+    <div class="members-content">
+      <!-- Left: stacked card deck -->
+      <div class="members-deck" data-members-deck>
+        {members.map((m, i) => (
+          <div
+            class={`members-deck__card ${i === members.length - 1 ? 'members-deck__card--front' : ''}`}
+            data-members-flip-card
+            data-member-index={i}
+          >
+            <div class="members-deck__border" style={`background: ${borderGradients[i]}`}>
+              <img
+                class="members-deck__img"
+                src={m.src}
+                alt={m.name}
+                loading="lazy"
+                draggable="false"
+              />
+            </div>
           </div>
-        </li>
-      ))}
-    </ul>
+        ))}
+      </div>
+
+      <!-- Right: member info that syncs with cards -->
+      <div class="members-info" data-members-info>
+        {members.map((m, i) => (
+          <div
+            class={`members-info__item ${i === 0 ? 'members-info__item--active' : ''}`}
+            data-members-info-item
+            data-member-index={i}
+          >
+            <h3 class="members-info__name">{m.name}</h3>
+            <span class="members-info__role">{m.role}</span>
+            <p class="members-info__bio">{m.bio}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   </div>
 </section>
-
-<!-- Animation is managed by initMembersCarousel (pinned ScrollTrigger) -->
 
 <style>
   .members-panel {
@@ -47,7 +97,6 @@ const borderGradients = [
     background: var(--color-background);
   }
 
-  /* Pin target — ScrollTrigger pins this while cards animate */
   .members-sticky {
     position: relative;
     width: 100%;
@@ -55,68 +104,153 @@ const borderGradients = [
     overflow: hidden;
   }
 
-  .members-panel__label {
+  /* ── Two-column layout ── */
+  .members-content {
     position: absolute;
-    top: clamp(2rem, 5vh, 4rem);
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
-    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
-    font-size: clamp(0.62rem, 0.5vw + 0.44rem, 0.76rem);
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    opacity: 0.7;
-    z-index: 5;
-  }
-
-  /* Card anchor — positioned at centre; GSAP moves cards via xPercent */
-  .members-cards {
-    position: absolute;
-    width: clamp(16rem, 22vw, 22rem);
-    aspect-ratio: 9 / 16;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: clamp(3rem, 6vw, 8rem);
+    width: min(88vw, 64rem);
   }
 
-  .members-card {
+  /* ── Left: Card deck ── */
+  .members-deck {
+    position: relative;
+    flex-shrink: 0;
+    width: clamp(14rem, 18vw, 20rem);
+    aspect-ratio: 3 / 4;
+  }
+
+  .members-deck__card {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    aspect-ratio: 9 / 16;
-    border-radius: 1.2rem;
+    aspect-ratio: 3 / 4;
+    border-radius: 1rem;
     overflow: hidden;
     will-change: transform, opacity;
+    cursor: default;
   }
 
-  /* Gradient border wrapper — background colour set inline per card */
-  .members-card__border {
+  /* Stacking offsets: nth-child(1) is bottom, last is top */
+  .members-deck__card:nth-child(1) {
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+  .members-deck__card:nth-child(2) {
+    top: -20px;
+    left: 20px;
+    z-index: 2;
+  }
+  .members-deck__card:nth-child(3) {
+    top: -40px;
+    left: 40px;
+    z-index: 3;
+  }
+  .members-deck__card:nth-child(4) {
+    top: -60px;
+    left: 60px;
+    z-index: 4;
+  }
+  .members-deck__card:nth-child(5) {
+    top: -80px;
+    left: 80px;
+    z-index: 5;
+  }
+
+  .members-deck__border {
     position: relative;
     width: 100%;
     height: 100%;
-    border-radius: 1.2rem;
+    border-radius: 1rem;
     padding: 3px;
   }
 
-  .members-card__img {
+  .members-deck__img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: calc(1.2rem - 3px);
+    border-radius: calc(1rem - 3px);
     background: var(--color-background);
     user-select: none;
     -webkit-user-drag: none;
   }
 
-  @media (max-width: 600px) {
-    .members-cards {
+  /* ── Right: Member info ── */
+  .members-info {
+    position: relative;
+    flex: 1;
+    min-height: 14rem;
+  }
+
+  .members-info__item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+    transition: none; /* GSAP controls transitions */
+  }
+
+  .members-info__item--active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .members-info__name {
+    margin: 0 0 0.6rem;
+    font-family: 'POIRETONE-REGULAR', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    font-size: clamp(1.4rem, 1.8vw + 0.4rem, 2.2rem);
+    font-weight: normal;
+    letter-spacing: 0.06em;
+    color: var(--color-secondary-foreground);
+    line-height: 1.3;
+  }
+
+  .members-info__role {
+    display: block;
+    margin-bottom: 1.2rem;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.6rem, 0.5vw + 0.36rem, 0.76rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    opacity: 0.7;
+  }
+
+  .members-info__bio {
+    margin: 0;
+    font-size: clamp(0.88rem, 0.5vw + 0.6rem, 1.05rem);
+    line-height: 1.85;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 60%, transparent);
+    max-width: 28rem;
+  }
+  /* ── Mobile: stack vertically ── */
+  @media (max-width: 720px) {
+    .members-content {
+      flex-direction: column;
+      gap: 2.5rem;
+      width: min(92vw, 24rem);
+    }
+
+    .members-deck {
       width: clamp(12rem, 55vw, 16rem);
+    }
+
+    .members-info {
+      text-align: center;
+      min-height: 12rem;
+    }
+
+    .members-info__bio {
+      max-width: none;
     }
   }
 </style>

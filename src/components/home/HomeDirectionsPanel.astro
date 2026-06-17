@@ -221,15 +221,6 @@ const groupAccents = [
           <span class="directions-category__subtitle">{cat.subtitle}</span>
         </div>
       ))}
-      <!-- Progress indicators -->
-      <div class="directions-progress">
-        {categories.map((_, i) => (
-          <span
-            class={`directions-progress__dot ${i === 0 ? 'directions-progress__dot--active' : ''}`}
-            data-directions-dot={i}
-          />
-        ))}
-      </div>
     </div>
 
     <!-- Card track -->
@@ -242,9 +233,12 @@ const groupAccents = [
           style={`--card-accent: ${groupAccents[card.group]}`}
         >
           <div class="directions-card__inner">
+            <span class="directions-card__ornament directions-card__ornament--top">Entia Futura</span>
+            <span class="directions-card__index directions-card__index--left">{String(i + 1).padStart(2, '0')}</span>
             <h3 class="directions-card__title">{card.title}</h3>
             <p class="directions-card__body">{card.body}</p>
-            <span class="directions-card__index">{String(i + 1).padStart(2, '0')}</span>
+            <span class="directions-card__index directions-card__index--right">{String(i + 1).padStart(2, '0')}</span>
+            <span class="directions-card__ornament directions-card__ornament--bottom">Entia Futura</span>
           </div>
         </div>
       ))}
@@ -279,25 +273,26 @@ const groupAccents = [
   .directions-category {
     position: absolute;
     top: clamp(2.5rem, 6vh, 4.5rem);
-    left: clamp(1.5rem, 4vw, 3.5rem);
+    left: 50%;
+    /* transform managed by GSAP (xPercent:-50 + y) — do NOT set here */
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
     gap: 0.5rem;
     opacity: 0;
-    transform: translateY(12px);
     transition: none; /* GSAP controls this */
     pointer-events: none;
   }
 
   .directions-category--active {
-    opacity: 1;
-    transform: translateY(0);
+    /* Initial state — GSAP overrides immediately */
     pointer-events: auto;
   }
 
   .directions-category__label {
     font-family: 'POIRETONE-REGULAR', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
-    font-size: clamp(1.6rem, 2.4vw + 0.4rem, 2.8rem);
+    font-size: clamp(2rem, 3vw + 0.5rem, 3.4rem);
     font-weight: normal;
     letter-spacing: 0.12em;
     color: var(--color-secondary-foreground);
@@ -306,35 +301,13 @@ const groupAccents = [
 
   .directions-category__subtitle {
     font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
-    font-size: clamp(0.58rem, 0.45vw + 0.4rem, 0.72rem);
+    font-size: clamp(0.68rem, 0.5vw + 0.44rem, 0.82rem);
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--color-primary);
     opacity: 0.6;
   }
 
-  /* ── Progress dots ── */
-  .directions-progress {
-    position: absolute;
-    top: clamp(2.5rem, 6vh, 4.5rem);
-    right: clamp(1.5rem, 4vw, 3.5rem);
-    display: flex;
-    gap: 0.6rem;
-    align-items: center;
-  }
-
-  .directions-progress__dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--color-secondary-foreground) 25%, transparent);
-    transition: background 0.35s ease, transform 0.35s ease;
-  }
-
-  .directions-progress__dot--active {
-    background: var(--color-primary);
-    transform: scale(1.5);
-  }
 
   /* ── Card track ── */
   .directions-track {
@@ -343,7 +316,7 @@ const groupAccents = [
     left: 50%;
     transform: translate(-50%, -50%);
     /* Cards are positioned absolutely inside; GSAP moves them */
-    width: clamp(18rem, 24vw, 26rem);
+    width: clamp(20rem, 26vw, 30rem);
     aspect-ratio: 3 / 4;
   }
 
@@ -363,25 +336,25 @@ const groupAccents = [
     position: relative;
     width: 100%;
     height: 100%;
-    padding: clamp(1.8rem, 3vw, 2.8rem);
+    padding: clamp(2.2rem, 3.5vw, 3.5rem);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 1rem;
+    gap: 1.2rem;
     background:
       linear-gradient(
         145deg,
         color-mix(in srgb, var(--card-accent) 8%, var(--color-background)),
         var(--color-background) 60%
       );
-    border: 1px solid color-mix(in srgb, var(--card-accent) 18%, transparent);
+    border: 2px solid color-mix(in srgb, var(--card-accent) 35%, transparent);
     border-radius: 1rem;
   }
 
   .directions-card__title {
     margin: 0;
     font-family: 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
-    font-size: clamp(1.1rem, 1.2vw + 0.4rem, 1.5rem);
+    font-size: clamp(1.5rem, 1.8vw + 0.5rem, 2.2rem);
     font-weight: 600;
     line-height: 1.35;
     color: var(--color-secondary-foreground);
@@ -389,20 +362,70 @@ const groupAccents = [
 
   .directions-card__body {
     margin: 0;
-    font-size: clamp(0.82rem, 0.6vw + 0.5rem, 1rem);
-    line-height: 1.72;
+    font-size: clamp(1.05rem, 0.8vw + 0.6rem, 1.28rem);
+    line-height: 1.82;
     color: color-mix(in srgb, var(--color-secondary-foreground) 65%, transparent);
   }
 
   .directions-card__index {
     position: absolute;
-    bottom: clamp(1.2rem, 2vw, 1.8rem);
-    right: clamp(1.2rem, 2vw, 1.8rem);
+    top: 50%;
+    transform: translateY(-50%);
     font-family: 'POIRETONE-REGULAR', monospace;
-    font-size: clamp(0.68rem, 0.5vw + 0.4rem, 0.82rem);
-    letter-spacing: 0.1em;
+    font-size: clamp(0.88rem, 0.7vw + 0.52rem, 1.05rem);
+    font-weight: 900;
+    letter-spacing: 0.12em;
     color: var(--card-accent);
-    opacity: 0.4;
+    opacity: 0.45;
+    writing-mode: vertical-rl;
+  }
+
+  .directions-card__index--left {
+    left: clamp(0.8rem, 1.2vw, 1.2rem);
+  }
+
+  .directions-card__index--right {
+    right: clamp(0.8rem, 1.2vw, 1.2rem);
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  /* ── Ornament line: ── Entia Futura ── ── */
+  .directions-card__ornament {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.62rem, 0.45vw + 0.4rem, 0.74rem);
+    font-weight: 900;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--card-accent);
+    opacity: 0.5;
+    white-space: nowrap;
+  }
+
+  .directions-card__ornament::before,
+  .directions-card__ornament::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: var(--card-accent);
+    opacity: 0.6;
+  }
+
+  .directions-card__ornament--top {
+    position: absolute;
+    top: clamp(1.2rem, 2vw, 1.8rem);
+    left: clamp(2.2rem, 3.5vw, 3.5rem);
+    right: clamp(2.2rem, 3.5vw, 3.5rem);
+  }
+
+  .directions-card__ornament--bottom {
+    position: absolute;
+    bottom: clamp(1.2rem, 2vw, 1.8rem);
+    left: clamp(2.2rem, 3.5vw, 3.5rem);
+    right: clamp(2.2rem, 3.5vw, 3.5rem);
+    transform: rotate(180deg);
   }
 
   /* ── Mobile adjustments ── */
@@ -414,26 +437,21 @@ const groupAccents = [
 
     .directions-category {
       top: max(2rem, calc(env(safe-area-inset-top) + 1.5rem));
-      left: max(1rem, calc(env(safe-area-inset-left) + 0.9rem));
+      /* left: 50% + translateX(-50%) already set in base rule */
     }
 
     .directions-category__label {
-      font-size: clamp(1.2rem, 5vw, 1.8rem);
-    }
-
-    .directions-progress {
-      top: max(2rem, calc(env(safe-area-inset-top) + 1.5rem));
-      right: max(1rem, calc(env(safe-area-inset-right) + 0.9rem));
+      font-size: clamp(1.4rem, 5.5vw, 2.2rem);
     }
 
     .directions-track {
-      width: clamp(14rem, 65vw, 18rem);
+      width: clamp(15rem, 65vw, 20rem);
     }
   }
 
   @media (max-width: 600px) {
     .directions-track {
-      width: clamp(12rem, 70vw, 16rem);
+      width: clamp(13rem, 72vw, 18rem);
     }
   }
 </style>

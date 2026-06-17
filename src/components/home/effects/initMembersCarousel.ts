@@ -1,127 +1,183 @@
 // ---------------------------------------------------------------------------
-// Members carousel — scrub-driven card flythrough with pin
+// Members carousel — Flip-based stacked card deck with synced info panel
 //
-// Adapted from GSAP "Infinite Scrolling Cards" demo's buildSeamlessLoop
-// approach.  Cards fly across from right to left; at the midpoint each card
-// reaches full scale / opacity (centre-stage).  Multiple cards are visible
-// simultaneously — the centred card is largest while neighbours are smaller
-// and fading in/out, just like the demo.
+// Adapted from the GreenSock Flip Cards demo (codepen.io/GreenSock/pen/Yzdzxem).
+// Cards are stacked like a deck; as the user scrolls, the top card flips away
+// and the remaining cards shift up.  The right-side info panel updates in sync
+// to show the bio of the currently-front card.
 //
-// The members-sticky container is pinned with ScrollTrigger for enough
-// scroll distance to play the full card sequence.
+// The members-sticky container is pinned with ScrollTrigger for enough scroll
+// distance to cycle through all cards.
 // ---------------------------------------------------------------------------
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Flip } from 'gsap/Flip';
 
-gsap.registerPlugin(ScrollTrigger);
-
-/**
- * Build a seamless card-loop timeline.
- *
- * Each card flies across (xPercent 400 → -400) and peaks at scale 1 /
- * opacity 1 mid-flight.  Stagger creates overlap so 3-5 cards are visible
- * simultaneously.  The centre card (at peak) is largest; neighbours on each
- * side are progressively smaller and more transparent — matching the demo.
- */
-function buildSeamlessLoop(
-  items: HTMLElement[],
-  spacing: number,
-): gsap.core.Timeline {
-  // Overlap determines how much of each card's fly-across overlaps with
-  // neighbours.  A spacing of 0.1 with duration 1 means each card starts
-  // 0.1 units after the previous, so ~10 cards overlap at once.
-  const overlap = Math.ceil(1 / spacing); // how many cards are visible at once
-
-  const rawSequence = gsap.timeline({ paused: true });
-
-  items.forEach((el, i) => {
-    const startPos = i * spacing;
-
-    // Scale/opacity: ramp up 0→1 in first half, ramp down 1→0 in second half
-    rawSequence
-      .fromTo(
-        el,
-        { scale: 0, opacity: 0 },
-        {
-          scale: 1,
-          opacity: 1,
-          zIndex: 100,
-          duration: 0.5,
-          yoyo: true,
-          repeat: 1,
-          ease: 'power1.in',
-          immediateRender: false,
-        },
-        startPos,
-      )
-      .fromTo(
-        el,
-        { xPercent: 400 },
-        {
-          xPercent: -400,
-          duration: 1,
-          ease: 'none',
-          immediateRender: false,
-        },
-        startPos,
-      );
-  });
-
-  return rawSequence;
-}
+gsap.registerPlugin(ScrollTrigger, Flip);
 
 // ── public entry ───────────────────────────────────────────────────────────
 
 export function initMembersCarousel(membersPanel: HTMLElement) {
-  const cards = gsap.utils.toArray<HTMLElement>('.members-card', membersPanel);
-  if (!cards.length) return;
+  const deck = membersPanel.querySelector<HTMLElement>('[data-members-deck]');
+  if (!deck) return;
 
   const stickyContainer = membersPanel.querySelector<HTMLElement>('.members-sticky');
   if (!stickyContainer) return;
 
-  // Label
-  const label = membersPanel.querySelector<HTMLElement>('.members-panel__label');
+  const cards = gsap.utils.toArray<HTMLElement>('[data-members-flip-card]', deck);
+  if (!cards.length) return;
 
-  // Initial state — cards invisible, off to the right
-  gsap.set(cards, { xPercent: 400, opacity: 0, scale: 0 });
-  if (label) gsap.set(label, { autoAlpha: 0, y: 20 });
+  const infoItems = gsap.utils.toArray<HTMLElement>('[data-members-info-item]', membersPanel);
+  // Total number of unique members
+  const totalMembers = cards.length;
 
-  const spacing = 0.1; // closer spacing → more cards visible at once
-  const seamlessLoop = buildSeamlessLoop(cards, spacing);
-  const totalDuration = seamlessLoop.duration();
+  // Track which member is currently shown (front card index)
+  // Cards are rendered bottom-to-top: index 0 is at the back, last is on top.
+  // The "front" card (top of deck) is cards[cards.length - 1].
+  // After a flip, the front card leaves and the new front is the next one down.
+  let currentMemberIndex = 0;
 
-  // Scroll distance proportional to number of unique cards
-  // 3 unique cards × 3 duplicates = 9, each takes `spacing` worth of scroll
-  const scrollDistance = Math.round(cards.length * 350);
+  // Scroll distance: enough for all card flips
+  const scrollPerFlip = 800;
+  const scrollDistance = totalMembers * scrollPerFlip;
 
-  // Create a master scrub timeline
-  const scrubTl = gsap.timeline({
+  // ── Helper: update info panel ──
+  function showMemberInfo(index: number) {
+    const safeIndex = ((index % totalMembers) + totalMembers) % totalMembers;
+
+    infoItems.forEach((item, i) => {
+      if (i === safeIndex) {
+        gsap.to(item, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.4,
+          ease: 'power2.out',
+          overwrite: true,
+        });
+      } else {
+        gsap.to(item, {
+          autoAlpha: 0,
+          y: 16,
+          duration: 0.25,
+          ease: 'power2.in',
+          overwrite: true,
+        });
+      }
+    });
+  }
+
+  // ── Helper: perform a single Flip card transition ──
+  function flipTopCard() {
+    // Get the current top card (last child in DOM)
+    const topCard = deck.querySelector<HTMLElement>('[data-members-flip-card]:last-child');
+    if (!topCard) return;
+
+    // Capture state before DOM change
+    const state = Flip.getState('[data-members-flip-card]', { props: 'opacity' });
+
+    // Move the top card to be hidden (move to start of deck = behind)
+    topCard.style.display = 'none';
+
+    // Create a clone and prepend it (so it goes to the back of the stack)
+    const clone = topCard.cloneNode(true) as HTMLElement;
+    clone.style.display = '';
+    deck.insertBefore(clone, deck.firstChild);
+
+    // Remove the old hidden card
+    deck.removeChild(topCard);
+
+    // Animate with Flip
+    Flip.from(state, {
+      targets: '[data-members-flip-card]',
+      duration: 0.6,
+      ease: 'sine.inOut',
+      absolute: true,
+      onEnter: (elements) => {
+        return gsap.from(elements, {
+          duration: 0.35,
+          yPercent: 20,
+          opacity: 0,
+          ease: 'expo.out',
+        });
+      },
+      onLeave: (elements) => {
+        return gsap.to(elements, {
+          duration: 0.35,
+          yPercent: 5,
+          xPercent: -8,
+          transformOrigin: 'bottom left',
+          opacity: 0,
+          ease: 'expo.out',
+        });
+      },
+    });
+
+    // Update member index and info
+    currentMemberIndex = (currentMemberIndex + 1) % totalMembers;
+    showMemberInfo(currentMemberIndex);
+  }
+
+  // ── Pinned ScrollTrigger that triggers flips at even intervals ──
+  gsap.timeline({
     scrollTrigger: {
       trigger: stickyContainer,
       start: 'top top',
       end: `+=${scrollDistance}`,
       pin: true,
       pinSpacing: true,
-      scrub: 0.4,
+      scrub: false,       // NOT scrub — we use onUpdate thresholds
       anticipatePin: 1,
       invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        // Determine which card should be on top based on scroll progress
+        const targetIndex = Math.min(
+          Math.floor(self.progress * totalMembers),
+          totalMembers - 1,
+        );
+
+        // Only flip when we cross a threshold going forward
+        while (currentMemberIndex < targetIndex) {
+          flipTopCard();
+        }
+
+        // Handle scrolling back: reset to original state
+        if (targetIndex < currentMemberIndex) {
+          // Reset the deck to its original order
+          resetDeck(targetIndex);
+        }
+      },
     },
   });
 
-  // Reveal the label first
-  if (label) {
-    scrubTl.to(label, { autoAlpha: 1, y: 0, duration: 0.1, ease: 'power2.out' }, 0);
+  // ── Reset deck to a specific member index (for scroll-back) ──
+  function resetDeck(targetIndex: number) {
+    // Re-order cards in DOM to match the target state
+    const allCards = gsap.utils.toArray<HTMLElement>('[data-members-flip-card]', deck);
+
+    // Clear and re-insert in correct order for targetIndex
+    // The "front" (top/last-child) card should correspond to targetIndex
+    const reordered: HTMLElement[] = [];
+    for (let i = 0; i < totalMembers; i++) {
+      const cardIndex = (targetIndex + totalMembers - i) % totalMembers;
+      // Find the card with this member index
+      const card = allCards.find(
+        c => parseInt(c.getAttribute('data-member-index') || '0', 10) === cardIndex,
+      );
+      if (card) reordered.push(card);
+    }
+
+    // Re-insert: first in array = last child (front of deck)
+    // We want reordered[0] to be the front (last child)
+    // So insert in reverse order
+    reordered.reverse().forEach(card => {
+      deck.appendChild(card);
+    });
+
+    currentMemberIndex = targetIndex;
+    showMemberInfo(currentMemberIndex);
   }
 
-  // Drive the seamless loop with scroll
-  scrubTl.to(
-    seamlessLoop,
-    {
-      time: totalDuration,
-      duration: 1,
-      ease: 'none',
-    },
-    0,
-  );
+  // Show initial member info
+  showMemberInfo(0);
 }
