@@ -1,13 +1,12 @@
 // ---------------------------------------------------------------------------
 // Directions carousel — scrub-driven card flythrough with category switching
 //
-// Modelled after the Members carousel (initMembersCarousel.ts) but extended
-// with three category groups.  As the user scrolls, cards fly across from
-// right to left; the currently centred card's group determines which category
-// label is shown at the top.  Progress dots also update per-group.
+// Uses the same seamless-loop animation as the Members carousel
+// (initMembersCarousel.ts): cards fly across from right to left, peaking at
+// full scale/opacity mid-flight with multiple cards visible simultaneously.
 //
-// The directions-sticky container is pinned with ScrollTrigger for enough
-// scroll distance to play all 17 cards.
+// Extended with three category groups — the currently centred card's group
+// determines which category label is shown at the top.
 // ---------------------------------------------------------------------------
 
 import gsap from 'gsap';
@@ -15,48 +14,54 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
-/** Build a linear card-flythrough timeline. */
-function buildCardSequence(
+/**
+ * Build a seamless card-loop timeline (identical to Members carousel).
+ *
+ * Each card flies across (xPercent 400 → -400) and peaks at scale 1 /
+ * opacity 1 mid-flight.  Stagger creates overlap so 3-5 cards are visible
+ * simultaneously.  The centre card (at peak) is largest; neighbours on each
+ * side are progressively smaller and more transparent.
+ */
+function buildSeamlessLoop(
   items: HTMLElement[],
   spacing: number,
 ): gsap.core.Timeline {
-  const seq = gsap.timeline({ paused: true });
+  const rawSequence = gsap.timeline({ paused: true });
 
   items.forEach((el, i) => {
-    const start = i * spacing;
+    const startPos = i * spacing;
 
-    // Scale + opacity: ramp up 0→1 then back 1→0 (yoyo)
-    seq.fromTo(
-      el,
-      { scale: 0.45, opacity: 0 },
-      {
-        scale: 1,
-        opacity: 1,
-        zIndex: 100,
-        duration: 0.5,
-        yoyo: true,
-        repeat: 1,
-        ease: 'power1.in',
-        immediateRender: false,
-      },
-      start,
-    );
-
-    // Horizontal sweep: right → left
-    seq.fromTo(
-      el,
-      { xPercent: 350 },
-      {
-        xPercent: -350,
-        duration: 1,
-        ease: 'none',
-        immediateRender: false,
-      },
-      start,
-    );
+    // Scale/opacity: ramp up 0→1 in first half, ramp down 1→0 in second half
+    rawSequence
+      .fromTo(
+        el,
+        { scale: 0, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          zIndex: 100,
+          duration: 0.5,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power1.in',
+          immediateRender: false,
+        },
+        startPos,
+      )
+      .fromTo(
+        el,
+        { xPercent: 400 },
+        {
+          xPercent: -400,
+          duration: 1,
+          ease: 'none',
+          immediateRender: false,
+        },
+        startPos,
+      );
   });
 
-  return seq;
+  return rawSequence;
 }
 
 /**
@@ -109,8 +114,8 @@ export function initDirectionsCarousel(panel: HTMLElement) {
     panel,
   );
 
-  // ── Initial state ──
-  gsap.set(cards, { xPercent: 350, opacity: 0, scale: 0.45 });
+  // ── Initial state (identical to Members) ──
+  gsap.set(cards, { xPercent: 400, opacity: 0, scale: 0 });
 
   // Hide all categories except first
   categoryEls.forEach((el, i) => {
@@ -121,10 +126,11 @@ export function initDirectionsCarousel(panel: HTMLElement) {
     }
   });
 
-  const spacing = 0.08;
-  const sequence = buildCardSequence(cards, spacing);
-  const totalDuration = sequence.duration();
-  const scrollDistance = Math.round(cards.length * 420);
+  // Same spacing & scroll distance as Members
+  const spacing = 0.1;
+  const seamlessLoop = buildSeamlessLoop(cards, spacing);
+  const totalDuration = seamlessLoop.duration();
+  const scrollDistance = Math.round(cards.length * 350);
 
   // Track current active group for category switching
   let currentGroup = 0;
@@ -137,7 +143,7 @@ export function initDirectionsCarousel(panel: HTMLElement) {
       end: `+=${scrollDistance}`,
       pin: true,
       pinSpacing: true,
-      scrub: 0.5,
+      scrub: 0.4,
       anticipatePin: 1,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
@@ -188,9 +194,9 @@ export function initDirectionsCarousel(panel: HTMLElement) {
     },
   });
 
-  // Drive the card sequence
+  // Drive the seamless loop with scroll
   scrubTl.to(
-    sequence,
+    seamlessLoop,
     {
       time: totalDuration,
       duration: 1,
