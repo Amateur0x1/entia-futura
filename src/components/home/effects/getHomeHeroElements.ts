@@ -19,7 +19,6 @@ export interface HomeHeroElements {
   secondPanelDivider: HTMLElement | null;
   secondPanelBody: HTMLElement | null;
   secondPanelParagraphs: HTMLElement[];
-  secondPanelCards: HTMLElement[];
   primaryVisual: HTMLElement | null;
 }
 
@@ -35,9 +34,6 @@ const getVideoElement = (root: ParentNode | null, selector: string) => {
 
 const getParagraphs = (root: HTMLElement | null) =>
   root ? Array.from(root.querySelectorAll<HTMLElement>('.landing-second-panel__paragraph')) : [];
-
-const getCards = (root: HTMLElement | null) =>
-  root ? Array.from(root.querySelectorAll<HTMLElement>('.landing-second-panel__card')) : [];
 
 export const getHomeHeroElements = (): HomeHeroElements => {
   const heroTransitionRoot = getHTMLElement(document, '[data-hero-transition-root]');
@@ -84,7 +80,6 @@ export const getHomeHeroElements = (): HomeHeroElements => {
     secondPanelDivider,
     secondPanelBody,
     secondPanelParagraphs: getParagraphs(secondPanelBody),
-    secondPanelCards: getCards(secondPanel),
     primaryVisual: portalShell ?? heroVideoShell,
   };
 };

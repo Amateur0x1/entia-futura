@@ -44,81 +44,12 @@ const instituteIntro = pickByLocale(
   '使命：围绕"未来我们将如何存在？"这一核心问题，连接研究、社群、产业与现实实验。\n愿景：在大学之外，建立一种更开放、更现实、也更具协作能力的新型研究机构。',
   'Mission: To organize research, community, industry, and real-world experimentation around one central question: How shall we exist in the future?\nVision: To build a new kind of institute beyond the university — more open, more grounded, and more capable of collaboration.',
 );
-const principleCards = [
-  {
-    zhTitle: '严肃思考，进入现实',
-    enTitle: 'Serious thought, grounded in reality',
-    zhBody: '坚持问题意识与现实触感并重，让研究进入组织、地方与合作之中。',
-    enBody: 'We hold firm to both critical rigor and real-world contact, bringing research into organizations, localities, and collaborations.',
-  },
-  {
-    zhTitle: '跨界连接，拒绝空转',
-    enTitle: 'Cross-boundary connection, not empty posturing',
-    zhBody: '连接研究者、创作者、技术实践者、企业与空间，但跨界不是姿态，而是共同承担问题。',
-    enBody: 'We connect researchers, makers, practitioners, enterprises, and spaces — but cross-boundary work is not a stance; it is shared responsibility for a problem.',
-  },
-  {
-    zhTitle: '长期主义，反对速成',
-    enTitle: 'Long-termism against quick fixes',
-    zhBody: '重视积累、节奏与信任，不追逐即时热度或短期流量。',
-    enBody: 'We value accumulation, rhythm, and trust. We do not chase instant attention or short-term reach.',
-  },
-  {
-    zhTitle: '开放合作，保持判断',
-    enTitle: 'Open to collaboration, firm in judgment',
-    zhBody: '欢迎合作，同时珍视研究的独立性与复杂度。',
-    enBody: 'We welcome collaboration while preserving the independence and complexity of our inquiry.',
-  },
-  {
-    zhTitle: '共同建设，而非被动消费',
-    enTitle: 'Build together, not consume passively',
-    zhBody: '研究所不是一个供人消费的品牌，而是一项需要共同建设的事业。',
-    enBody: 'The institute is not a brand to be consumed, but a project to be built together.',
-  },
-  {
-    zhTitle: '有思想，也能做事',
-    enTitle: 'Thinkers who can act',
-    zhBody: '反对把思想与行动切开，强调研究深度与现实能力并存。',
-    enBody: 'We reject the separation of thought and action, insisting on both depth of inquiry and capacity for real-world work.',
-  },
-] as const;
-
 const whatWeDoTitle = pickByLocale(locale, '我们做什么？', 'What We Do?');
 const whatWeDoIntro = pickByLocale(
   locale,
   '我们关心的不只是技术将如何改变世界，更关心在技术剧变与社会重组的时代，我们将如何学习、工作、居住、连接、创造，并重新组织知识、空间与共同体。',
   'We are concerned not only with how technology is changing the world, but with how, in a time of technological transformation and social reconfiguration, we shall learn, work, dwell, connect, create, and reorganize knowledge, space, and collective life.',
 );
-const whatWeDoModules = [
-  {
-    zhTitle: '研究',
-    enTitle: 'Research',
-    zhBody: '围绕未来社会的重要议题展开长期研究、写作、访谈、观察、案例档案与公共讨论。',
-    enBody:
-      'Long-term inquiry, writing, interviews, observation, case archives, and public discussion around critical questions of future society.',
-  },
-  {
-    zhTitle: '项目机制',
-    enTitle: 'Programs',
-    zhBody: '通过研究项目、公共活动、协作项目、驻留机制、社群结构与实验项目组织工作。',
-    enBody:
-      'Work organized through research programs, public programs, collaborative projects, residencies, community structures, and experimental initiatives.',
-  },
-  {
-    zhTitle: '研究转化',
-    enTitle: 'Research in Practice',
-    zhBody: '让高等研究进入现实问题、组织实践、品牌叙事、空间场景与协作机制之中。',
-    enBody:
-      'Bringing advanced inquiry into real-world questions, organizational practice, narrative work, spaces, and collaborative structures.',
-  },
-  {
-    zhTitle: '未来项目',
-    enTitle: 'Future Ventures',
-    zhBody: '从研究中发展项目、机制、原型与新的组织形式，测试未来社会的可能结构。',
-    enBody:
-      'Developing projects, mechanisms, prototypes, and new institutional forms out of inquiry to test possible futures.',
-  },
-] as const;
 ---
 
 <Layout title={`${pageTitle} | ${siteMeta.enName}`} description={pageDescription} locale={locale} theme="landing-dark">
@@ -127,12 +58,11 @@ const whatWeDoModules = [
   <main class="landing-main" data-hero-stage>
     <HomeHeroScreen locale={locale} />
     <HomeOverviewPanel locale={locale} label={overviewLabel} body={overviewBody} />
-    <HomeSecondPanel locale={locale} coreQuestion={coreQuestion} instituteIntro={instituteIntro} principleCards={principleCards} />
+    <HomeSecondPanel locale={locale} coreQuestion={coreQuestion} instituteIntro={instituteIntro} />
     <HomeThirdPanel
       locale={locale}
       title={whatWeDoTitle}
       intro={whatWeDoIntro}
-      modules={whatWeDoModules}
     />
     <HomeMembersPanel locale={locale} />
     <HomeFourthPanel locale={locale} />

@@ -10,10 +10,17 @@ interface SetupSecondPanelRevealArgs {
   secondPanelDivider: Element | null | undefined;
   secondPanelBody: Element | null | undefined;
   secondPanelParagraphs: HTMLElement[];
-  secondPanelCards?: HTMLElement[];
   timeline?: gsap.core.Timeline;
   startAt?: number;
 }
+
+// ---------------------------------------------------------------------------
+// Scatter → order: each character starts at a random position/rotation and
+// animates back to its natural layout position.
+// ---------------------------------------------------------------------------
+
+/** Generate a random number in [-range, range]. */
+const rand = (range: number) => (Math.random() - 0.5) * 2 * range;
 
 export const setupSecondPanelReveal = ({
   prefersReducedMotion,
@@ -23,7 +30,6 @@ export const setupSecondPanelReveal = ({
   secondPanelDivider,
   secondPanelBody,
   secondPanelParagraphs,
-  secondPanelCards = [],
   timeline,
   startAt = 0,
 }: SetupSecondPanelRevealArgs) => {
@@ -43,24 +49,25 @@ export const setupSecondPanelReveal = ({
   gsap.set(secondPanelBody, { autoAlpha: 1 });
   gsap.set(secondPanelDivider, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
 
-  // Split each paragraph into lines with mask for the slide-up reveal.
-  const allSplitLines: Element[] = [];
+  // Split each paragraph into individual characters for the scatter effect.
+  const allChars: Element[] = [];
   secondPanelParagraphs.forEach((p) => {
     const split = SplitText.create(p, {
-      type: 'lines',
-      linesClass: 'split-line',
-      mask: 'lines',
+      type: 'chars',
     });
-    allSplitLines.push(...split.lines);
+    allChars.push(...split.chars);
   });
 
-  // Set initial state: lines hidden below their mask.
-  gsap.set(allSplitLines, { yPercent: 100, opacity: 0 });
-
-  // Cards start hidden + slightly below; revealed one-by-one AFTER the body text.
-  if (secondPanelCards.length > 0) {
-    gsap.set(secondPanelCards, { autoAlpha: 0, y: 28 });
-  }
+  // Set initial state: each char at a random scattered position.
+  allChars.forEach((char) => {
+    gsap.set(char, {
+      x: rand(120),
+      y: rand(80),
+      rotation: rand(45),
+      scale: 0.3 + Math.random() * 0.3,
+      opacity: 0,
+    });
+  });
 
   const tl =
     timeline ??
@@ -80,33 +87,24 @@ export const setupSecondPanelReveal = ({
     startAt,
   );
 
-  // Lines slide-up reveal (scrub-driven, part of the timeline)
+  // Characters scatter → order reveal (scrub-driven, part of the timeline).
+  // Each char animates from its random position back to natural layout.
   tl.to(
-    allSplitLines,
+    allChars,
     {
-      yPercent: 0,
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: 1,
       opacity: 1,
-      duration: 0.6,
-      ease: 'expo.out',
-      stagger: 0.1,
-    },
-    startAt + 0.2,
-  );
-
-  // Cards reveal — after lines finish
-  const linesEnd = startAt + 0.2 + 0.6 + 0.1 * (allSplitLines.length - 1);
-  if (secondPanelCards.length > 0) {
-    tl.to(
-      secondPanelCards,
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.5,
-        ease: 'power3.out',
-        stagger: { each: 0.12, from: 'start' },
+      duration: 0.3,
+      ease: 'power3.out',
+      stagger: {
+        each: 0.002,
+        from: 'start',
       },
-      linesEnd + 0.18,
-    );
-  }
+    },
+    startAt + 0.15,
+  );
 
 };

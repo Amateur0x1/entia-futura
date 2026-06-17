@@ -8,6 +8,14 @@ interface SetupThirdPanelRevealArgs {
   startAt: number;
 }
 
+// ---------------------------------------------------------------------------
+// Scatter → order: each character starts at a random position/rotation and
+// animates back to its natural layout position.
+// ---------------------------------------------------------------------------
+
+/** Generate a random number in [-range, range]. */
+const rand = (range: number) => (Math.random() - 0.5) * 2 * range;
+
 export const setupThirdPanelReveal = ({
   prefersReducedMotion,
   thirdPanel,
@@ -20,28 +28,32 @@ export const setupThirdPanelReveal = ({
 
   const intro   = thirdPanel.querySelector<HTMLElement>('[data-tp-intro]');
   const divider = thirdPanel.querySelector<HTMLElement>('[data-tp-divider]');
-  const cards   = Array.from(thirdPanel.querySelectorAll<HTMLElement>('[data-tp-card]'));
 
   if (!intro) return;
 
   if (prefersReducedMotion) {
-    gsap.set([intro, divider, ...cards], { autoAlpha: 1, y: 0, scaleX: 1 });
+    gsap.set([intro, divider], { autoAlpha: 1, y: 0, scaleX: 1 });
     return;
   }
 
-  // ── Split intro into lines with mask for the slide-up reveal ──
+  // ── Split intro into individual characters for scatter effect ──
   const split = SplitText.create(intro, {
-    type: 'lines',
-    linesClass: 'split-line',
-    mask: 'lines',
+    type: 'chars',
   });
-  const introLines = split.lines;
+  const introChars = split.chars;
 
-  // ── Initial hidden state ──
-  gsap.set(introLines, { yPercent: 100, opacity: 0 });
+  // ── Initial hidden state: scattered ──
+  introChars.forEach((char: Element) => {
+    gsap.set(char, {
+      x: rand(120),
+      y: rand(80),
+      rotation: rand(45),
+      scale: 0.3 + Math.random() * 0.3,
+      opacity: 0,
+    });
+  });
   gsap.set(intro, { autoAlpha: 1 });
   if (divider) gsap.set(divider, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
-  gsap.set(cards, { autoAlpha: 0, y: 20 });
 
   // ── Scrub-driven reveal (part of the timeline) ──
   // Divider
@@ -53,26 +65,23 @@ export const setupThirdPanelReveal = ({
     );
   }
 
-  // Lines slide-up
+  // Characters scatter → order
   timeline.to(
-    introLines,
+    introChars,
     {
-      yPercent: 0,
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: 1,
       opacity: 1,
-      duration: 0.6,
-      ease: 'expo.out',
-      stagger: 0.1,
+      duration: 0.3,
+      ease: 'power3.out',
+      stagger: {
+        each: 0.002,
+        from: 'start',
+      },
     },
     startAt + 0.2,
   );
 
-  // Cards reveal after lines
-  if (cards.length > 0) {
-    const linesEnd = startAt + 0.2 + 0.6 + 0.1 * (introLines.length - 1);
-    timeline.to(
-      cards,
-      { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.1 },
-      linesEnd + 0.15,
-    );
-  }
 };

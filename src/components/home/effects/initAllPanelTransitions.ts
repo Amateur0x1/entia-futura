@@ -216,8 +216,8 @@ const initFullTransitions = ({
       defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: overviewPanel,
-        start: 'top 88%',
-        end: 'top 20%',
+        start: 'top 150%',
+        end: 'bottom 10%',
         scrub: 0.4,
       },
     });
@@ -244,8 +244,8 @@ const initFullTransitions = ({
     defaults: { ease: 'none' },
     scrollTrigger: {
       trigger: secondPanel,
-      start: 'top 88%',
-      end: 'top 10%',
+      start: 'top 150%',
+      end: 'bottom 10%',
       scrub: 0.4,
     },
   });
@@ -263,7 +263,7 @@ const initFullTransitions = ({
     secondPanelDivider: elements.secondPanelDivider,
     secondPanelBody: elements.secondPanelBody,
     secondPanelParagraphs: elements.secondPanelParagraphs,
-    secondPanelCards: elements.secondPanelCards,
+    
     timeline: secondTl,
     startAt: 0.15,
   });
@@ -275,8 +275,8 @@ const initFullTransitions = ({
     defaults: { ease: 'none' },
     scrollTrigger: {
       trigger: thirdPanel,
-      start: 'top 88%',
-      end: 'top 10%',
+      start: 'top 150%',
+      end: 'bottom 10%',
       scrub: 0.4,
     },
   });

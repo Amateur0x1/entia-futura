@@ -10,11 +10,19 @@ interface SetupOverviewPanelRevealArgs {
   startAt?: number;
 }
 
+// ---------------------------------------------------------------------------
+// Scatter → order: each character starts at a random position/rotation and
+// animates back to its natural layout position.
+// ---------------------------------------------------------------------------
+
+/** Generate a random number in [-range, range]. */
+const rand = (range: number) => (Math.random() - 0.5) * 2 * range;
+
 /**
  * Reveals the standalone Institute Overview panel:
  *   1. The thin divider scales in from the left.
- *   2. Each paragraph is split into lines and revealed with a masked
- *      slide-up (yPercent: 100 → 0) — scrub-driven, same as second panel.
+ *   2. Each paragraph is split into individual characters that start
+ *      scattered and animate back to their natural positions.
  */
 export const setupOverviewPanelReveal = ({
   prefersReducedMotion,
@@ -45,19 +53,25 @@ export const setupOverviewPanelReveal = ({
     gsap.set(overviewLines, { autoAlpha: 1 });
   }
 
-  // Split each paragraph into lines with mask (clip) for the slide-up reveal.
-  const allSplitLines: Element[] = [];
+  // Split each paragraph into individual characters for the scatter effect.
+  const allChars: Element[] = [];
   overviewLines.forEach((el) => {
     const split = SplitText.create(el, {
-      type: 'lines',
-      linesClass: 'split-line',
-      mask: 'lines',
+      type: 'chars',
     });
-    allSplitLines.push(...split.lines);
+    allChars.push(...split.chars);
   });
 
-  // Set initial state: lines hidden below their mask.
-  gsap.set(allSplitLines, { yPercent: 100, opacity: 0 });
+  // Set initial state: each char at a random scattered position.
+  allChars.forEach((char) => {
+    gsap.set(char, {
+      x: rand(120),
+      y: rand(80),
+      rotation: rand(45),
+      scale: 0.3 + Math.random() * 0.3,
+      opacity: 0,
+    });
+  });
 
   const tl =
     timeline ??
@@ -79,16 +93,22 @@ export const setupOverviewPanelReveal = ({
     );
   }
 
-  // Lines slide-up reveal (scrub-driven, part of the timeline).
+  // Characters scatter → order reveal (scrub-driven, part of the timeline).
   tl.to(
-    allSplitLines,
+    allChars,
     {
-      yPercent: 0,
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: 1,
       opacity: 1,
-      duration: 0.6,
-      ease: 'expo.out',
-      stagger: 0.1,
+      duration: 0.3,
+      ease: 'power3.out',
+      stagger: {
+        each: 0.002,
+        from: 'start',
+      },
     },
-    startAt + 0.2,
+    startAt + 0.15,
   );
 };
