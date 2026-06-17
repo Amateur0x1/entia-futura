@@ -233,6 +233,53 @@ const initFullTransitions = ({
     });
   }
 
+  // ── Mission panel: scrub-driven reveal (between Overview and Directions) ──
+  const missionPanel = document.querySelector<HTMLElement>('[data-mission-panel]');
+  if (missionPanel) {
+    gsap.set(missionPanel, { autoAlpha: 0, y: 48 });
+
+    const missionLabel = missionPanel.querySelector<HTMLElement>('[data-mission-label]');
+    const missionDivider = missionPanel.querySelector<HTMLElement>('[data-mission-divider]');
+    const missionItems = gsap.utils.toArray<HTMLElement>('[data-mission-item]', missionPanel);
+
+    // Hide items initially
+    if (missionLabel) gsap.set(missionLabel, { autoAlpha: 0, y: 16 });
+    if (missionDivider) gsap.set(missionDivider, { scaleX: 0, transformOrigin: 'center', autoAlpha: 1 });
+    missionItems.forEach((item) => gsap.set(item, { autoAlpha: 0, y: 24 }));
+
+    const missionTl = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: {
+        trigger: missionPanel,
+        start: 'top 110%',
+        end: 'top -12%',
+        scrub: 0.4,
+      },
+    });
+
+    // Phase 1: panel fades in
+    missionTl.to(missionPanel, { autoAlpha: 1, y: 0, duration: 0.2, ease: 'power2.out' }, 0);
+
+    // Phase 2: label appears
+    if (missionLabel) {
+      missionTl.to(missionLabel, { autoAlpha: 1, y: 0, duration: 0.15, ease: 'power2.out' }, 0.1);
+    }
+
+    // Phase 3: divider scales in
+    if (missionDivider) {
+      missionTl.to(missionDivider, { scaleX: 1, duration: 0.2, ease: 'power2.out' }, 0.15);
+    }
+
+    // Phase 4: items stagger in
+    missionTl.to(missionItems, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.2,
+      ease: 'power2.out',
+      stagger: 0.08,
+    }, 0.25);
+  }
+
   // ── Second panel: scrub-driven reveal (optional — panel may not exist) ──
   if (elements.secondPanel) {
     const secondPanel = elements.secondPanel;
@@ -285,15 +332,58 @@ const initFullTransitions = ({
   if (fourthPanel) {
     gsap.set(fourthPanel, { autoAlpha: 0, y: 48 });
 
-    gsap.timeline({
+    const fourthTl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: fourthPanel,
         start: 'top 88%',
-        end: 'top 30%',
+        end: 'top 10%',
         scrub: 0.4,
       },
-    }).to(fourthPanel, { autoAlpha: 1, y: 0, duration: 1, ease: 'power2.out' }, 0);
+    });
+
+    // Phase 1: panel fades in
+    fourthTl.to(fourthPanel, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 0);
+
+    // Phase 2: closing quote — SplitText character reveal (mirrors hero slogan)
+    const closingQuote = fourthPanel.querySelector<HTMLElement>('[data-fp-closing-quote]');
+    const closingText = fourthPanel.querySelector<HTMLElement>('[data-fp-closing-text]');
+    const closingOrnament = fourthPanel.querySelector<HTMLElement>('.fp-closing-quote__ornament');
+
+    if (closingQuote && closingText) {
+      gsap.set(closingQuote, { opacity: 0 });
+      if (closingOrnament) gsap.set(closingOrnament, { opacity: 0 });
+
+      gsap.registerPlugin(SplitText);
+      const split = new SplitText(closingText, { type: 'chars' });
+      gsap.set(split.chars, { opacity: 0, y: 20, filter: 'blur(4px)' });
+
+      // Fade in the container
+      fourthTl.to(closingQuote, { opacity: 1, duration: 0.15, ease: 'none' }, 0.35);
+
+      // Stagger character reveal
+      const charCount = split.chars.length;
+      const revealBudget = 0.45;
+      const perCharDuration = revealBudget / (charCount + 1);
+
+      fourthTl.to(
+        split.chars,
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: perCharDuration,
+          stagger: perCharDuration,
+          ease: 'power2.out',
+        },
+        0.4,
+      );
+
+      // Ornament lines fade in after text
+      if (closingOrnament) {
+        fourthTl.to(closingOrnament, { opacity: 0.8, duration: 0.15, ease: 'power2.out' }, 0.75);
+      }
+    }
   }
 };
 

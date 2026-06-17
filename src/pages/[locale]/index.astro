@@ -5,6 +5,7 @@ import HomeMembersPanel from '../../components/home/HomeMembersPanel.astro';
 import HomeHeroScreen from '../../components/home/HomeHeroScreen.astro';
 import HomeOverviewPanel from '../../components/home/HomeOverviewPanel.astro';
 import HomeDirectionsPanel from '../../components/home/HomeDirectionsPanel.astro';
+import HomeMissionPanel from '../../components/home/HomeMissionPanel.astro';
 import LoadingOrbitDevice from '../../components/home/LoadingOrbitDevice.astro';
 import PageLoader from '../../components/home/PageLoader.astro';
 import Layout from '../../layouts/Layout.astro';
@@ -44,6 +45,7 @@ const overviewBody = pickByLocale(
   <main class="landing-main" data-hero-stage>
     <HomeHeroScreen locale={locale} />
     <HomeOverviewPanel locale={locale} label={overviewLabel} body={overviewBody} />
+    <HomeMissionPanel locale={locale} />
     <HomeDirectionsPanel locale={locale} />
     <HomeMembersPanel locale={locale} />
     <HomeFourthPanel locale={locale} />

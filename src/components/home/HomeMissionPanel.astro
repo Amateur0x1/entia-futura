@@ -1,0 +1,144 @@
+---
+import { pickByLocale, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const sectionLabel = pickByLocale(locale, '使命、愿景与价值观', 'Mission, Vision & Values');
+
+const items = [
+  {
+    heading: pickByLocale(locale, '使命', 'Mission'),
+    body: pickByLocale(
+      locale,
+      '围绕"未来我们将如何存在？"这一核心问题，连接研究、社群、产业与现实实验。',
+      'To organize research, community, industry, and real-world experimentation around one central question: How shall we exist in the future?',
+    ),
+  },
+  {
+    heading: pickByLocale(locale, '愿景', 'Vision'),
+    body: pickByLocale(
+      locale,
+      '在大学之外，建立一种更开放、更现实、也更具协作能力的新型研究机构。',
+      'To build a new kind of research institution beyond the university — more open, more grounded, and more collaborative.',
+    ),
+  },
+  {
+    heading: pickByLocale(locale, '价值观', 'Values'),
+    body: pickByLocale(
+      locale,
+      '独立思考、长期主义、跨学科协作、扎根现实、面向未来。',
+      'Independent thinking, long-termism, interdisciplinary collaboration, grounded in reality, oriented toward the future.',
+    ),
+  },
+];
+---
+
+<section class="mission-panel" data-mission-panel>
+  <div class="mission-panel__inner">
+    <span class="mission-panel__label" data-mission-label>{sectionLabel}</span>
+    <div class="mission-panel__divider" data-mission-divider aria-hidden="true"></div>
+    <div class="mission-panel__items">
+      {items.map((item) => (
+        <div class="mission-panel__item" data-mission-item>
+          <h3 class="mission-panel__heading">{item.heading}</h3>
+          <p class="mission-panel__body">{item.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .mission-panel {
+    position: relative;
+    z-index: 31;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-background);
+    color: var(--color-secondary-foreground);
+    overflow: hidden;
+  }
+
+  .mission-panel__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: min(52rem, 88vw);
+    padding: clamp(3rem, 8vh, 6rem) clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .mission-panel__label {
+    font-family: 'POIRETONE-REGULAR', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    font-size: clamp(0.72rem, 0.6vw + 0.4rem, 0.88rem);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    opacity: 0.75;
+    line-height: 1;
+  }
+
+  .mission-panel__divider {
+    width: min(6rem, 18vw);
+    height: 1px;
+    margin: 1.2rem 0 2.8rem;
+    background: color-mix(in srgb, var(--color-border-inverse-strong) 60%, transparent);
+    transform-origin: center;
+    transform: scaleX(0);
+  }
+
+  .mission-panel__items {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.4rem, 5vh, 3.6rem);
+  }
+
+  .mission-panel__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .mission-panel__heading {
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    font-size: clamp(1.1rem, 1vw + 0.6rem, 1.6rem);
+    font-weight: normal;
+    letter-spacing: 0.18em;
+    color: var(--color-secondary-foreground);
+    line-height: 1.3;
+  }
+
+  .mission-panel__body {
+    margin: 0;
+    font-family: 'Hiragino Sans GB', 'Noto Sans SC', 'PingFang SC', sans-serif;
+    font-size: clamp(1rem, 0.6vw + 0.7rem, 1.28rem);
+    line-height: 1.9;
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, var(--color-secondary-foreground) 68%, transparent);
+    max-width: 36rem;
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .mission-panel__inner {
+      max-width: 92vw;
+      padding: clamp(2.5rem, 6vh, 4rem) clamp(1rem, 3vw, 2rem);
+    }
+
+    .mission-panel__heading {
+      font-size: clamp(1rem, 4vw, 1.3rem);
+    }
+
+    .mission-panel__body {
+      font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+    }
+  }
+</style>

@@ -25,6 +25,12 @@ const joinBody  = pickByLocale(
   'Entia Futura Institut welcomes all those who take the future seriously. Joining the institute does not necessarily mean entering a fixed role; it may mean entering a discussion, joining a program, co-creating a project, submitting a proposal, or working alongside the institute for a certain period of time.',
 );
 const joinBtn   = pickByLocale(locale, '了解参与方式', 'Learn How to Participate');
+
+const closingQuote = pickByLocale(
+  locale,
+  '合作不是研究的妥协，而是研究进入现实的一种方式。',
+  'Collaboration is not a compromise of research, but a way for research to enter reality.',
+);
 ---
 
 <section
@@ -70,6 +76,18 @@ const joinBtn   = pickByLocale(locale, '了解参与方式', 'Learn How to Parti
         <path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/>
       </svg>
     </a>
+  </div>
+
+  <!-- Bottom closing quote (mirrors hero slogan style) -->
+  <div class="fp-closing-quote" data-fp-closing-quote>
+    <blockquote class="fp-closing-quote__block">
+      <span class="fp-closing-quote__text" data-fp-closing-text>{closingQuote}</span>
+      <span class="fp-closing-quote__ornament" aria-hidden="true">
+        <span class="fp-closing-quote__ornament-line"></span>
+        <span class="fp-closing-quote__ornament-symbol">✦</span>
+        <span class="fp-closing-quote__ornament-line"></span>
+      </span>
+    </blockquote>
   </div>
 
 </section>
@@ -258,5 +276,86 @@ const joinBtn   = pickByLocale(locale, '了解参与方式', 'Learn How to Parti
     height: 100%;
     object-fit: cover;
     opacity: 0.7;
+  }
+
+  /* ── Closing quote (mirrors hero slogan) ── */
+  .fp-closing-quote {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 6;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 6vw, 5rem) clamp(3.5rem, 8vh, 5.5rem);
+    pointer-events: none;
+  }
+
+  .fp-closing-quote__block {
+    margin: 0;
+    padding: 0;
+    max-width: min(48rem, 90vw);
+    text-align: center;
+  }
+
+  .fp-closing-quote__text {
+    display: block;
+    font-family: 'Hiragino Sans GB', 'Noto Sans SC', 'PingFang SC', 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(1.2rem, 2vw + 0.2rem, 1.8rem);
+    font-weight: 500;
+    line-height: 1.72;
+    letter-spacing: 0.05em;
+    color: color-mix(in srgb, var(--color-primary) 60%, white 40%);
+    text-shadow:
+      0 0 18px color-mix(in srgb, var(--color-primary) 50%, transparent),
+      0 0 40px color-mix(in srgb, var(--color-primary) 22%, transparent);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :lang(zh) .fp-closing-quote__text {
+    line-height: 1.92;
+    letter-spacing: 0.10em;
+  }
+
+  .fp-closing-quote__ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1.2rem;
+    opacity: 0.8;
+  }
+
+  .fp-closing-quote__ornament-line {
+    flex: 1;
+    max-width: 10rem;
+    height: 1.5px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--color-primary) 60%, white 40%),
+      transparent
+    );
+  }
+
+  .fp-closing-quote__ornament-symbol {
+    font-size: 0.68rem;
+    color: color-mix(in srgb, var(--color-primary) 50%, white 50%);
+    text-shadow:
+      0 0 10px color-mix(in srgb, var(--color-primary) 55%, transparent),
+      0 0 24px color-mix(in srgb, var(--color-primary) 28%, transparent);
+    line-height: 1;
+  }
+
+  @media (max-width: 720px) {
+    .fp-closing-quote {
+      padding: 1rem max(1rem, calc(env(safe-area-inset-left) + 0.9rem)) max(3rem, calc(env(safe-area-inset-bottom) + 2.5rem));
+    }
+
+    .fp-closing-quote__text {
+      font-size: clamp(1rem, 4vw, 1.3rem);
+    }
   }
 </style>
