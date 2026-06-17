@@ -8,6 +8,7 @@ import { addHeroVideoTransitionSegment } from './heroVideoEffects';
 import { setupOverviewPanelReveal } from './setupOverviewPanelReveal';
 import { setupSecondPanelReveal } from './setupSecondPanelReveal';
 import { setupThirdPanelReveal } from './setupThirdPanelReveal';
+import { initMembersCarousel } from './initMembersCarousel';
 
 // ---------------------------------------------------------------------------
 // Timing constants (desktop scroll distance for the hero video scrub)
@@ -28,6 +29,7 @@ export const HERO_TO_INTRO_TIMING = {
 interface InitAllPanelTransitionsOptions {
   elements: HomeHeroElements;
   thirdPanel: HTMLElement;
+  membersPanel: HTMLElement | null;
   fourthPanel: HTMLElement | null;
   prefersReducedMotion: boolean;
   splitTextAvailable: boolean;
@@ -39,8 +41,9 @@ interface InitAllPanelTransitionsOptions {
 const initReducedMotionTransitions = ({
   elements,
   thirdPanel,
+  membersPanel,
   fourthPanel,
-}: Pick<InitAllPanelTransitionsOptions, 'elements' | 'thirdPanel' | 'fourthPanel'>) => {
+}: Pick<InitAllPanelTransitionsOptions, 'elements' | 'thirdPanel' | 'membersPanel' | 'fourthPanel'>) => {
   const { overviewPanel, secondPanel } = elements;
 
   // Show slogan immediately.
@@ -69,6 +72,7 @@ const initReducedMotionTransitions = ({
     startAt: 0,
   });
 
+  if (membersPanel) gsap.set(membersPanel, { autoAlpha: 1 });
   if (fourthPanel) gsap.set(fourthPanel, { autoAlpha: 1 });
 };
 
@@ -83,6 +87,7 @@ const initReducedMotionTransitions = ({
 const initFullTransitions = ({
   elements,
   thirdPanel,
+  membersPanel,
   fourthPanel,
   splitTextAvailable,
 }: Omit<InitAllPanelTransitionsOptions, 'prefersReducedMotion'>) => {
@@ -287,6 +292,13 @@ const initFullTransitions = ({
     startAt: 0.15,
   });
 
+  // ── Members panel: independent pinned carousel ─────────────────────────
+  // The members panel uses its own pinned ScrollTrigger (similar to the hero)
+  // so cards get enough scroll distance for the fly-across animation.
+  if (membersPanel) {
+    initMembersCarousel(membersPanel);
+  }
+
   // ── Fourth panel: scrub-driven reveal ───────────────────────────────────
   if (fourthPanel) {
     gsap.set(fourthPanel, { autoAlpha: 0, y: 48 });
@@ -309,14 +321,15 @@ const initFullTransitions = ({
 export const initAllPanelTransitions = ({
   elements,
   thirdPanel,
+  membersPanel,
   fourthPanel,
   prefersReducedMotion,
   splitTextAvailable,
 }: InitAllPanelTransitionsOptions) => {
   if (prefersReducedMotion) {
-    initReducedMotionTransitions({ elements, thirdPanel, fourthPanel });
+    initReducedMotionTransitions({ elements, thirdPanel, membersPanel, fourthPanel });
     return;
   }
 
-  initFullTransitions({ elements, thirdPanel, fourthPanel, splitTextAvailable });
+  initFullTransitions({ elements, thirdPanel, membersPanel, fourthPanel, splitTextAvailable });
 };

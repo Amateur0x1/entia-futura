@@ -1,0 +1,122 @@
+---
+import { pickByLocale, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const sectionLabel = pickByLocale(locale, '核心成员', 'Core Members');
+
+const members = [
+  { src: '/images/members/member-01.jpg', name: pickByLocale(locale, '成员一', 'Member 01') },
+  { src: '/images/members/member-02.jpg', name: pickByLocale(locale, '成员二', 'Member 02') },
+  { src: '/images/members/member-03.jpg', name: pickByLocale(locale, '成员三', 'Member 03') },
+];
+
+// Gradient border colours per card (cyan, violet, mixed)
+const borderGradients = [
+  'linear-gradient(135deg, #00e5ff, #007a8a, #00e5ff)',
+  'linear-gradient(135deg, #7b5cff, #c850c0, #7b5cff)',
+  'linear-gradient(135deg, #00e5ff, #7b5cff, #00e5ff)',
+];
+---
+
+<section class="members-panel" data-members-panel>
+  <div class="members-sticky">
+    <p class="members-panel__label">{sectionLabel}</p>
+    <ul class="members-cards">
+      {[...members, ...members, ...members].map((m, i) => (
+        <li class="members-card">
+          <div class="members-card__border" style={`background: ${borderGradients[i % members.length]}`}>
+            <img class="members-card__img" src={m.src} alt={m.name} loading="lazy" draggable="false" />
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<!-- Animation is managed by initMembersCarousel (pinned ScrollTrigger) -->
+
+<style>
+  .members-panel {
+    position: relative;
+    z-index: 38;
+    background: var(--color-background);
+  }
+
+  /* Pin target — ScrollTrigger pins this while cards animate */
+  .members-sticky {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .members-panel__label {
+    position: absolute;
+    top: clamp(2rem, 5vh, 4rem);
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.62rem, 0.5vw + 0.44rem, 0.76rem);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    opacity: 0.7;
+    z-index: 5;
+  }
+
+  /* Card anchor — positioned at centre; GSAP moves cards via xPercent */
+  .members-cards {
+    position: absolute;
+    width: clamp(16rem, 22vw, 22rem);
+    aspect-ratio: 9 / 16;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .members-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+
+  /* Gradient border wrapper — background colour set inline per card */
+  .members-card__border {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 1.2rem;
+    padding: 3px;
+  }
+
+  .members-card__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: calc(1.2rem - 3px);
+    background: var(--color-background);
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  @media (max-width: 600px) {
+    .members-cards {
+      width: clamp(12rem, 55vw, 16rem);
+    }
+  }
+</style>

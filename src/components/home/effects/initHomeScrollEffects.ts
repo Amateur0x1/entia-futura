@@ -15,12 +15,14 @@ export const initHomeScrollEffects = ({
   splitTextAvailable,
 }: InitHomeScrollEffectsOptions) => {
   const thirdPanel = document.querySelector<HTMLElement>('[data-third-panel]');
+  const membersPanel = document.querySelector<HTMLElement>('[data-members-panel]');
   const fourthPanel = document.querySelector<HTMLElement>('[data-fourth-panel]');
 
   if (thirdPanel) {
     initAllPanelTransitions({
       elements: homeHeroElements,
       thirdPanel,
+      membersPanel,
       fourthPanel,
       prefersReducedMotion,
       splitTextAvailable,

@@ -1,6 +1,7 @@
 ---
 import HomeEffects from '../../components/home/HomeEffects.astro';
 import HomeFourthPanel from '../../components/home/HomeFourthPanel.astro';
+import HomeMembersPanel from '../../components/home/HomeMembersPanel.astro';
 import HomeHeroScreen from '../../components/home/HomeHeroScreen.astro';
 import HomeOverviewPanel from '../../components/home/HomeOverviewPanel.astro';
 import HomeSecondPanel from '../../components/home/HomeSecondPanel.astro';
@@ -133,6 +134,7 @@ const whatWeDoModules = [
       intro={whatWeDoIntro}
       modules={whatWeDoModules}
     />
+    <HomeMembersPanel locale={locale} />
     <HomeFourthPanel locale={locale} />
   </main>
   <!-- Header (brand + actions) is outside data-hero-stage so it's visible during loading -->

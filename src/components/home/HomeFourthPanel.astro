@@ -45,11 +45,17 @@ const joinBtn   = pickByLocale(locale, '了解参与方式', 'Learn How to Parti
     </a>
   </div>
 
-  <!-- 3D CSS flower — centred, auto-bloom -->
-  <div class="fp-flower-stage" aria-hidden="true">
-    <div class="fp-flower-wrapper">
-      <div class="fp-flower" data-fp-flower></div>
-    </div>
+  <!-- Central loop video -->
+  <div class="fp-video-stage" aria-hidden="true">
+    <video
+      class="fp-video"
+      src="/videos/portal-loop.webm"
+      autoplay
+      loop
+      muted
+      playsinline
+      preload="auto"
+    ></video>
   </div>
 
   <!-- Right side block: Join Us (violet / secondary) -->
@@ -68,71 +74,6 @@ const joinBtn   = pickByLocale(locale, '了解参与方式', 'Learn How to Parti
 
 </section>
 
-<script>
-  (function initFourthPanelFlower() {
-    const flower = document.querySelector<HTMLElement>('[data-fp-flower]');
-    if (!flower) return;
-
-    const MAX_PARTS = 20;
-    const MAX_PETALS = 6;
-    const PARTS_FONT_STEP = 25 / MAX_PARTS;
-
-    // Cyan (#00e5ff hue≈189) → Violet (#7b5cff hue≈252)
-    const HUE_START = 189;
-    const HUE_END = 252;
-    const HUE_STEP = (HUE_END - HUE_START) / MAX_PARTS;
-
-    function createBox(box: HTMLElement | null, pos: number): HTMLElement {
-      const half = MAX_PARTS / 2;
-      let fontSize: string;
-      let bright = 50;
-
-      if (pos < half + 1) {
-        fontSize = (PARTS_FONT_STEP * pos) + 'vmin';
-      } else {
-        fontSize = (PARTS_FONT_STEP * (MAX_PARTS - pos)) + 'vmin';
-        bright = 10 + (40 / half) * (MAX_PARTS - pos);
-      }
-
-      const hue = HUE_START + HUE_STEP * pos;
-      const color = `hsl(${hue}, 90%, ${bright}%)`;
-
-      const newShape = document.createElement('div');
-      newShape.classList.add('fp-shape');
-
-      const newBox = document.createElement('div');
-      newBox.classList.add('fp-box');
-      newBox.style.color = color;
-      newBox.style.fontSize = fontSize;
-
-      if (box) newBox.appendChild(box);
-      newBox.appendChild(newShape);
-
-      return newBox;
-    }
-
-    function createPetal(): HTMLElement {
-      let box = createBox(null, 0);
-      const petal = document.createElement('div');
-      petal.classList.add('fp-petal');
-
-      for (let i = 1; i <= MAX_PARTS; i++) {
-        box = createBox(box, i);
-      }
-
-      petal.appendChild(box);
-      return petal;
-    }
-
-    const angle = 360 / MAX_PETALS;
-    for (let i = 0; i < MAX_PETALS; i++) {
-      const petal = createPetal();
-      const currAngle = angle * i + 'deg';
-      petal.style.transform = `rotateY(${currAngle}) rotateX(-30deg) translateZ(5.5vmin)`;
-      flower.appendChild(petal);
-    }
-  })();
-</script>
 
 <style>
   .landing-fourth-panel {
@@ -303,98 +244,19 @@ const joinBtn   = pickByLocale(locale, '了解参与方式', 'Learn How to Parti
     }
   }
 
-  /* ── 3D CSS Flower (centre-bottom) ── */
-  .fp-flower-stage {
+  /* ── Fullscreen loop video background ── */
+  .fp-video-stage {
     position: absolute;
     inset: 0;
-    z-index: 3;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    padding-bottom: 22%;
+    z-index: 1;
     pointer-events: none;
-    overflow: visible;
+    overflow: hidden;
   }
 
-  .fp-flower-wrapper {
-    position: relative;
-    width: 5vmin;
-    height: 5vmin;
-    font-size: 5vmin;
-    transform: rotateX(-45deg);
-    transform-style: preserve-3d;
-  }
-
-  .fp-flower {
-    width: 5vmin;
-    height: 5vmin;
-    transform-style: preserve-3d;
-    animation: fp-rotate-flower 20s linear infinite;
-  }
-
-  /* Centre pistil disc */
-  .fp-flower::before {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 95%;
-    height: 95%;
-    inset: 0;
-    margin: auto;
-    background: color-mix(in srgb, var(--color-primary) 45%, var(--color-secondary) 55%);
-    border-radius: 50%;
-    transform: rotateX(90deg);
+  .fp-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     opacity: 0.7;
-  }
-
-  :global(.fp-petal) {
-    position: absolute;
-    z-index: 20;
-    bottom: 80%;
-    left: -5vmin;
-    transform-style: preserve-3d;
-    transform-origin: bottom;
-  }
-
-  :global(.fp-box) {
-    width: 15vmin;
-    transform-style: preserve-3d;
-    transform-origin: bottom;
-    animation: fp-bloom 4s ease-in-out forwards;
-  }
-
-  :global(.fp-shape) {
-    width: 0.5em;
-    height: 0.5em;
-    margin: auto;
-    background: currentColor;
-    box-shadow:
-      0.5em 0 0 0 currentColor,
-      1em 0 0 0 currentColor,
-      -1em 0 0 0 currentColor,
-      -0.5em 0 0 0 currentColor;
-    border-radius: 50%;
-  }
-
-  @keyframes fp-rotate-flower {
-    100% {
-      transform: rotateY(360deg);
-    }
-  }
-
-  @keyframes fp-bloom {
-    0% {
-      transform: rotateX(3.5deg);
-    }
-    100% {
-      transform: rotateX(-7deg);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .fp-flower,
-    :global(.fp-box) {
-      animation: none !important;
-    }
   }
 </style>
