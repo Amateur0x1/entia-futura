@@ -19,9 +19,6 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
 ---
 
 <section class={`landing-second-panel ${locale === 'en' ? 'landing-second-panel--en' : ''}`} data-second-panel>
-  <canvas class="landing-second-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
-  <!-- Diagonal atmosphere veil: top-left cyan, bottom-right violet -->
-  <div class="landing-second-panel__veil" aria-hidden="true"></div>
   <div class="landing-second-panel__inner" data-second-panel-inner>
     <article class="landing-second-panel__block landing-second-panel__block--top-right">
       <h2 class="landing-second-panel__title" data-second-panel-heading>{coreQuestion}</h2>
@@ -56,27 +53,13 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
 
 <style>
   .landing-second-panel {
-    position: fixed;
-    inset: 0;
+    position: relative;
     z-index: 30;
+    min-height: 100svh;
     padding: clamp(5rem, 20vh, 10rem) clamp(1.2rem, 4vw, 3rem) clamp(3.5rem, 8vw, 6rem);
     background: var(--color-background);
     color: var(--color-secondary-foreground);
-    /* Initial hidden state is driven by GSAP (opacity:0, yPercent:100 via transform) */
-    opacity: 0;
-    pointer-events: none;
     overflow: hidden;
-    border-radius: 0;
-  }
-
-  .landing-second-panel__nebula {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.76;
   }
 
   .landing-second-panel__inner {
@@ -302,32 +285,6 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
     display: none;
   }
 
-  /* ── Diagonal atmosphere veil: top-left cyan, bottom-right violet ── */
-  .landing-second-panel__veil {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(
-        ellipse 90% 90% at -10% -10%,
-        color-mix(in srgb, var(--color-primary) 22%, transparent) 0%,
-        color-mix(in srgb, var(--color-primary) 7%, transparent) 50%,
-        transparent 78%
-      ),
-      radial-gradient(
-        ellipse 90% 90% at 110% 110%,
-        color-mix(in srgb, var(--color-secondary) 22%, transparent) 0%,
-        color-mix(in srgb, var(--color-secondary) 7%, transparent) 50%,
-        transparent 78%
-      );
-  }
-
-  @media (max-width: 720px) {
-    .landing-second-panel__veil {
-      display: none;
-    }
-  }
 
   @keyframes landing-monolith-scan {
     0% {

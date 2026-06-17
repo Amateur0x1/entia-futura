@@ -34,12 +34,6 @@ const items = locale === 'zh'
   data-fifth-panel
   aria-label={title}
 >
-  <!-- Nebula particle background -->
-  <canvas class="landing-fifth-panel__nebula" data-nebula-canvas aria-hidden="true"></canvas>
-
-  <!-- Atmosphere veil: top-right cyan, bottom-left violet -->
-  <div class="landing-fifth-panel__veil" aria-hidden="true"></div>
-
   <!-- Central logo -->
   <div class="landing-fifth-panel__logo-wrap" aria-hidden="true">
     <img
@@ -91,37 +85,6 @@ const items = locale === 'zh'
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .landing-fifth-panel__nebula {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.88;
-  }
-
-  /* Veil: top-right cyan, bottom-left violet (mirrored from fourth panel) */
-  .landing-fifth-panel__veil {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background:
-      radial-gradient(
-        ellipse 90% 90% at 110% -10%,
-        color-mix(in srgb, var(--color-primary) 18%, transparent) 0%,
-        color-mix(in srgb, var(--color-primary) 6%, transparent) 50%,
-        transparent 78%
-      ),
-      radial-gradient(
-        ellipse 90% 90% at -10% 110%,
-        color-mix(in srgb, var(--color-secondary) 18%, transparent) 0%,
-        color-mix(in srgb, var(--color-secondary) 6%, transparent) 50%,
-        transparent 78%
-      );
   }
 
   .landing-fifth-panel__logo-wrap {

@@ -8,7 +8,6 @@ import { initHomeHeroStageEffects } from './initHomeHeroStageEffects';
 import { initHomeScrollEffects } from './initHomeScrollEffects';
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
-import { initThirdPanelNebulaBackground } from './initThirdPanelNebulaBackground';
 
 const initSmoothScrolling = () => {
   const lenis = new Lenis({
@@ -55,28 +54,8 @@ export const initHomeEffects = () => {
 
   initMonolithBinaryVisuals(prefersReducedMotion);
 
-  const overviewPanel = document.querySelector<HTMLElement>('[data-overview-panel]');
-  initThirdPanelNebulaBackground({
-    panel: overviewPanel,
-    prefersReducedMotion,
-  });
-
-  initThirdPanelNebulaBackground({
-    panel: homeHeroElements.secondPanel,
-    prefersReducedMotion,
-  });
-
   const thirdPanel = document.querySelector<HTMLElement>('[data-third-panel]');
-  initThirdPanelNebulaBackground({
-    panel: thirdPanel,
-    prefersReducedMotion,
-  });
-
   const fourthPanel = document.querySelector<HTMLElement>('[data-fourth-panel]');
-  initThirdPanelNebulaBackground({
-    panel: fourthPanel,
-    prefersReducedMotion,
-  });
 
   // initHomeEffects is called after loader:done. Refresh ScrollTrigger and
   // create all scroll timelines immediately — layout is stable at this point
@@ -89,7 +68,6 @@ export const initHomeEffects = () => {
   });
   document.body.style.overflow = '';
 
-  // Panels 4–6 transitions are now managed by initAllPanelTransitions
-  // (scrub-based push timelines, matching the 2→3 pattern) — no extra
-  // ScrollTrigger.create loops needed here.
+  // All panel reveals are now simple scroll-triggered animations in normal
+  // document flow — no scrub-based push transitions or spacer calibration.
 };

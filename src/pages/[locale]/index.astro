@@ -126,21 +126,15 @@ const whatWeDoModules = [
   <main class="landing-main" data-hero-stage>
     <HomeHeroScreen locale={locale} />
     <HomeOverviewPanel locale={locale} label={overviewLabel} body={overviewBody} />
-    <!-- Scroll spacer driving the overview → second panel push transition -->
-    <div class="landing-scroll-spacer-overview" data-landing-scroll-spacer-overview aria-hidden="true"></div>
     <HomeSecondPanel locale={locale} coreQuestion={coreQuestion} instituteIntro={instituteIntro} principleCards={principleCards} />
-    <div class="landing-scroll-spacer" data-landing-scroll-spacer aria-hidden="true"></div>
     <HomeThirdPanel
       locale={locale}
       title={whatWeDoTitle}
       intro={whatWeDoIntro}
       modules={whatWeDoModules}
     />
-    <!-- Additional scroll spacer for panel 4 -->
-    <div class="landing-scroll-spacer-extra" data-landing-scroll-spacer-4 aria-hidden="true"></div>
+    <HomeFourthPanel locale={locale} />
   </main>
-  <!-- Fourth panel is outside data-hero-stage so it remains visible during loading -->
-  <HomeFourthPanel locale={locale} />
   <!-- Header (brand + actions) is outside data-hero-stage so it's visible during loading -->
   <div class="floating-brand-cluster" data-brand-cluster>
     <!-- Logo buttons intentionally avoid sheen classes; motion is GSAP-only for now. -->
@@ -238,47 +232,4 @@ const whatWeDoModules = [
     opacity: 1;
   }
 
-  .landing-scroll-spacer {
-    height: 380svh;
-    width: 100%;
-    pointer-events: none;
-  }
-
-  /* Spacer driving the overview → second panel push. Height calibrated by GSAP
-     at runtime; this floor covers PUSH_DURATION(1.6) + buffer before JS runs. */
-  .landing-scroll-spacer-overview {
-    height: 280svh;
-    width: 100%;
-    pointer-events: none;
-  }
-
-  /* Spacer for panel 4 — height calibrated by GSAP at runtime (buildPushTimeline).
-     Set an initial floor that covers PUSH_DURATION(1.6) + buffer(0.4) + extra = 280svh
-     so layout is never under-estimated before JS runs. */
-  .landing-scroll-spacer-extra {
-    height: 280svh;
-    width: 100%;
-    pointer-events: none;
-  }
-
-  /* Panel 4: initial state — GSAP scrub timeline owns all visual properties.
-     No CSS transition here; transitions would fight the scrub and cause jumps. */
-  :global([data-fourth-panel]) {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  @media (max-width: 720px) {
-    .landing-scroll-spacer {
-      height: 320svh;
-    }
-
-    .landing-scroll-spacer-overview {
-      height: 220svh;
-    }
-
-    .landing-scroll-spacer-extra {
-      height: 220svh;
-    }
-  }
 </style>
