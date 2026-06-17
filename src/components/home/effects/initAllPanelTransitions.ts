@@ -1,6 +1,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { SplitText } from 'gsap/SplitText';
 
 import { addHeroMediaDriftSegment } from './addHeroMediaDriftSegment';
 import type { HomeHeroElements } from './getHomeHeroElements';
@@ -350,64 +351,48 @@ const initFullTransitions = ({
       );
     }
 
-    // ── Slogan reveal (ScrambleText decryption effect) ─────────────────────
-    // The scramble animation is TIME-BASED (not scrub-driven). We use an
-    // onStart callback on a tiny scrub placeholder to fire an independent
-    // gsap.to() that auto-plays regardless of further scroll activity.
+    // ── Slogan reveal (scrub-driven SplitText char emergence) ──────────────
+    // Each character emerges (opacity + y + blur) proportionally to scroll
+    // progress — fully scrub-controlled, no time-based callbacks.
     if (sloganStage) {
-      gsap.registerPlugin(ScrambleTextPlugin);
+      gsap.registerPlugin(SplitText);
 
       const sloganText = sloganQuote?.querySelector<HTMLElement>('.hero-slogan__text');
-      const originalText = sloganText?.textContent ?? '';
 
       if (sloganQuote) {
         gsap.set(sloganQuote, { opacity: 1 });
       }
-      // Clear the text — ScrambleText will type it in from empty.
+
+      // Split text into individual characters for staggered reveal
+      let split: SplitText | null = null;
       if (sloganText) {
-        sloganText.textContent = '';
+        split = new SplitText(sloganText, { type: 'chars' });
+        gsap.set(split.chars, { opacity: 0, y: 20, filter: 'blur(4px)' });
       }
 
-      // Fade the slogan stage in (still scrub-driven — quick opacity reveal).
-      heroTimeline.to(sloganStage, { opacity: 1, duration: 0.4, ease: 'power2.out' }, sloganRevealAt);
+      // Fade the slogan stage in (scrub-driven) — start earlier than loopHoldStart.
+      const earlyRevealAt = sloganRevealAt - 0.6;
+      heroTimeline.to(sloganStage, { opacity: 1, duration: 0.3, ease: 'none' }, earlyRevealAt);
 
-      // Fire the time-based scramble each time the scrub enters this point.
-      // On reverse (scroll back up past the trigger), clear the text so the
-      // next forward pass replays the animation from scratch.
-      let scrambleTween: gsap.core.Tween | null = null;
-      if (sloganText && originalText) {
+      // Scrub-driven per-character emergence: all chars must finish well within
+      // the hold window so the text is fully visible before the panel push.
+      if (sloganText && split) {
+        const charCount = split.chars.length;
+        const revealBudget = 1.2;
+        const perCharDuration = revealBudget / (charCount + 1);
+        const staggerTime = perCharDuration;
+
         heroTimeline.to(
-          sloganText,
+          split.chars,
           {
-            // A zero-visual-change placeholder so we can hook onStart/onReverseComplete.
-            duration: 0.01,
             opacity: 1,
-            onStart: () => {
-              // Kill any in-flight scramble and replay from empty.
-              if (scrambleTween) scrambleTween.kill();
-              sloganText.textContent = '';
-              scrambleTween = gsap.to(sloganText, {
-                duration: 1,
-                scrambleText: {
-                  text: originalText,
-                  chars: 'upperAndLowerCase',
-                  revealDelay: 0.2,
-                  tweenLength: false,
-                },
-                ease: 'power2.inOut',
-                overwrite: 'auto',
-              });
-            },
-            onReverseComplete: () => {
-              // Scrolled back before this point — reset text so next entry replays.
-              if (scrambleTween) {
-                scrambleTween.kill();
-                scrambleTween = null;
-              }
-              sloganText.textContent = '';
-            },
+            y: 0,
+            filter: 'blur(0px)',
+            duration: perCharDuration,
+            stagger: staggerTime,
+            ease: 'power2.out',
           },
-          sloganRevealAt + 0.12,
+          earlyRevealAt + 0.1,
         );
       }
 

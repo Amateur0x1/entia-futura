@@ -26,30 +26,33 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
     <article class="landing-second-panel__block landing-second-panel__block--top-right">
       <h2 class="landing-second-panel__title" data-second-panel-heading>{coreQuestion}</h2>
       <div class="landing-second-panel__divider" data-second-panel-divider aria-hidden="true"></div>
-      <div class="landing-second-panel__body" data-second-panel-body>
-        {instituteIntro.split('\n').map((paragraph) => (
-          <p class="landing-second-panel__paragraph">{paragraph}</p>
-        ))}
-      </div>
-      {principleCards && principleCards.length > 0 && (
-        <div class="landing-second-panel__cards" data-second-panel-body>
-          {principleCards.map((card, i) => (
-            <div class="landing-second-panel__card" data-card-index={i}>
-              <p class="landing-second-panel__card-label">{String(i + 1).padStart(2, '0')}</p>
-              <h3 class="landing-second-panel__card-title">
-                {locale === 'zh' ? card.zhTitle : card.enTitle}
-              </h3>
-              <div class="landing-second-panel__card-divider" aria-hidden="true"></div>
-              <p class="landing-second-panel__card-body">
-                {locale === 'zh' ? card.zhBody : card.enBody}
-              </p>
-            </div>
+      <div class="landing-second-panel__content-row">
+        <div class="landing-second-panel__body" data-second-panel-body>
+          {instituteIntro.split('\n').map((paragraph) => (
+            <p class="landing-second-panel__paragraph">{paragraph}</p>
           ))}
         </div>
-      )}
+        {principleCards && principleCards.length > 0 && (
+          <div class="landing-second-panel__cards" data-second-panel-body>
+            {principleCards.map((card, i) => (
+              <div class="landing-second-panel__card" data-card-index={i}>
+                <p class="landing-second-panel__card-label">{String(i + 1).padStart(2, '0')}</p>
+                <h3 class="landing-second-panel__card-title">
+                  {locale === 'zh' ? card.zhTitle : card.enTitle}
+                </h3>
+                <div class="landing-second-panel__card-divider" aria-hidden="true"></div>
+                <p class="landing-second-panel__card-body">
+                  {locale === 'zh' ? card.zhBody : card.enBody}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </article>
   </div>
 </section>
+
 
 <style>
   .landing-second-panel {
@@ -83,13 +86,13 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
     grid-template-columns: 1fr;
     align-items: start;
     gap: clamp(1.5rem, 3.2vw, 4rem);
-    max-width: min(64rem, 88vw);
+    width: 100%;
     padding-bottom: clamp(4rem, 12vh, 8rem);
   }
 
   .landing-second-panel__title {
     margin: 0;
-    max-width: 18ch;
+    white-space: nowrap;
     font-family: 'POIRETONE-REGULAR', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
     font-size: clamp(0.82rem, 1.1vw, 1.05rem);
     line-height: 1;
@@ -99,11 +102,18 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
     opacity: 0.75;
   }
 
-  /* Cards grid — sits below the mission/vision body text */
-  .landing-second-panel__cards {
-    margin-top: clamp(1.4rem, 2.2vw, 2.4rem);
+  /* Content row: text left, cards right */
+  .landing-second-panel__content-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 3vw, 3rem);
+    align-items: start;
+  }
+
+  /* Cards grid — sits to the right of the body text */
+  .landing-second-panel__cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: clamp(0.6rem, 1vw, 1rem);
   }
 
@@ -177,10 +187,9 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
     font-size: clamp(0.66rem, 0.42vw + 0.46rem, 0.8rem);
   }
 
-  /* Fallback: plain body paragraphs (no cards) */
+  /* Body paragraphs (left column) */
   .landing-second-panel__body {
     margin: 0;
-    max-width: calc(72rem + 20px);
     display: grid;
     gap: 24px;
     line-height: 1.74;
@@ -217,7 +226,7 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
   }
 
   .landing-second-panel__block--top-right {
-    width: min(76rem, 100%);
+    width: 100%;
     text-align: left;
     justify-items: start;
     padding-left: clamp(1.5rem, 3.2vw, 3.125rem);
@@ -363,6 +372,7 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
   @media (max-width: 1024px) {
     .landing-second-panel__title {
       font-size: clamp(0.76rem, 1vw, 0.95rem);
+      white-space: normal;
     }
 
     .landing-second-panel--en .landing-second-panel__body {
@@ -371,6 +381,10 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
 
     .landing-second-panel:not(.landing-second-panel--en) .landing-second-panel__body {
       font-size: clamp(1.1rem, 0.8vw + 0.8rem, 1.56rem);
+    }
+
+    .landing-second-panel__content-row {
+      grid-template-columns: 1fr;
     }
 
     .landing-second-panel__cards {
@@ -423,6 +437,10 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
       font-size: clamp(1rem, 3.4vw, 1.18rem);
     }
 
+    .landing-second-panel__content-row {
+      grid-template-columns: 1fr;
+    }
+
     .landing-second-panel__cards {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -433,4 +451,5 @@ const { locale, coreQuestion, instituteIntro, principleCards } = Astro.props;
       grid-template-columns: 1fr;
     }
   }
+
 </style>

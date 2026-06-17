@@ -94,8 +94,8 @@ export const setupSecondPanelReveal = ({
   );
 
   // Cards reveal — after lines finish
+  const linesEnd = startAt + 0.2 + 0.6 + 0.1 * (allSplitLines.length - 1);
   if (secondPanelCards.length > 0) {
-    const linesEnd = startAt + 0.2 + 0.6 + 0.1 * (allSplitLines.length - 1);
     tl.to(
       secondPanelCards,
       {
@@ -108,4 +108,5 @@ export const setupSecondPanelReveal = ({
       linesEnd + 0.18,
     );
   }
+
 };
