@@ -390,11 +390,6 @@ small[data-brand-animated-text] {
   filter: var(--filter-hero-scroll);
 }
 
-.hero-video-loop {
-  opacity: 0;
-  filter: var(--filter-hero-loop);
-}
-
 .hero-video-overlay {
   position: absolute;
   inset: 0;
@@ -501,10 +496,15 @@ small[data-brand-animated-text] {
 
 
 /* ── Fluid reveal overlay (WebGL canvas container) ────────────────────────── */
+/* Fixed position, placed OUTSIDE the hero frame in the DOM so ancestor
+   overflow:hidden cannot clip it.
+   z-index 25 — BELOW the overview panel (z-index 30) so the second screen
+   naturally slides over the overlay as the user scrolls down.  No fade-out
+   logic needed: the overlay stays fully black and the next panel covers it. */
 .hero-fluid-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 5;
+  z-index: 25;
   pointer-events: none;
   overflow: hidden;
 }

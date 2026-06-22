@@ -26,26 +26,17 @@ const isZh = locale !== 'en';
         webkit-playsinline
         preload="auto"
       ></video>
-      <video
-        class="hero-video hero-video-loop"
-        data-loop-video
-        src="/videos/portal-loop.webm"
-        crossorigin="anonymous"
-        autoplay
-        loop
-        muted
-        playsinline
-        webkit-playsinline
-        preload="auto"
-      ></video>
       <div class="hero-video-overlay" aria-hidden="true"></div>
       <div class="hero-video-vignette" aria-hidden="true"></div>
     </div>
 
-    <!-- Fluid reveal overlay: "close" mode — mouse paints dark+cyan+purple over content -->
-    <div class="hero-fluid-overlay" data-fluid-overlay="close" aria-hidden="true"></div>
   </div>
 </section>
+
+<!-- Fluid reveal overlay: "close" mode.
+     Placed OUTSIDE the hero frame (which has overflow:hidden) so it can
+     remain fixed on screen even after the hero unpins and scrolls away. -->
+<div class="hero-fluid-overlay" data-fluid-overlay="close" aria-hidden="true"></div>
 
 <script>
   import { initLandingHeroInteractions } from './landing-hero/landingHeroInteractions';

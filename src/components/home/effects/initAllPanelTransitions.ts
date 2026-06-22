@@ -16,7 +16,7 @@ import { initMembersCarousel } from './initMembersCarousel';
 export const HERO_TO_INTRO_TIMING = {
   videoPlaybackStart: 0,
   videoPlaybackDuration: 4.1,
-  loopVideoHoldDuration: 2.6,
+  sloganHoldDuration: 2.2,
   panelRevealDelayAfterVideoEnd: 0.4,
   transitionScrollDistanceDesktop: 3600,
   transitionScrollDistanceMobile: 2500,
@@ -134,27 +134,27 @@ const initFullTransitions = ({
     HERO_TO_INTRO_TIMING.videoPlaybackStart +
     HERO_TO_INTRO_TIMING.videoPlaybackDuration;
 
-  const loopHoldStart = videoPlaybackEnd + HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
-  const loopHoldEnd = loopHoldStart + HERO_TO_INTRO_TIMING.loopVideoHoldDuration;
+  const sloganHoldStart = videoPlaybackEnd + HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
 
-  // ── Slogan reveal during loop-video hold ──────────────────────────────
+  // ── Slogan reveal after video playback ──────────────────────────────
   const sloganStage = heroTransitionRoot.querySelector<HTMLElement>('[data-hero-slogan]');
   const sloganQuote = heroTransitionRoot.querySelector<HTMLElement>('[data-overview-quote]');
 
-  const sloganRevealAt = loopHoldStart;
+  const sloganRevealAt = sloganHoldStart;
 
   if (sloganStage) {
-    const signalCardsFadeOutAt = loopHoldStart - 0.3;
+    const signalCardsFadeOutAt = sloganHoldStart - 0.3;
     heroTimeline.to(
       elements.signalCards,
       { autoAlpha: 0, y: -38, duration: 0.28, stagger: 0.02 },
       signalCardsFadeOutAt,
     );
   } else {
+    const sloganHoldEnd = sloganHoldStart + HERO_TO_INTRO_TIMING.sloganHoldDuration;
     heroTimeline.to(
       elements.signalCards,
       { autoAlpha: 0, y: -58, duration: 0.32, stagger: 0.02 },
-      loopHoldEnd,
+      sloganHoldEnd,
     );
   }
 
@@ -257,41 +257,41 @@ const initFullTransitions = ({
       defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: missionPanel,
-        start: 'top 110%',
+        start: 'top 90%',
         end: 'top -12%',
         scrub: 0.4,
       },
     });
 
     // Phase 1: panel fades in (background visible)
-    missionTl.to(missionPanel, { autoAlpha: 1, duration: 0.15, ease: 'power2.out' }, 0);
+    missionTl.to(missionPanel, { autoAlpha: 1, duration: 0.18, ease: 'power2.out' }, 0);
 
     // Phase 2: label appears
     if (missionLabel) {
-      missionTl.to(missionLabel, { autoAlpha: 1, y: 0, duration: 0.15, ease: 'power2.out' }, 0.04);
+      missionTl.to(missionLabel, { autoAlpha: 1, y: 0, duration: 0.18, ease: 'power2.out' }, 0.08);
     }
 
     // Phase 3: divider scales in
     if (missionDivider) {
-      missionTl.to(missionDivider, { scaleX: 1, duration: 0.2, ease: 'power2.out' }, 0.08);
+      missionTl.to(missionDivider, { scaleX: 1, duration: 0.22, ease: 'power2.out' }, 0.14);
     }
 
     // Phase 4: headings fade in (stay in place)
     missionTl.to(missionHeadings, {
       autoAlpha: 1,
-      duration: 0.2,
+      duration: 0.22,
       ease: 'power2.out',
-      stagger: 0.1,
-    }, 0.12);
+      stagger: 0.14,
+    }, 0.20);
 
     // Phase 5: body text slides from right → centre
     missionTl.to(missionBodies, {
       autoAlpha: 1,
       xPercent: 0,
-      duration: 0.35,
-      ease: 'power3.out',
-      stagger: 0.12,
-    }, 0.16);
+      duration: 0.55,
+      ease: 'power2.out',
+      stagger: 0.22,
+    }, 0.28);
   }
 
   // ── Second panel: scrub-driven reveal (optional — panel may not exist) ──
@@ -356,8 +356,8 @@ const initFullTransitions = ({
       },
     });
 
-    // Phase 1: panel fades in
-    fourthTl.to(fourthPanel, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 0);
+    // Phase 1: panel fades in (linear — no acceleration)
+    fourthTl.to(fourthPanel, { autoAlpha: 1, y: 0, duration: 0.4 }, 0);
 
     // Phase 2: closing quote — SplitText character reveal (mirrors hero slogan)
     const closingQuote = fourthPanel.querySelector<HTMLElement>('[data-fp-closing-quote]');

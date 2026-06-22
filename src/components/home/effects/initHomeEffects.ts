@@ -9,7 +9,7 @@ import { initHomeScrollEffects } from './initHomeScrollEffects';
 import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
 import { createFluidRevealOverlay, type FluidOverlayInstance } from './initFluidRevealOverlay';
-import { createHeroVideoDistortion, createFluidDistortion, type FluidDistortionInstance } from './initHeroVideoDistortion';
+import { createFluidDistortion, type FluidDistortionInstance } from './initHeroVideoDistortion';
 
 const initSmoothScrolling = () => {
   const lenis = new Lenis({
@@ -45,7 +45,6 @@ export const initHomeEffects = () => {
   initHeroVideoEffects({
     heroVideoShell: homeHeroElements.heroVideoShell,
     scrollVideo: homeHeroElements.scrollVideo,
-    loopVideo: homeHeroElements.loopVideo,
     heroVideoLoading: homeHeroElements.heroVideoLoading,
   });
 
@@ -75,12 +74,13 @@ export const initHomeEffects = () => {
   const distortionInstances: FluidDistortionInstance[] = [];
 
   if (!prefersReducedMotion) {
-    // 1. Hero video distortion (dual-video crossfade)
-    if (homeHeroElements.heroVideoShell && homeHeroElements.scrollVideo && homeHeroElements.loopVideo) {
-      const heroDistortion = createHeroVideoDistortion({
+    // 1. Hero video distortion (single scroll video)
+    if (homeHeroElements.heroVideoShell && homeHeroElements.scrollVideo) {
+      const heroDistortion = createFluidDistortion({
+        mode: 'video',
         container: homeHeroElements.heroVideoShell,
-        scrollVideo: homeHeroElements.scrollVideo,
-        loopVideo: homeHeroElements.loopVideo,
+        video: homeHeroElements.scrollVideo,
+        dataAttr: 'data-hero-distortion',
       });
       heroDistortion.start();
       distortionInstances.push(heroDistortion);
@@ -163,8 +163,8 @@ const FLUID_CONFIG = {
   velocityDissipation: 0.92,
   splatRadius: 0.025,
   splatForce: 8,
-  fluidInfluence: 0.25,    // fluid distortion strength
-  terrainAmplitude: 0.5,   // hilly terrain roughness — half screen relief
+  fluidInfluence: 0,       // disabled — fluid splats must not warp the waterline
+  terrainAmplitude: 0.35,  // vertical ridge relief — bold but no islands
 } as const;
 
 // ── Scroll velocity tracker ───────────────────────────────────────────────
@@ -196,9 +196,16 @@ const initFluidOverlays = () => {
   const instances: FluidOverlayInstance[] = [];
 
   // ── Hero "close" overlay ──────────────────────────────────────────────
-  // Black tide rises in the last ~30% of the hero's scroll.
-  // setProgress() drives the deterministic waterline — scrubs both ways.
-  // injectSplats() adds organic distortion at the waterline edge.
+  // Black tide rises within the hero's pinned scroll range.
+  //
+  // The overlay is `position: fixed; z-index: 25` — BELOW the overview
+  // panel (z-index: 30).  As the user scrolls past the hero, the overview
+  // panel naturally slides over the fully-black overlay.  No fade-out or
+  // opacity manipulation is needed.
+  //
+  // The ScrollTrigger drives flood progress 0→1 during the last 50% of
+  // the hero pin.  Once the hero unpins (onLeave) the overlay is hidden
+  // to free GPU resources; it reappears when scrolling back (onEnterBack).
   const heroContainer = document.querySelector<HTMLElement>('[data-fluid-overlay="close"]');
   const heroRoot = document.querySelector<HTMLElement>('[data-hero-transition-root]');
 
@@ -217,33 +224,33 @@ const initFluidOverlays = () => {
 
     ScrollTrigger.create({
       trigger: triggerEl,
-      start: 'top top',
+      start: () => {
+        const spacerH = triggerEl.offsetHeight;
+        // Start the tide at 50% through the hero pin-spacer.
+        return `top+=${Math.round(spacerH * 0.50)} top`;
+      },
+      // End at the pin-spacer bottom (hero unpin point).
       end: 'bottom top',
       scrub: true,
+      invalidateOnRefresh: true,
       onUpdate: (self) => {
         const progress = self.progress;
         const { velocity, delta } = heroVel.update(progress);
 
-        const ONSET = 0.70;
+        heroOverlay.setProgress(progress);
 
-        // Map progress [ONSET..1] → localProgress [0..1].
-        // Below onset → 0 (no coverage).
-        const localProgress = progress <= ONSET
-          ? 0
-          : (progress - ONSET) / (1 - ONSET);
-
-        // ALWAYS update the deterministic waterline — this is what
-        // makes reverse scroll work.  No early return.
-        heroOverlay.setProgress(localProgress);
-
-        // Only inject organic splats when there's meaningful scroll movement
-        // AND we're in the active zone.
-        if (localProgress > 0 && Math.abs(delta) > 0.001) {
-          const splatY = localProgress;
+        if (progress > 0 && progress < 1 && Math.abs(delta) > 0.001) {
+          const splatY = progress;
           const baseForceMag = 8 + velocity * 27;
           const force = delta > 0 ? baseForceMag : -baseForceMag;
           heroOverlay.injectSplats(splatY, force, velocity);
         }
+      },
+      onLeave: () => {
+        heroContainer.style.visibility = 'hidden';
+      },
+      onEnterBack: () => {
+        heroContainer.style.visibility = '';
       },
     });
   }

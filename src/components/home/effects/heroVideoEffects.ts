@@ -5,7 +5,6 @@ import type { HomeHeroElements } from './getHomeHeroElements';
 interface InitHeroVideoEffectsOptions {
   heroVideoShell: HTMLElement | null;
   scrollVideo: HTMLVideoElement | null;
-  loopVideo: HTMLVideoElement | null;
   heroVideoLoading: HTMLElement | null;
 }
 
@@ -24,55 +23,39 @@ export const hideHeroVideoLoading = (heroVideoLoading: HTMLElement | null) => {
   heroVideoLoading.classList.add('is-hidden');
 };
 
-export const startLoopVideo = (loopVideo: HTMLVideoElement | null) => {
-  if (!loopVideo) {
-    return;
-  }
-
-  const playAttempt = loopVideo.play();
-  if (playAttempt && typeof playAttempt.catch === 'function') {
-    playAttempt.catch(() => {});
-  }
-};
-
 export const initHeroVideoEffects = ({
   heroVideoShell,
   scrollVideo,
-  loopVideo,
   heroVideoLoading,
 }: InitHeroVideoEffectsOptions) => {
-  if (!heroVideoShell || !scrollVideo || !loopVideo) {
+  if (!heroVideoShell || !scrollVideo) {
     return;
   }
 
-  const initializeHeroVideos = () => {
-    gsap.set(loopVideo, { autoAlpha: 0 });
+  const initializeHeroVideo = () => {
     gsap.set(scrollVideo, {
       autoAlpha: 1,
       currentTime: 0,
     });
 
-    startLoopVideo(loopVideo);
     hideHeroVideoLoading(heroVideoLoading);
   };
 
-  // When scroll video fails to load, fall back: hide loader and show loop video directly.
-  const initializeHeroVideosOnError = () => {
+  // When scroll video fails to load, fall back: hide loader.
+  const initializeHeroVideoOnError = () => {
     gsap.set(scrollVideo, { autoAlpha: 0 });
-    gsap.set(loopVideo, { autoAlpha: 1 });
-    startLoopVideo(loopVideo);
     hideHeroVideoLoading(heroVideoLoading);
   };
 
   // scrollVideo.error means the error event already fired before initHomeEffects ran —
   // fall back immediately without waiting for a listener that will never fire.
   if (scrollVideo.error) {
-    initializeHeroVideosOnError();
+    initializeHeroVideoOnError();
   } else if (scrollVideo.readyState >= 1) {
-    initializeHeroVideos();
+    initializeHeroVideo();
   } else {
-    scrollVideo.addEventListener('loadedmetadata', initializeHeroVideos, { once: true });
-    scrollVideo.addEventListener('error', initializeHeroVideosOnError, { once: true });
+    scrollVideo.addEventListener('loadedmetadata', initializeHeroVideo, { once: true });
+    scrollVideo.addEventListener('error', initializeHeroVideoOnError, { once: true });
   }
 
   if (scrollVideo.error || scrollVideo.readyState >= 3) {
@@ -82,12 +65,6 @@ export const initHeroVideoEffects = ({
     scrollVideo.addEventListener('loadeddata', () => hideHeroVideoLoading(heroVideoLoading), { once: true });
     scrollVideo.addEventListener('error', () => hideHeroVideoLoading(heroVideoLoading), { once: true });
   }
-
-  if (loopVideo.readyState >= 2) {
-    startLoopVideo(loopVideo);
-  } else {
-    loopVideo.addEventListener('canplay', () => startLoopVideo(loopVideo), { once: true });
-  }
 };
 
 /**
@@ -96,24 +73,18 @@ export const initHeroVideoEffects = ({
  * The video plays from 0 → videoDuration across timeline positions [0, videoPlaybackEnd].
  * videoPlaybackEnd should equal heroPanelExitStart so the video finishes exactly when
  * the panel-push transition begins — regardless of heroTimeline's total duration.
- *
- * Cross-fade to loopVideo happens in the last 8% of the video slot.
  */
 const attachVideoScrubToTimeline = ({
   scrollVideo,
-  loopVideo,
   heroTimeline,
   videoPlaybackEnd,
 }: {
   scrollVideo: HTMLVideoElement;
-  loopVideo: HTMLVideoElement;
   heroTimeline: gsap.core.Timeline;
   videoPlaybackEnd: number;
 }) => {
   const targetDuration = Math.max(scrollVideo.duration - 0.04, 0);
-  const crossFadeAt = videoPlaybackEnd * 0.92; // cross-fade starts at 92% of video slot
 
-  gsap.set(loopVideo, { autoAlpha: 0 });
   gsap.set(scrollVideo, { autoAlpha: 1 });
 
   // Drive currentTime from 0 → targetDuration across the full video slot.
@@ -122,12 +93,6 @@ const attachVideoScrubToTimeline = ({
     { currentTime: targetDuration, duration: videoPlaybackEnd },
     0,
   );
-
-  // Cross-fade: loopVideo fades in, scrollVideo fades out, over the last 8%.
-  const fadeDuration = videoPlaybackEnd - crossFadeAt;
-  heroTimeline
-    .to(loopVideo, { autoAlpha: 1, duration: fadeDuration }, crossFadeAt)
-    .to(scrollVideo, { autoAlpha: 0.16, duration: fadeDuration * 0.8 }, crossFadeAt + fadeDuration * 0.1);
 };
 
 export const addHeroVideoTransitionSegment = ({
@@ -135,9 +100,9 @@ export const addHeroVideoTransitionSegment = ({
   heroTimeline,
   videoPlaybackEnd,
 }: AddHeroVideoTransitionSegmentOptions) => {
-  const { heroVideoShell, loopVideo, scrollVideo } = elements;
+  const { heroVideoShell, scrollVideo } = elements;
 
-  if (!heroVideoShell || !scrollVideo || !loopVideo) {
+  if (!heroVideoShell || !scrollVideo) {
     return;
   }
 
@@ -147,7 +112,6 @@ export const addHeroVideoTransitionSegment = ({
 
     attachVideoScrubToTimeline({
       scrollVideo,
-      loopVideo,
       heroTimeline,
       videoPlaybackEnd,
     });
@@ -172,15 +136,12 @@ export const addHeroVideoTransitionSegment = ({
     });
   };
 
-  // On error: skip scroll-video scrub entirely — show loop video immediately
-  // so GSAP panel transitions still initialise correctly (no video currentTime tween).
+  // On error: skip scroll-video scrub entirely — GSAP panel transitions
+  // still initialise correctly (no video currentTime tween).
   const attachOnError = () => {
     if (attached) return;
     attached = true;
-    if (loopVideo) {
-      gsap.set(scrollVideo, { autoAlpha: 0 });
-      gsap.set(loopVideo, { autoAlpha: 1 });
-    }
+    gsap.set(scrollVideo, { autoAlpha: 0 });
     requestAnimationFrame(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).__gsapScrollTriggerRefresh?.();

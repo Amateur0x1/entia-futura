@@ -1,10 +1,9 @@
 /**
  * Fluid Distortion — general-purpose fluid-driven UV displacement.
  *
- * Supports three source modes:
- *   1. "dual-video"  — Hero: crossfades between scroll + loop video textures.
- *   2. "video"       — Single video element (e.g. fourth panel loop video).
- *   3. "element"     — Captures a DOM element via canvas drawImage + CSS rendering.
+ * Supports two source modes:
+ *   1. "video"       — Single video element (hero scroll video, fourth panel loop video).
+ *   2. "element"     — Captures a DOM element via canvas drawImage + CSS rendering.
  *
  * The effect: mouse/touch movement drives a GPU fluid simulation, whose
  * velocity field offsets UV sampling in a fullscreen post-processing pass,
@@ -52,12 +51,6 @@ interface FluidDistortionBaseOptions {
   alpha?: boolean;
 }
 
-export interface DualVideoDistortionOptions extends FluidDistortionBaseOptions {
-  mode: 'dual-video';
-  scrollVideo: HTMLVideoElement;
-  loopVideo: HTMLVideoElement;
-}
-
 export interface SingleVideoDistortionOptions extends FluidDistortionBaseOptions {
   mode: 'video';
   video: HTMLVideoElement;
@@ -70,7 +63,6 @@ export interface ElementDistortionOptions extends FluidDistortionBaseOptions {
 }
 
 export type FluidDistortionOptions =
-  | DualVideoDistortionOptions
   | SingleVideoDistortionOptions
   | ElementDistortionOptions;
 
@@ -103,24 +95,12 @@ export function createFluidDistortion(options: FluidDistortionOptions): FluidDis
   container.appendChild(canvas);
 
   // ── Texture source setup ────────────────────────────────────────────
-  let scrollTex: VideoTexture | null = null;
-  let loopTex: VideoTexture | null = null;
   let singleVideoTex: VideoTexture | null = null;
   let elementCaptureTex: CanvasTexture | null = null;
   let captureCanvas: HTMLCanvasElement | null = null;
   let captureCtx: CanvasRenderingContext2D | null = null;
 
-  if (options.mode === 'dual-video') {
-    scrollTex = new VideoTexture(options.scrollVideo);
-    scrollTex.minFilter = LinearFilter;
-    scrollTex.magFilter = LinearFilter;
-    scrollTex.colorSpace = SRGBColorSpace;
-
-    loopTex = new VideoTexture(options.loopVideo);
-    loopTex.minFilter = LinearFilter;
-    loopTex.magFilter = LinearFilter;
-    loopTex.colorSpace = SRGBColorSpace;
-  } else if (options.mode === 'video') {
+  if (options.mode === 'video') {
     singleVideoTex = new VideoTexture(options.video);
     singleVideoTex.minFilter = LinearFilter;
     singleVideoTex.magFilter = LinearFilter;
@@ -150,7 +130,7 @@ export function createFluidDistortion(options: FluidDistortionOptions): FluidDis
   const detachSplats = attachPointerSplats(pointerEl, fluid);
 
   // ── Composite shader ───────────────────────────────────────────────
-  const initialTexture = scrollTex || singleVideoTex || elementCaptureTex;
+  const initialTexture = singleVideoTex || elementCaptureTex;
 
   const composite = new ShaderMaterial({
     vertexShader: FULLSCREEN_VERTEX,
@@ -197,10 +177,6 @@ export function createFluidDistortion(options: FluidDistortionOptions): FluidDis
 
   // ── Get active texture per frame ──────────────────────────────────
   const getActiveTexture = () => {
-    if (options.mode === 'dual-video' && scrollTex && loopTex) {
-      const loopOpacity = parseFloat(getComputedStyle(options.loopVideo).opacity || '0');
-      return loopOpacity > 0.5 ? loopTex : scrollTex;
-    }
     if (options.mode === 'video' && singleVideoTex) {
       return singleVideoTex;
     }
@@ -247,8 +223,6 @@ export function createFluidDistortion(options: FluidDistortionOptions): FluidDis
     detachSplats();
     pass.dispose();
     composite.dispose();
-    scrollTex?.dispose();
-    loopTex?.dispose();
     singleVideoTex?.dispose();
     elementCaptureTex?.dispose();
     fluid.dispose();
@@ -334,16 +308,3 @@ function captureElement(
   });
 }
 
-// ── Legacy export for backwards compatibility ──────────────────────────────
-export type HeroVideoDistortionOptions = DualVideoDistortionOptions;
-export type HeroVideoDistortionInstance = FluidDistortionInstance;
-
-export function createHeroVideoDistortion(
-  opts: Omit<DualVideoDistortionOptions, 'mode'>,
-): FluidDistortionInstance {
-  return createFluidDistortion({
-    ...opts,
-    mode: 'dual-video',
-    dataAttr: 'data-hero-distortion',
-  });
-}

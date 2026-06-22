@@ -3,7 +3,6 @@ export interface HomeHeroElements {
   heroTransitionFrame: HTMLElement | null;
   heroVideoShell: HTMLElement | null;
   scrollVideo: HTMLVideoElement | null;
-  loopVideo: HTMLVideoElement | null;
   heroVideoLoading: HTMLElement | null;
   portalShell: HTMLElement | null;
   signalCards: HTMLElement[];
@@ -40,7 +39,6 @@ export const getHomeHeroElements = (): HomeHeroElements => {
   const heroTransitionFrame = getHTMLElement(heroTransitionRoot, '[data-orbit-frame]');
   const heroVideoShell = getHTMLElement(heroTransitionRoot, '[data-hero-video-shell]');
   const scrollVideo = getVideoElement(heroTransitionRoot, '[data-scroll-video]');
-  const loopVideo = getVideoElement(heroTransitionRoot, '[data-loop-video]');
   const heroVideoLoading = getHTMLElement(heroTransitionRoot, '[data-hero-video-loading]');
   const portalShell = getHTMLElement(heroTransitionRoot, '[data-future-portal-shell]');
   const signalCards = heroTransitionRoot
@@ -64,7 +62,6 @@ export const getHomeHeroElements = (): HomeHeroElements => {
     heroTransitionFrame,
     heroVideoShell,
     scrollVideo,
-    loopVideo,
     heroVideoLoading,
     portalShell,
     signalCards,

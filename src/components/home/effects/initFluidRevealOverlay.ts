@@ -122,15 +122,15 @@ export function createFluidRevealOverlay(options: FluidOverlayOptions): FluidOve
         return mix(hash(i), hash(i + 1.0), u);
       }
 
-      // FBM — 5 octaves for complex terrain
+      // FBM — 2 octaves for broad, smooth terrain
       float fbm(float x) {
         float value = 0.0;
         float amplitude = 0.5;
         float frequency = 1.0;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 2; i++) {
           value += amplitude * noise(x * frequency);
-          frequency *= 2.17;   // non-integer ratio avoids repetition
-          amplitude *= 0.48;   // persistence
+          frequency *= 2.17;
+          amplitude *= 0.48;
         }
         return value;
       }
@@ -139,13 +139,11 @@ export function createFluidRevealOverlay(options: FluidOverlayOptions): FluidOve
         vec4 fl = texture2D(tFluid, vUv);
 
         // ── Terrain profile ────────────────────────────────────────
-        // FBM along x creates a hilly landscape.
-        float terrain = fbm(vUv.x * 6.0 + uSeed);
-        terrain += fbm(vUv.x * 14.0 + uSeed + 50.0) * 0.4;
-        // Normalise to 0..1 range (all positive — peaks only, no valleys
-        // below baseline).  This ensures that at progress=0 the waterline
-        // sits entirely below the screen.
-        terrain = terrain / 1.4; // roughly 0..1
+        // Vertical ridges — noise along X only, constant along Y.
+        // This creates north-south "mountain ranges" so the waterline
+        // carves wide vertical bands, not isolated peaks.
+        float terrain = fbm(vUv.x * 4.0 + uSeed);
+        terrain = terrain / 0.74; // normalise roughly to 0..1
 
         // ── Water level ────────────────────────────────────────────
         // Extra margin so progress=0 is fully invisible and progress=1
@@ -156,24 +154,31 @@ export function createFluidRevealOverlay(options: FluidOverlayOptions): FluidOve
         // Terrain creates peaks that resist flooding.
         float terrainDisp = terrain * uTerrainAmp;
 
-        // Fluid adds dynamic distortion — but only when there's
-        // meaningful progress, so it can't leak at progress=0.
-        float fluidDisp = fl.b * uFluidInfluence * smoothstep(0.0, 0.1, uProgress);
+        // Gentle fluid warp — scaled down to avoid jagged tendrils.
+        float fluidWarp = (fl.r + fl.g) * 0.5 * uFluidInfluence * 0.4 * smoothstep(0.0, 0.1, uProgress);
 
-        // Combined water level
-        float waterLevel = baseLevel - terrainDisp + fluidDisp;
+        // Wide soft edge — smooth gradient instead of hard cut
+        float edgeWidth = 0.06;
 
-        // Soft edge
-        float edgeWidth = 0.015 + fluidDisp * 0.25;
+        float coverage;
 
-        // Coverage: 1 below waterline, 0 above
-        float coverage = smoothstep(waterLevel + edgeWidth, waterLevel - edgeWidth, vUv.y);
+        // Water level rises from below screen to above screen as progress grows.
+        float waterLevel = baseLevel - terrainDisp + fluidWarp;
 
         if (uMode == 1) {
-          // OPEN: starts covered, recedes as progress grows
-          gl_FragColor = vec4(uFloodColor, 1.0 - coverage);
+          // OPEN: black veil covers ABOVE the waterline, clear BELOW.
+          // progress=0 → waterLevel far below screen → veil covers everything.
+          // progress=1 → waterLevel far above screen → veil gone.
+          // The veil is always contiguous: screen top → waterline edge.
+          // No islands possible because veil connects to the top boundary.
+          coverage = smoothstep(waterLevel - edgeWidth, waterLevel + edgeWidth, vUv.y);
+          gl_FragColor = vec4(uFloodColor, coverage);
         } else {
-          // CLOSE: starts clear, covers as progress grows
+          // CLOSE: black tide covers BELOW the waterline, clear ABOVE.
+          // progress=0 → waterLevel far below → no coverage.
+          // progress=1 → waterLevel far above → fully covered.
+          // Always contiguous: waterline edge → screen bottom.
+          coverage = smoothstep(waterLevel + edgeWidth, waterLevel - edgeWidth, vUv.y);
           gl_FragColor = vec4(uFloodColor, coverage);
         }
       }
