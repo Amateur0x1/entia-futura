@@ -50,6 +50,7 @@ function createFlairState(membersPanel: HTMLElement): FlairState | null {
 function playFlairAnimation(img: HTMLElement) {
   const tl = gsap.timeline();
 
+  // Phase 1: Elastic pop-in (0 → 0.8s)
   tl.from(img, {
     opacity: 0,
     scale: 0,
@@ -59,12 +60,19 @@ function playFlairAnimation(img: HTMLElement) {
     .to(img, {
       rotation: `random([-360, 360])`,
       duration: 0.8,
-    }, '<')
-    .to(img, {
-      y: '120vh',
-      ease: 'back.in(0.4)',
-      duration: 1,
-    }, 0);
+    }, '<');
+
+  // Phase 2: Hold — let the image linger in place so it's actually visible.
+  // This is just a tiny spacer; the gravity fall starts after it.
+  tl.to(img, { duration: 0.45 });
+
+  // Phase 3: Fade-fall with gentle gravity
+  tl.to(img, {
+    y: '120vh',
+    opacity: 0,
+    ease: 'back.in(0.4)',
+    duration: 1.1,
+  });
 }
 
 function startFlairTracker(flair: FlairState, stickyContainer: HTMLElement) {
