@@ -34,11 +34,15 @@ const items = locale === 'zh'
   <!-- Atmosphere veil -->
   <div class="loading-orbit-device__veil" aria-hidden="true"></div>
 
-  <!-- Central logo -->
-  <div class="loading-orbit-device__logo-wrap">
+  <!-- Central logo with parallax halo -->
+  <div class="loading-orbit-device__logo-stage" id="loading-logo-stage">
+    <!-- Yellow halo behind logo (moves more = further layer) -->
+    <div class="loading-orbit-device__halo" id="loading-halo" aria-hidden="true"></div>
+    <!-- Logo in front (moves less = closer layer) -->
     <img
       class="loading-orbit-device__logo"
-      src="/brand/entia-logo-white-lines.png"
+      id="loading-logo"
+      src="/brand/entia-logo-cutout.png"
       alt=""
       draggable="false"
     />
@@ -106,8 +110,8 @@ const items = locale === 'zh'
       );
   }
 
-  /* ── Logo ── */
-  .loading-orbit-device__logo-wrap {
+  /* ── Logo stage (holds halo + logo for parallax) ── */
+  .loading-orbit-device__logo-stage {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -118,12 +122,35 @@ const items = locale === 'zh'
     height: clamp(260px, 34vmin, 480px);
   }
 
+  /* ── Yellow halo (behind logo) ── */
+  .loading-orbit-device__halo {
+    position: absolute;
+    /* Center the halo on the circular part of the logo (slightly above center) */
+    top: 12%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 62%;
+    height: 62%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 220, 60, 0.85) 0%,
+      rgba(255, 200, 40, 0.6) 40%,
+      rgba(255, 180, 20, 0.25) 70%,
+      transparent 100%
+    );
+    filter: blur(6px);
+    will-change: transform;
+  }
+
   .loading-orbit-device__logo {
+    position: relative;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    opacity: 0.88;
-    filter: drop-shadow(0 0 32px color-mix(in srgb, var(--color-primary) 36%, transparent));
+    opacity: 0.92;
+    filter: invert(1) brightness(1.1) drop-shadow(0 0 24px rgba(255, 220, 60, 0.18));
+    will-change: transform;
   }
 
   /* ── Orbit container ── */
@@ -412,13 +439,46 @@ const items = locale === 'zh'
       if (active) raf = requestAnimationFrame(draw);
     }
 
+    // ── Parallax: halo & logo respond to mouse at different rates ──────────
+    const haloEl = document.getElementById('loading-halo') as HTMLElement | null;
+    const logoEl = document.getElementById('loading-logo') as HTMLElement | null;
+    const HALO_FACTOR = 0.035;  // halo moves more (further away)
+    const LOGO_FACTOR = 0.012;  // logo moves less (closer to viewer)
+
+    function applyParallax(clientX: number, clientY: number) {
+      const cx = W / 2;
+      const cy = H / 2;
+      const dx = clientX - cx;
+      const dy = clientY - cy;
+
+      if (haloEl) {
+        const hx = dx * HALO_FACTOR;
+        const hy = dy * HALO_FACTOR;
+        haloEl.style.transform = `translate(calc(-50% + ${hx}px), ${hy}px)`;
+      }
+      if (logoEl) {
+        const lx = dx * LOGO_FACTOR;
+        const ly = dy * LOGO_FACTOR;
+        logoEl.style.transform = `translate(${lx}px, ${ly}px)`;
+      }
+    }
+
+    function resetParallax() {
+      if (haloEl) haloEl.style.transform = 'translate(-50%, 0)';
+      if (logoEl) logoEl.style.transform = 'translate(0, 0)';
+    }
+
     // ── Mouse ────────────────────────────────────────────────────────────────
     function onMouseMove(e: MouseEvent) {
       const r = device!.getBoundingClientRect();
       mouseX = e.clientX - r.left;
       mouseY = e.clientY - r.top;
+      applyParallax(e.clientX, e.clientY);
     }
-    function onPointerLeave() { mouseX = -9999; mouseY = -9999; }
+    function onPointerLeave() {
+      mouseX = -9999; mouseY = -9999;
+      resetParallax();
+    }
 
     // ── Start animation immediately ──────────────────────────────────────────
     resize();

@@ -1,20 +1,181 @@
 // ---------------------------------------------------------------------------
-// Members carousel — Flip-based stacked card deck with synced info panel
+// Members carousel — scroll-driven stacked card deck with synced info panel
+// + Flair cursor follower (shared pool of shaped decorative images)
 //
-// Adapted from the GreenSock Flip Cards demo (codepen.io/GreenSock/pen/Yzdzxem).
-// Cards are stacked like a deck; as the user scrolls, the top card flips away
-// and the remaining cards shift up.  The right-side info panel updates in sync
-// to show the bio of the currently-front card.
+// Cards are stacked like a deck.  As the user scrolls through the pinned
+// section, the front card slides away and the next card takes its place.
+// The right-side info panel updates in sync.  A shared pool of shaped flair
+// images trails the mouse cursor throughout the section.
 //
-// The members-sticky container is pinned with ScrollTrigger for enough scroll
-// distance to cycle through all cards.
+// Unlike the previous Flip-based approach, this version directly animates
+// card transforms / opacity based on scroll progress, making it fully
+// reversible (scroll back works correctly) and immune to DOM-mutation bugs.
 // ---------------------------------------------------------------------------
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Flip } from 'gsap/Flip';
 
-gsap.registerPlugin(ScrollTrigger, Flip);
+gsap.registerPlugin(ScrollTrigger);
+
+// ── Flair cursor follower ──────────────────────────────────────────────────
+
+interface FlairState {
+  images: HTMLElement[];
+  index: number;
+  mousePos: { x: number; y: number };
+  lastMousePos: { x: number; y: number };
+  gap: number;
+  tickerCallback: (() => void) | null;
+  isActive: boolean;
+}
+
+function createFlairState(membersPanel: HTMLElement): FlairState | null {
+  const flairContainer = membersPanel.querySelector<HTMLElement>('[data-members-flair]');
+  if (!flairContainer) return null;
+
+  const images = gsap.utils.toArray<HTMLElement>('[data-flair-img]', flairContainer);
+  if (!images.length) return null;
+
+  return {
+    images,
+    index: 0,
+    mousePos: { x: 0, y: 0 },
+    lastMousePos: { x: 0, y: 0 },
+    gap: 80,
+    tickerCallback: null,
+    isActive: false,
+  };
+}
+
+function playFlairAnimation(img: HTMLElement) {
+  const tl = gsap.timeline();
+
+  tl.from(img, {
+    opacity: 0,
+    scale: 0,
+    duration: 0.8,
+    ease: 'elastic.out(1, 0.3)',
+  })
+    .to(img, {
+      rotation: `random([-360, 360])`,
+      duration: 0.8,
+    }, '<')
+    .to(img, {
+      y: '120vh',
+      ease: 'back.in(0.4)',
+      duration: 1,
+    }, 0);
+}
+
+function startFlairTracker(flair: FlairState, stickyContainer: HTMLElement) {
+  if (flair.isActive) return;
+
+  const onMouseMove = (e: MouseEvent) => {
+    flair.mousePos = { x: e.clientX, y: e.clientY };
+  };
+
+  stickyContainer.addEventListener('mousemove', onMouseMove);
+
+  const tickerCallback = () => {
+    const dx = flair.lastMousePos.x - flair.mousePos.x;
+    const dy = flair.lastMousePos.y - flair.mousePos.y;
+    const travelDistance = Math.hypot(dx, dy);
+
+    if (travelDistance > flair.gap) {
+      const wrappedIndex = flair.index % flair.images.length;
+      const img = flair.images[wrappedIndex];
+
+      gsap.killTweensOf(img);
+      gsap.set(img, { clearProps: 'all' });
+      gsap.set(img, {
+        opacity: 1,
+        left: flair.mousePos.x,
+        top: flair.mousePos.y,
+        xPercent: -50,
+        yPercent: -50,
+      });
+
+      playFlairAnimation(img);
+      flair.index++;
+      flair.lastMousePos = { ...flair.mousePos };
+    }
+  };
+
+  gsap.ticker.add(tickerCallback);
+  flair.tickerCallback = tickerCallback;
+  flair.isActive = true;
+
+  // Store cleanup reference
+  (stickyContainer as any).__flairCleanup = () => {
+    stickyContainer.removeEventListener('mousemove', onMouseMove);
+    if (flair.tickerCallback) {
+      gsap.ticker.remove(flair.tickerCallback);
+      flair.tickerCallback = null;
+    }
+    flair.isActive = false;
+  };
+}
+
+// ── Card deck helpers ──────────────────────────────────────────────────────
+
+/** CSS stacking offsets (matches the CSS nth-child rules). */
+const STACK_OFFSETS = [
+  { top: 0, left: 0 },
+  { top: -20, left: 20 },
+  { top: -40, left: 40 },
+  { top: -60, left: 60 },
+  { top: -80, left: 80 },
+];
+
+/**
+ * For a given "active member index", compute each card's visual state.
+ *
+ * Cards are rendered in DOM order 0→N-1.  At any point, one member is "front"
+ * (fully visible, highest z-index), cards "behind" it are stacked underneath
+ * with decreasing offsets, and cards that have already been shown are off-screen.
+ */
+function getCardStates(totalMembers: number, activeMember: number) {
+  const states: Array<{
+    memberIndex: number;
+    zIndex: number;
+    opacity: number;
+    x: number;
+    y: number;
+    rotation: number;
+    scale: number;
+  }> = [];
+
+  for (let i = 0; i < totalMembers; i++) {
+    const distFromFront = i - activeMember;
+
+    if (distFromFront < 0) {
+      // Already flipped away — off to the left
+      states.push({
+        memberIndex: i,
+        zIndex: 0,
+        opacity: 0,
+        x: -120,
+        y: -40,
+        rotation: -12,
+        scale: 0.9,
+      });
+    } else {
+      // In the stack
+      const offset = STACK_OFFSETS[distFromFront] || STACK_OFFSETS[STACK_OFFSETS.length - 1];
+      states.push({
+        memberIndex: i,
+        zIndex: totalMembers - distFromFront,
+        opacity: distFromFront <= 2 ? 1 : 0,
+        x: offset.left,
+        y: offset.top,
+        rotation: 0,
+        scale: 1,
+      });
+    }
+  }
+
+  return states;
+}
 
 // ── public entry ───────────────────────────────────────────────────────────
 
@@ -29,20 +190,82 @@ export function initMembersCarousel(membersPanel: HTMLElement) {
   if (!cards.length) return;
 
   const infoItems = gsap.utils.toArray<HTMLElement>('[data-members-info-item]', membersPanel);
-  // Total number of unique members
   const totalMembers = cards.length;
 
-  // Track which member is currently shown (front card index)
-  // Cards are rendered bottom-to-top: index 0 is at the back, last is on top.
-  // The "front" card (top of deck) is cards[cards.length - 1].
-  // After a flip, the front card leaves and the new front is the next one down.
+  // Sort cards by their data-member-index to ensure consistent mapping
+  const cardsByMember: HTMLElement[] = [];
+  cards.forEach(card => {
+    const idx = parseInt(card.getAttribute('data-member-index') || '0', 10);
+    cardsByMember[idx] = card;
+  });
+
   let currentMemberIndex = 0;
 
-  // Scroll distance: enough for all card flips
+  // Scroll distance per member transition
   const scrollPerFlip = 800;
   const scrollDistance = totalMembers * scrollPerFlip;
 
-  // ── Helper: update info panel ──
+  // ── Flair setup (shared pool, no per-member grouping) ──
+  const flairState = createFlairState(membersPanel);
+  if (flairState) {
+    startFlairTracker(flairState, stickyContainer);
+  }
+
+  // ── Apply visual state to all cards ──
+  function applyDeckState(activeMember: number, progress?: number) {
+    const states = getCardStates(totalMembers, activeMember);
+
+    // Sub-progress within the current card transition (0→1)
+    let subProgress = 0;
+    if (progress !== undefined) {
+      const rawIndex = progress * totalMembers;
+      subProgress = rawIndex - Math.floor(rawIndex);
+    }
+
+    states.forEach((state) => {
+      const card = cardsByMember[state.memberIndex];
+      if (!card) return;
+
+      const distFromFront = state.memberIndex - activeMember;
+
+      if (distFromFront === -1 && subProgress > 0) {
+        // Being flipped away — interpolate
+        const prevOffset = STACK_OFFSETS[0] || { top: 0, left: 0 };
+        gsap.set(card, {
+          zIndex: totalMembers + 1,
+          opacity: 1 - subProgress,
+          x: gsap.utils.interpolate(prevOffset.left, -120, subProgress),
+          y: gsap.utils.interpolate(prevOffset.top, -40, subProgress),
+          rotation: gsap.utils.interpolate(0, -12, subProgress),
+          scale: gsap.utils.interpolate(1, 0.9, subProgress),
+        });
+      } else if (distFromFront === 0 && subProgress > 0) {
+        // Becoming the front — interpolate from position 1 to position 0
+        const fromOffset = STACK_OFFSETS[1] || STACK_OFFSETS[0];
+        const toOffset = STACK_OFFSETS[0];
+        gsap.set(card, {
+          zIndex: totalMembers,
+          opacity: 1,
+          x: gsap.utils.interpolate(fromOffset.left, toOffset.left, subProgress),
+          y: gsap.utils.interpolate(fromOffset.top, toOffset.top, subProgress),
+          rotation: 0,
+          scale: 1,
+        });
+      } else {
+        // Static position
+        gsap.set(card, {
+          zIndex: state.zIndex,
+          opacity: state.opacity,
+          x: state.x,
+          y: state.y,
+          rotation: state.rotation,
+          scale: state.scale,
+        });
+      }
+    });
+  }
+
+  // ── Update info panel ──
   function showMemberInfo(index: number) {
     const safeIndex = ((index % totalMembers) + totalMembers) % totalMembers;
 
@@ -67,117 +290,43 @@ export function initMembersCarousel(membersPanel: HTMLElement) {
     });
   }
 
-  // ── Helper: perform a single Flip card transition ──
-  function flipTopCard() {
-    // Get the current top card (last child in DOM)
-    const topCard = deck.querySelector<HTMLElement>('[data-members-flip-card]:last-child');
-    if (!topCard) return;
-
-    // Capture state before DOM change
-    const state = Flip.getState('[data-members-flip-card]', { props: 'opacity' });
-
-    // Move the top card to be hidden (move to start of deck = behind)
-    topCard.style.display = 'none';
-
-    // Create a clone and prepend it (so it goes to the back of the stack)
-    const clone = topCard.cloneNode(true) as HTMLElement;
-    clone.style.display = '';
-    deck.insertBefore(clone, deck.firstChild);
-
-    // Remove the old hidden card
-    deck.removeChild(topCard);
-
-    // Animate with Flip
-    Flip.from(state, {
-      targets: '[data-members-flip-card]',
-      duration: 0.6,
-      ease: 'sine.inOut',
-      absolute: true,
-      onEnter: (elements) => {
-        return gsap.from(elements, {
-          duration: 0.35,
-          yPercent: 20,
-          opacity: 0,
-          ease: 'expo.out',
-        });
-      },
-      onLeave: (elements) => {
-        return gsap.to(elements, {
-          duration: 0.35,
-          yPercent: 5,
-          xPercent: -8,
-          transformOrigin: 'bottom left',
-          opacity: 0,
-          ease: 'expo.out',
-        });
-      },
-    });
-
-    // Update member index and info
-    currentMemberIndex = (currentMemberIndex + 1) % totalMembers;
-    showMemberInfo(currentMemberIndex);
-  }
-
-  // ── Pinned ScrollTrigger that triggers flips at even intervals ──
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: stickyContainer,
-      start: 'top top',
-      end: `+=${scrollDistance}`,
-      pin: true,
-      pinSpacing: true,
-      scrub: false,       // NOT scrub — we use onUpdate thresholds
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        // Determine which card should be on top based on scroll progress
-        const targetIndex = Math.min(
-          Math.floor(self.progress * totalMembers),
-          totalMembers - 1,
-        );
-
-        // Only flip when we cross a threshold going forward
-        while (currentMemberIndex < targetIndex) {
-          flipTopCard();
-        }
-
-        // Handle scrolling back: reset to original state
-        if (targetIndex < currentMemberIndex) {
-          // Reset the deck to its original order
-          resetDeck(targetIndex);
-        }
-      },
-    },
+  // ── Clear CSS positioning — we take full control via GSAP ──
+  cards.forEach(card => {
+    card.style.top = '0';
+    card.style.left = '0';
   });
 
-  // ── Reset deck to a specific member index (for scroll-back) ──
-  function resetDeck(targetIndex: number) {
-    // Re-order cards in DOM to match the target state
-    const allCards = gsap.utils.toArray<HTMLElement>('[data-members-flip-card]', deck);
-
-    // Clear and re-insert in correct order for targetIndex
-    // The "front" (top/last-child) card should correspond to targetIndex
-    const reordered: HTMLElement[] = [];
-    for (let i = 0; i < totalMembers; i++) {
-      const cardIndex = (targetIndex + totalMembers - i) % totalMembers;
-      // Find the card with this member index
-      const card = allCards.find(
-        c => parseInt(c.getAttribute('data-member-index') || '0', 10) === cardIndex,
-      );
-      if (card) reordered.push(card);
-    }
-
-    // Re-insert: first in array = last child (front of deck)
-    // We want reordered[0] to be the front (last child)
-    // So insert in reverse order
-    reordered.reverse().forEach(card => {
-      deck.appendChild(card);
-    });
-
-    currentMemberIndex = targetIndex;
-    showMemberInfo(currentMemberIndex);
-  }
-
-  // Show initial member info
+  // ── Initial state ──
+  applyDeckState(0);
   showMemberInfo(0);
+
+  // ── Pinned ScrollTrigger ──
+  ScrollTrigger.create({
+    trigger: stickyContainer,
+    start: 'top top',
+    end: `+=${scrollDistance}`,
+    pin: true,
+    pinSpacing: true,
+    scrub: 0.3,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onUpdate: (self) => {
+      const progress = self.progress;
+
+      // Which member should be front?
+      const targetIndex = Math.min(
+        Math.floor(progress * totalMembers),
+        totalMembers - 1,
+      );
+
+      // Apply deck visual state with sub-progress for smooth interpolation
+      applyDeckState(targetIndex, progress);
+
+      // Update info panel only when member actually changes
+      if (targetIndex !== currentMemberIndex) {
+        currentMemberIndex = targetIndex;
+        showMemberInfo(currentMemberIndex);
+      }
+    },
+  });
 }

@@ -7,35 +7,49 @@ interface Props {
 
 const { locale } = Astro.props;
 
+// Flair images — shared pool of shaped photos for cursor trail.
+// All members use the same set; different shapes add visual variety.
+const flairImages = [
+  '/images/flair/m1-circle.png',    // circle
+  '/images/flair/m1-diamond.png',   // diamond
+  '/images/flair/m1-roundsq.png',   // rounded square
+  '/images/flair/m2-hexagon.png',   // hexagon
+  '/images/flair/m2-smcircle.png',  // small circle
+  '/images/flair/m2-ellipse.png',   // ellipse
+  '/images/flair/m3-softsq.png',    // soft square
+  '/images/flair/m3-triangle.png',  // triangle
+  '/images/flair/m3-octagon.png',   // octagon
+];
+
 const members = [
   {
-    src: '/images/members/member-01.jpg',
-    name: pickByLocale(locale, '成员一', 'Member 01'),
-    role: pickByLocale(locale, '创始人 / 研究总监', 'Founder / Research Director'),
+    src: '/images/members/member-02.jpg',
+    name: pickByLocale(locale, '马城', 'Cheng Ma'),
+    role: pickByLocale(locale, '人类学博士', 'PhD in Anthropology'),
     bio: pickByLocale(
       locale,
-      '关注未来机构形态、知识生产与社会创新。曾任职于多个跨学科研究机构，致力于在大学之外建立新的研究基础设施。',
-      'Focused on future institutional forms, knowledge production, and social innovation. Previously worked across interdisciplinary research institutions, committed to building new research infrastructure beyond the university.',
+      '柏林自由大学人类学博士研究生，关注未来机构形态、知识生产与社会创新，致力于在大学之外建立新的研究基础设施。',
+      'Cheng Ma is an anthropologist, curator, and interdisciplinary researcher. Currently pursuing a PhD in Anthropology at Free University of Berlin, his research focuses on entrepreneurship, intellectual networks, and social change. As the founder of Entia Futura, he is interested in building bridges between knowledge and practice.',
     ),
   },
   {
-    src: '/images/members/member-02.jpg',
-    name: pickByLocale(locale, '成员二', 'Member 02'),
-    role: pickByLocale(locale, '研究员 / 社群策划', 'Researcher / Community Curator'),
+    src: '/images/members/member-01.jpg',
+    name: pickByLocale(locale, 'Dreamer Piggy', 'Dreamer Piggy'),
+    role: pickByLocale(locale, '独立开发者', 'Indie Developer'),
     bio: pickByLocale(
       locale,
-      '专注于社群机制设计、公共活动策划与地方文化研究。相信真正的共同体来自持续的对话与共同实践。',
-      'Specializing in community mechanism design, public program curation, and local culture research. Believes genuine community emerges from sustained dialogue and shared practice.',
+      '独立开发者，大厂螺丝工，INTP。作品：煮理人 App。热爱各种创作，分享做产品与学习的过程和感悟，提供有趣的产品给到大家。',
+      'Independent developer and creator. Builder of Zhuliren App. Passionate about all forms of creation, sharing the journey of building products and learning, bringing interesting products to everyone.',
     ),
   },
   {
     src: '/images/members/member-03.jpg',
-    name: pickByLocale(locale, '成员三', 'Member 03'),
-    role: pickByLocale(locale, '技术研究员 / 工具实验', 'Tech Researcher / Tools Lab'),
+    name: pickByLocale(locale, '汪季宸', 'Jichen Wang'),
+    role: pickByLocale(locale, '独立书店主理人', 'Independent Bookstore Owner'),
     bio: pickByLocale(
       locale,
-      '探索 AI、协作工具与未来学习系统的交叉地带。关注技术如何重组研究流程、写作方式与知识传播路径。',
-      'Exploring the intersection of AI, collaborative tools, and future learning systems. Investigating how technology reorganizes research workflows, writing practices, and knowledge dissemination.',
+      '华东师范大学外国哲学硕士，政治哲学方向，研究兴趣在德国观念论、政治现象学；现居景德镇，创立并运营一家独立书店。',
+      'MA in Foreign Philosophy from East China Normal University, specializing in political philosophy with research interests in German Idealism and political phenomenology. Currently based in Jingdezhen, where he founded and runs an independent bookstore.',
     ),
   },
 ];
@@ -50,6 +64,21 @@ const borderGradients = [
 
 <section class="members-panel" data-members-panel>
   <div class="members-sticky">
+    <!-- Flair cursor trail — shared pool of shaped images (outside .members-content to avoid transform breaking position:fixed) -->
+    <div class="members-flair-container" data-members-flair>
+      {flairImages.map((src, i) => (
+        <img
+          class="members-flair-img"
+          src={src}
+          alt=""
+          loading="eager"
+          draggable="false"
+          data-flair-img
+          data-flair-idx={i}
+        />
+      ))}
+    </div>
+
     <div class="members-content">
       <!-- Left: stacked card deck -->
       <div class="members-deck" data-members-deck>
@@ -120,7 +149,7 @@ const borderGradients = [
   .members-deck {
     position: relative;
     flex-shrink: 0;
-    width: clamp(14rem, 18vw, 20rem);
+    width: clamp(16rem, 22vw, 26rem);
     aspect-ratio: 3 / 4;
   }
 
@@ -132,34 +161,10 @@ const borderGradients = [
     overflow: hidden;
     will-change: transform, opacity;
     cursor: default;
+    pointer-events: none;
   }
 
-  /* Stacking offsets: nth-child(1) is bottom, last is top */
-  .members-deck__card:nth-child(1) {
-    top: 0;
-    left: 0;
-    z-index: 1;
-  }
-  .members-deck__card:nth-child(2) {
-    top: -20px;
-    left: 20px;
-    z-index: 2;
-  }
-  .members-deck__card:nth-child(3) {
-    top: -40px;
-    left: 40px;
-    z-index: 3;
-  }
-  .members-deck__card:nth-child(4) {
-    top: -60px;
-    left: 60px;
-    z-index: 4;
-  }
-  .members-deck__card:nth-child(5) {
-    top: -80px;
-    left: 80px;
-    z-index: 5;
-  }
+  /* Stacking offsets are controlled by JS (initMembersCarousel) */
 
   .members-deck__border {
     position: relative;
@@ -227,11 +232,31 @@ const borderGradients = [
 
   .members-info__bio {
     margin: 0;
-    font-size: clamp(0.88rem, 0.5vw + 0.6rem, 1.05rem);
+    font-size: clamp(1.05rem, 0.7vw + 0.7rem, 1.32rem);
     line-height: 1.85;
     color: color-mix(in srgb, var(--color-secondary-foreground) 60%, transparent);
     max-width: 28rem;
   }
+  /* ── Flair cursor follower ── */
+  :global(.members-flair-container) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+    overflow: hidden;
+  }
+
+  :global(.members-flair-img) {
+    position: fixed;
+    opacity: 0;
+    width: 90px;
+    pointer-events: none;
+    z-index: 51;
+  }
+
   /* ── Mobile: stack vertically ── */
   @media (max-width: 720px) {
     .members-content {
@@ -251,6 +276,10 @@ const borderGradients = [
 
     .members-info__bio {
       max-width: none;
+    }
+
+    :global(.members-flair-container) {
+      display: none;
     }
   }
 </style>

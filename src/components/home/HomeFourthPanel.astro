@@ -64,6 +64,9 @@ const closingQuote = pickByLocale(
     ></video>
   </div>
 
+  <!-- Fluid reveal overlay: "open" mode — mouse erases dark veil to reveal content -->
+  <div class="fp-fluid-overlay" data-fluid-overlay="open" aria-hidden="true"></div>
+
   <!-- Right side block: Join Us (violet / secondary) -->
   <div class="landing-fourth-panel__side landing-fourth-panel__side--right landing-fourth-panel__side--violet" aria-label={joinTitle}>
     <p class="landing-fourth-panel__side-label">{pickByLocale(locale, '参与', 'Join')}</p>
@@ -78,17 +81,6 @@ const closingQuote = pickByLocale(
     </a>
   </div>
 
-  <!-- Bottom closing quote (mirrors hero slogan style) -->
-  <div class="fp-closing-quote" data-fp-closing-quote>
-    <blockquote class="fp-closing-quote__block">
-      <span class="fp-closing-quote__text" data-fp-closing-text>{closingQuote}</span>
-      <span class="fp-closing-quote__ornament" aria-hidden="true">
-        <span class="fp-closing-quote__ornament-line"></span>
-        <span class="fp-closing-quote__ornament-symbol">✦</span>
-        <span class="fp-closing-quote__ornament-line"></span>
-      </span>
-    </blockquote>
-  </div>
 
 </section>
 
@@ -262,6 +254,15 @@ const closingQuote = pickByLocale(
     }
   }
 
+  /* ── Fluid reveal overlay (WebGL canvas container) ── */
+  .fp-fluid-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
   /* ── Fullscreen loop video background ── */
   .fp-video-stage {
     position: absolute;
@@ -276,6 +277,11 @@ const closingQuote = pickByLocale(
     height: 100%;
     object-fit: cover;
     opacity: 0.7;
+  }
+
+  /* Hide raw video when distortion canvas is active */
+  .fp-video-stage:has([data-fp-distortion]) .fp-video {
+    visibility: hidden;
   }
 
   /* ── Closing quote (mirrors hero slogan) ── */

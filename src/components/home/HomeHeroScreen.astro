@@ -42,21 +42,8 @@ const isZh = locale !== 'en';
       <div class="hero-video-vignette" aria-hidden="true"></div>
     </div>
 
-    <!-- Slogan — bottom-centered, revealed after scroll-video ends -->
-    <div class="hero-slogan-stage" data-hero-slogan aria-hidden="true">
-      <blockquote class="hero-slogan" data-overview-quote>
-{isZh ? (
-<span class="hero-slogan__text">未来我们将如何存在</span>
-) : (
-<span class="hero-slogan__text">How shall we exist in the future</span>
-)}
-        <span class="hero-slogan__ornament" aria-hidden="true">
-          <span class="hero-slogan__ornament-line"></span>
-          <span class="hero-slogan__ornament-symbol">✦</span>
-          <span class="hero-slogan__ornament-line"></span>
-        </span>
-      </blockquote>
-    </div>
+    <!-- Fluid reveal overlay: "close" mode — mouse paints dark+cyan+purple over content -->
+    <div class="hero-fluid-overlay" data-fluid-overlay="close" aria-hidden="true"></div>
   </div>
 </section>
 

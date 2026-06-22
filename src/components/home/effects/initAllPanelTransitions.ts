@@ -229,23 +229,29 @@ const initFullTransitions = ({
       overviewDivider: elements.overviewPanelDivider,
       overviewLines: elements.overviewPanelLines,
       timeline: overviewTl,
-      startAt: 0.08,
+      startAt: 0.22,
     });
   }
 
   // ── Mission panel: scrub-driven reveal (between Overview and Directions) ──
+  // Label + divider fade in first, then items slide from screen right → centre.
   const missionPanel = document.querySelector<HTMLElement>('[data-mission-panel]');
   if (missionPanel) {
-    gsap.set(missionPanel, { autoAlpha: 0, y: 48 });
+    gsap.set(missionPanel, { autoAlpha: 0 });
 
     const missionLabel = missionPanel.querySelector<HTMLElement>('[data-mission-label]');
     const missionDivider = missionPanel.querySelector<HTMLElement>('[data-mission-divider]');
-    const missionItems = gsap.utils.toArray<HTMLElement>('[data-mission-item]', missionPanel);
+    const missionHeadings = gsap.utils.toArray<HTMLElement>('[data-mission-heading]', missionPanel);
+    const missionBodies = gsap.utils.toArray<HTMLElement>('[data-mission-body]', missionPanel);
 
-    // Hide items initially
+    // Hide label + divider initially
     if (missionLabel) gsap.set(missionLabel, { autoAlpha: 0, y: 16 });
     if (missionDivider) gsap.set(missionDivider, { scaleX: 0, transformOrigin: 'center', autoAlpha: 1 });
-    missionItems.forEach((item) => gsap.set(item, { autoAlpha: 0, y: 24 }));
+
+    // Headings: fade in only (no position shift)
+    missionHeadings.forEach((h) => gsap.set(h, { autoAlpha: 0 }));
+    // Body paragraphs: start off-screen to the right
+    missionBodies.forEach((b) => gsap.set(b, { autoAlpha: 0, xPercent: 80 }));
 
     const missionTl = gsap.timeline({
       defaults: { ease: 'none' },
@@ -257,27 +263,35 @@ const initFullTransitions = ({
       },
     });
 
-    // Phase 1: panel fades in
-    missionTl.to(missionPanel, { autoAlpha: 1, y: 0, duration: 0.2, ease: 'power2.out' }, 0);
+    // Phase 1: panel fades in (background visible)
+    missionTl.to(missionPanel, { autoAlpha: 1, duration: 0.15, ease: 'power2.out' }, 0);
 
     // Phase 2: label appears
     if (missionLabel) {
-      missionTl.to(missionLabel, { autoAlpha: 1, y: 0, duration: 0.15, ease: 'power2.out' }, 0.1);
+      missionTl.to(missionLabel, { autoAlpha: 1, y: 0, duration: 0.15, ease: 'power2.out' }, 0.04);
     }
 
     // Phase 3: divider scales in
     if (missionDivider) {
-      missionTl.to(missionDivider, { scaleX: 1, duration: 0.2, ease: 'power2.out' }, 0.15);
+      missionTl.to(missionDivider, { scaleX: 1, duration: 0.2, ease: 'power2.out' }, 0.08);
     }
 
-    // Phase 4: items stagger in
-    missionTl.to(missionItems, {
+    // Phase 4: headings fade in (stay in place)
+    missionTl.to(missionHeadings, {
       autoAlpha: 1,
-      y: 0,
       duration: 0.2,
       ease: 'power2.out',
-      stagger: 0.08,
-    }, 0.25);
+      stagger: 0.1,
+    }, 0.12);
+
+    // Phase 5: body text slides from right → centre
+    missionTl.to(missionBodies, {
+      autoAlpha: 1,
+      xPercent: 0,
+      duration: 0.35,
+      ease: 'power3.out',
+      stagger: 0.12,
+    }, 0.16);
   }
 
   // ── Second panel: scrub-driven reveal (optional — panel may not exist) ──

@@ -82,6 +82,12 @@
     display: none;
   }
 
+  /* When distortion canvas is active, hide original layers to avoid doubling */
+  :global(.landing-second-panel__visual-shell:has([data-monolith-distortion])) :global(.landing-second-panel__visual-base),
+  :global(.landing-second-panel__visual-shell:has([data-monolith-distortion])) :global(.landing-second-panel__visual-binary) {
+    visibility: hidden;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     :global(.landing-second-panel__visual-glow),
     :global(.landing-second-panel__visual-scan),

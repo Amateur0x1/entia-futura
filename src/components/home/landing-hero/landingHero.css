@@ -380,6 +380,12 @@ small[data-brand-animated-text] {
   object-fit: cover;
 }
 
+/* When the distortion canvas is active, hide the raw <video> elements
+   so we don't see double. The canvas renders the distorted video instead. */
+.hero-video-shell:has([data-hero-distortion]) .hero-video {
+  visibility: hidden;
+}
+
 .hero-video-scroll {
   filter: var(--filter-hero-scroll);
 }
@@ -493,6 +499,15 @@ small[data-brand-animated-text] {
   line-height: 1;
 }
 
+
+/* ── Fluid reveal overlay (WebGL canvas container) ────────────────────────── */
+.hero-fluid-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
 
 @media (max-width: 720px) {
   .hero-slogan-stage {

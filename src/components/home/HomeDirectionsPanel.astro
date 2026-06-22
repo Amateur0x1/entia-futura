@@ -12,29 +12,14 @@ const categories = [
   {
     key: 'research-directions',
     label: pickByLocale(locale, '研究方向', 'Research Directions'),
-    subtitle: pickByLocale(
-      locale,
-      'How shall we exist in the future?',
-      'How shall we exist in the future?',
-    ),
   },
   {
     key: 'project-mechanisms',
     label: pickByLocale(locale, '项目机制', 'Project Mechanisms'),
-    subtitle: pickByLocale(
-      locale,
-      '未来人研究所 | ENTIA FUTURA INSTITUT',
-      'ENTIA FUTURA INSTITUT',
-    ),
   },
   {
     key: 'research-translation',
     label: pickByLocale(locale, '研究转化', 'Research Translation'),
-    subtitle: pickByLocale(
-      locale,
-      '让研究进入现实',
-      'Bringing research into reality',
-    ),
   },
 ];
 
@@ -218,7 +203,6 @@ const groupAccents = [
           data-directions-category={i}
         >
           <span class="directions-category__label">{cat.label}</span>
-          <span class="directions-category__subtitle">{cat.subtitle}</span>
         </div>
       ))}
     </div>
@@ -298,16 +282,6 @@ const groupAccents = [
     color: var(--color-secondary-foreground);
     line-height: 1.2;
   }
-
-  .directions-category__subtitle {
-    font-family: 'POIRETONE-REGULAR', 'Helvetica Neue', Arial, sans-serif;
-    font-size: clamp(0.68rem, 0.5vw + 0.44rem, 0.82rem);
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    opacity: 0.6;
-  }
-
 
   /* ── Card track ── */
   .directions-track {
