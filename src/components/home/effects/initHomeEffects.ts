@@ -10,6 +10,7 @@ import { initHeroVideoEffects } from './heroVideoEffects';
 import { initMonolithBinaryVisuals } from './initMonolithBinaryVisuals';
 import { createFluidRevealOverlay, type FluidOverlayInstance } from './initFluidRevealOverlay';
 import { createFluidDistortion, type FluidDistortionInstance } from './initHeroVideoDistortion';
+import { HERO_TO_INTRO_TIMING } from './initAllPanelTransitions';
 
 const initSmoothScrolling = () => {
   const lenis = new Lenis({
@@ -226,8 +227,13 @@ const initFluidOverlays = () => {
       trigger: triggerEl,
       start: () => {
         const spacerH = triggerEl.offsetHeight;
-        // Start the tide at 50% through the hero pin-spacer.
-        return `top+=${Math.round(spacerH * 0.50)} top`;
+        // Start the tide AFTER video playback ends.
+        // videoPlaybackEnd / totalDuration gives the scroll fraction where video finishes.
+        // We use the timing constants to compute this ratio precisely.
+        const videoEnd = HERO_TO_INTRO_TIMING.videoPlaybackStart + HERO_TO_INTRO_TIMING.videoPlaybackDuration;
+        const totalDur = videoEnd + HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd + HERO_TO_INTRO_TIMING.sloganHoldDuration;
+        const videoEndRatio = Math.min(videoEnd / totalDur, 0.92);
+        return `top+=${Math.round(spacerH * videoEndRatio)} top`;
       },
       // End at the pin-spacer bottom (hero unpin point).
       end: 'bottom top',

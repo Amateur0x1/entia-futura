@@ -46,13 +46,7 @@ const initReducedMotionTransitions = ({
 }: Pick<InitAllPanelTransitionsOptions, 'elements' | 'directionsPanel' | 'membersPanel' | 'fourthPanel'>) => {
   const { overviewPanel, secondPanel } = elements;
 
-  // Show slogan immediately.
-  const sloganStage = elements.heroTransitionRoot?.querySelector<HTMLElement>('[data-hero-slogan]');
-  const sloganQuote = elements.heroTransitionRoot?.querySelector<HTMLElement>('[data-overview-quote]');
-  if (sloganStage) {
-    gsap.set(sloganStage, { opacity: 1 });
-    if (sloganQuote) gsap.set(sloganQuote, { opacity: 1 });
-  }
+  // Slogan is CSS-visible by default — nothing to do for reduced-motion.
 
   if (overviewPanel) {
     setupOverviewPanelReveal({
@@ -68,6 +62,55 @@ const initReducedMotionTransitions = ({
 
   if (membersPanel) gsap.set(membersPanel, { autoAlpha: 1 });
   if (fourthPanel) gsap.set(fourthPanel, { autoAlpha: 1 });
+};
+
+// ---------------------------------------------------------------------------
+// Accent word rotation (time-based, independent of scroll)
+//
+// Cycles through an array of words with a smooth vertical swap animation.
+// Each word slides up + fades out, then the new word slides in from below.
+// ---------------------------------------------------------------------------
+type RotatableElement = HTMLElement & { _rotateInterval?: number };
+
+const startAccentWordRotation = (el: HTMLElement, words: string[]) => {
+  const rotEl = el as RotatableElement;
+
+  // Guard against duplicate invocations (scrub can re-trigger callbacks).
+  if (rotEl._rotateInterval) return;
+
+  let currentIndex = 0;
+  const INTERVAL = 3; // seconds between rotations
+
+  const rotate = () => {
+    const nextIndex = (currentIndex + 1) % words.length;
+    const nextWord = words[nextIndex];
+
+    gsap.timeline()
+      // Phase 1: current word slides up and fades out
+      .to(el, {
+        yPercent: -30,
+        opacity: 0,
+        filter: 'blur(4px)',
+        duration: 0.4,
+        ease: 'power2.in',
+        onComplete: () => {
+          el.textContent = nextWord;
+          gsap.set(el, { yPercent: 30, filter: 'blur(4px)' });
+        },
+      })
+      // Phase 2: new word slides in from below
+      .to(el, {
+        yPercent: 0,
+        opacity: 1,
+        filter: 'blur(0px)',
+        duration: 0.5,
+        ease: 'power2.out',
+      });
+
+    currentIndex = nextIndex;
+  };
+
+  rotEl._rotateInterval = window.setInterval(rotate, INTERVAL * 1000);
 };
 
 // ---------------------------------------------------------------------------
@@ -117,7 +160,6 @@ const initFullTransitions = ({
       pin: true,
       pinSpacing: true,
       scrub: 0.35,
-      anticipatePin: 1,
       invalidateOnRefresh: true,
     },
   });
@@ -136,19 +178,46 @@ const initFullTransitions = ({
 
   const sloganHoldStart = videoPlaybackEnd + HERO_TO_INTRO_TIMING.panelRevealDelayAfterVideoEnd;
 
-  // ── Slogan reveal after video playback ──────────────────────────────
+  // ── Slogan: visible from first frame, fades out during early scroll ──────
   const sloganStage = heroTransitionRoot.querySelector<HTMLElement>('[data-hero-slogan]');
   const sloganQuote = heroTransitionRoot.querySelector<HTMLElement>('[data-overview-quote]');
 
-  const sloganRevealAt = sloganHoldStart;
+  // The slogan is CSS-visible by default (no opacity:0 initial state).
+  // We fade it OUT during the first ~40 % of the video scrub so it
+  // disappears smoothly as the user scrolls down.
+  const sloganFadeOutStart = 0.6;                    // timeline position to start fading
+  const sloganFadeOutDuration = 1.2;                  // duration within the scrub timeline
 
   if (sloganStage) {
-    const signalCardsFadeOutAt = sloganHoldStart - 0.3;
+    // Signal cards also fade out together with the slogan.
     heroTimeline.to(
       elements.signalCards,
       { autoAlpha: 0, y: -38, duration: 0.28, stagger: 0.02 },
-      signalCardsFadeOutAt,
+      sloganFadeOutStart,
     );
+
+    // Fade out the slogan stage (text drifts up slightly as it disappears).
+    heroTimeline.to(
+      sloganStage,
+      {
+        opacity: 0,
+        y: -40,
+        filter: 'blur(6px)',
+        duration: sloganFadeOutDuration,
+        ease: 'power2.in',
+      },
+      sloganFadeOutStart,
+    );
+
+    // ── Accent word rotation: starts immediately on page load ──
+    const accentEl = sloganStage.querySelector<HTMLElement>('[data-rotate-words]');
+    if (accentEl) {
+      const words = (accentEl.dataset.rotateWords ?? '').split(',').filter(Boolean);
+      if (words.length > 1) {
+        // Kick off rotation on next frame so layout is settled.
+        requestAnimationFrame(() => startAccentWordRotation(accentEl, words));
+      }
+    }
   } else {
     const sloganHoldEnd = sloganHoldStart + HERO_TO_INTRO_TIMING.sloganHoldDuration;
     heroTimeline.to(
@@ -156,39 +225,6 @@ const initFullTransitions = ({
       { autoAlpha: 0, y: -58, duration: 0.32, stagger: 0.02 },
       sloganHoldEnd,
     );
-  }
-
-  if (sloganStage) {
-    gsap.registerPlugin(SplitText);
-    const sloganText = sloganQuote?.querySelector<HTMLElement>('.hero-slogan__text');
-    if (sloganQuote) gsap.set(sloganQuote, { opacity: 1 });
-
-    let split: SplitText | null = null;
-    if (sloganText) {
-      split = new SplitText(sloganText, { type: 'chars' });
-      gsap.set(split.chars, { opacity: 0, y: 20, filter: 'blur(4px)' });
-    }
-
-    const earlyRevealAt = sloganRevealAt - 0.6;
-    heroTimeline.to(sloganStage, { opacity: 1, duration: 0.3, ease: 'none' }, earlyRevealAt);
-
-    if (sloganText && split) {
-      const charCount = split.chars.length;
-      const revealBudget = 1.2;
-      const perCharDuration = revealBudget / (charCount + 1);
-      heroTimeline.to(
-        split.chars,
-        {
-          opacity: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          duration: perCharDuration,
-          stagger: perCharDuration,
-          ease: 'power2.out',
-        },
-        earlyRevealAt + 0.1,
-      );
-    }
   }
 
   // Video scrub segment — added immediately if metadata is available,
@@ -206,30 +242,30 @@ const initFullTransitions = ({
   // ── Overview panel: scrub-driven reveal ─────────────────────────────────
   if (overviewPanel) {
     // Hide panel initially.
-    gsap.set(overviewPanel, { autoAlpha: 0, y: 48 });
+    gsap.set(overviewPanel, { autoAlpha: 0, y: 32 });
 
     const overviewTl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: overviewPanel,
-        start: 'top 110%',       // begin when panel top is ~10% below viewport bottom
-        end: 'top -12%',         // finish over ~1.22 screens of scroll distance
+        start: 'top 80%',        // begin when panel is already partially visible
+        end: 'top 10%',          // finish when panel top is near viewport top
         scrub: 0.4,
       },
     });
 
-    // Phase 1: panel fades in.
-    overviewTl.to(overviewPanel, { autoAlpha: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0);
+    // Phase 1: panel fades in quickly.
+    overviewTl.to(overviewPanel, { autoAlpha: 1, y: 0, duration: 0.15, ease: 'power2.out' }, 0);
 
-    // Phase 2: content reveals (divider + SplitText lines), starting early
-    // so the scatter→order animation completes quickly.
+    // Phase 2: content reveals (divider + SplitText scatter→order).
+    // Starts very early so text is mostly settled when panel is visible.
     setupOverviewPanelReveal({
       prefersReducedMotion: false,
       overviewPanel,
       overviewDivider: elements.overviewPanelDivider,
       overviewLines: elements.overviewPanelLines,
       timeline: overviewTl,
-      startAt: 0.22,
+      startAt: 0.05,
     });
   }
 
@@ -250,8 +286,14 @@ const initFullTransitions = ({
 
     // Headings: fade in only (no position shift)
     missionHeadings.forEach((h) => gsap.set(h, { autoAlpha: 0 }));
-    // Body paragraphs: start off-screen to the right
-    missionBodies.forEach((b) => gsap.set(b, { autoAlpha: 0, xPercent: 80 }));
+    // Body paragraphs: start off-screen — direction matches item side
+    // (left items slide in from the left, right items from the right)
+    const missionItems = gsap.utils.toArray<HTMLElement>('[data-mission-item]', missionPanel);
+    missionBodies.forEach((b, i) => {
+      const side = missionItems[i]?.getAttribute('data-mission-side');
+      const xDir = side === 'right' ? 80 : -80;
+      gsap.set(b, { autoAlpha: 0, xPercent: xDir });
+    });
 
     const missionTl = gsap.timeline({
       defaults: { ease: 'none' },

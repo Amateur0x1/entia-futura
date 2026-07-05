@@ -154,9 +154,8 @@ export function initDirectionsCarousel(panel: HTMLElement) {
       end: `+=${scrollDistance}`,
       pin: true,
       pinSpacing: true,
-      scrub: 0.4,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
+    scrub: 0.4,
+    invalidateOnRefresh: true,
       onUpdate: (self) => {
         // Determine which group is currently centred.
         // Progress 0→1 maps to firstCardPeak→lastCardPeak in the loop timeline.

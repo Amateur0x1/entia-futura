@@ -418,80 +418,78 @@ small[data-brand-animated-text] {
   pointer-events: none;
 }
 
-/* ── Act 1: Slogan stage (bottom-centered) ──────────────────────────────── */
+/* ── Act 1: Slogan stage (left-aligned, visible from first frame) ──────── */
 
 .hero-slogan-stage {
   position: absolute;
   inset: 0;
   z-index: 4;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: clamp(3rem, 8vh, 6rem) clamp(1.5rem, 6vw, 5rem) clamp(5.2rem, 12vh, 8.4rem);
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 clamp(3rem, 8vw, 9rem);
   pointer-events: none;
-  opacity: 0;
-  overflow: hidden;
-  /* initial state — driven by GSAP scroll scrub */
+  /* Visible immediately — GSAP will fade it OUT on scroll. */
 }
 
+/* ── Slogan block (shared between zh / en) ────────────────────────────── */
 .hero-slogan {
   margin: 0;
   padding: 0;
-  max-width: min(86rem, 96vw);
-  overflow: hidden;
-  overflow-wrap: break-word;
-  text-align: center;
-}
-
-.hero-slogan__text {
-  display: block;
-  font-family: "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(1.42rem, 2.6vw + 0.2rem, 2.1rem);
-  font-weight: 500;
-  line-height: 1.72;
-  letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--color-primary) 60%, white 40%);
-  text-shadow:
-    0 0 18px color-mix(in srgb, var(--color-primary) 50%, transparent),
-    0 0 40px color-mix(in srgb, var(--color-primary) 22%, transparent);
-  -webkit-font-smoothing: antialiased;
-}
-
-:lang(zh) .hero-slogan__text {
-  line-height: 1.92;
-  letter-spacing: 0.10em;
-}
-
-/* ── Slogan ornament (decorative lines + symbol) ──────────────────────────── */
-.hero-slogan__ornament {
+  overflow: visible;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  width: 100%;
-  margin-top: 1.2rem;
-  opacity: 0.8;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 }
 
-.hero-slogan__ornament-line {
-  flex: 1;
-  max-width: 10rem;
-  height: 1.5px;
+/* Each line is a separate block element — ensures explicit line breaks. */
+.hero-slogan__line {
+  display: block;
+  font-family: 'POIRETONE-REGULAR', "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 0 40px rgba(255, 255, 255, 0.06);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.3;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+}
+
+/* ── English variant ────────────────────────────────────────────────────── */
+.hero-slogan--en .hero-slogan__line {
+  font-size: clamp(3.4rem, 7vw + 0.8rem, 6.4rem);
+  text-transform: lowercase;
+  letter-spacing: 0.24em;
+  line-height: 1.15;
+}
+
+/* ── Chinese variant ────────────────────────────────────────────────────── */
+.hero-slogan--zh .hero-slogan__line {
+  font-family: 'POIRETONE-REGULAR', "Hiragino Sans GB", "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: clamp(3rem, 6.5vw + 0.8rem, 5.8rem);
+  letter-spacing: 0.32em;
+  line-height: 1.2;
+}
+
+/* ── Gradient accent word ───────────────────────────────────────────────── */
+/* display:inline-block required for GSAP yPercent transform during rotation. */
+.hero-slogan__accent,
+.hero-slogan__accent > div {
+  display: inline-block;
+  font-size: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
   background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--color-primary) 60%, white 40%),
-    transparent
+    135deg,
+    var(--palette-cosmic-cyan, #00e5ff) 0%,
+    color-mix(in srgb, var(--palette-cosmic-cyan, #00e5ff) 60%, var(--palette-cosmic-violet, #7b5cff) 40%) 50%,
+    var(--palette-cosmic-violet, #7b5cff) 100%
   );
-}
-
-.hero-slogan__ornament-symbol {
-  font-size: 0.68rem;
-  color: color-mix(in srgb, var(--color-primary) 50%, white 50%);
-  text-shadow:
-    0 0 10px color-mix(in srgb, var(--color-primary) 55%, transparent),
-    0 0 24px color-mix(in srgb, var(--color-primary) 28%, transparent);
-  line-height: 1;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
 }
 
 
@@ -511,11 +509,15 @@ small[data-brand-animated-text] {
 
 @media (max-width: 720px) {
   .hero-slogan-stage {
-    padding: 1.5rem max(1rem, calc(env(safe-area-inset-left) + 0.9rem)) max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem));
+    padding: 0 max(1.5rem, calc(env(safe-area-inset-left) + 1.2rem));
   }
 
-  .hero-slogan__text {
-    font-size: clamp(1.24rem, 5vw, 1.56rem);
+  .hero-slogan--en .hero-slogan__line {
+    font-size: clamp(2.4rem, 12vw, 3.8rem);
+  }
+
+  .hero-slogan--zh .hero-slogan__line {
+    font-size: clamp(2.2rem, 11vw, 3.4rem);
   }
 }
 

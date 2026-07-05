@@ -42,8 +42,8 @@ const items = [
     <span class="mission-panel__label" data-mission-label>{sectionLabel}</span>
     <div class="mission-panel__divider" data-mission-divider aria-hidden="true"></div>
     <div class="mission-panel__items" data-mission-items>
-      {items.map((item) => (
-        <div class="mission-panel__item" data-mission-item>
+      {items.map((item, i) => (
+        <div class={`mission-panel__item ${i % 2 === 0 ? 'mission-panel__item--left' : 'mission-panel__item--right'}`} data-mission-item data-mission-side={i % 2 === 0 ? 'left' : 'right'}>
           <h3 class="mission-panel__heading" data-mission-heading>{item.heading}</h3>
           <p class="mission-panel__body" data-mission-body>{item.body}</p>
         </div>
@@ -70,8 +70,9 @@ const items = [
     flex-direction: column;
     align-items: center;
     text-align: center;
-    max-width: min(52rem, 88vw);
-    padding: clamp(3rem, 8vh, 6rem) clamp(1.5rem, 4vw, 3rem);
+    width: 100%;
+    max-width: min(72rem, 92vw);
+    padding: clamp(3rem, 8vh, 6rem) clamp(2rem, 6vw, 5rem);
   }
 
   .mission-panel__label {
@@ -97,13 +98,27 @@ const items = [
     display: flex;
     flex-direction: column;
     gap: clamp(2.8rem, 6vh, 4.2rem);
+    width: 100%;
   }
 
   .mission-panel__item {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 1rem;
+  }
+
+  .mission-panel__item--left {
+    align-items: flex-start;
+    align-self: flex-start;
+    text-align: left;
+    max-width: 60%;
+  }
+
+  .mission-panel__item--right {
+    align-items: flex-end;
+    align-self: flex-end;
+    text-align: right;
+    max-width: 60%;
   }
 
   .mission-panel__heading {
@@ -154,6 +169,11 @@ const items = [
     .mission-panel__inner {
       max-width: 92vw;
       padding: clamp(2.5rem, 6vh, 4rem) clamp(1rem, 3vw, 2rem);
+    }
+
+    .mission-panel__item--left,
+    .mission-panel__item--right {
+      max-width: 85%;
     }
 
     .mission-panel__heading {

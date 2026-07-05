@@ -316,7 +316,6 @@ export function initMembersCarousel(membersPanel: HTMLElement) {
     pin: true,
     pinSpacing: true,
     scrub: 0.3,
-    anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: (self) => {
       const progress = self.progress;
