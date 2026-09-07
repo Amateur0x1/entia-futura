@@ -32,28 +32,6 @@ const isZh = locale !== 'en';
 
   </div>
 
-  <!-- Core question headline — revealed via GSAP line-by-line after video scrub.
-       Chinese and English use separate markup so each language gets its own
-       line-break rhythm with the accent word on a dedicated, prominent line. -->
-  <div class="hero-slogan-stage" data-hero-slogan>
-    {isZh ? (
-      <blockquote class="hero-slogan hero-slogan--zh" data-overview-quote>
-        <span class="hero-slogan__line" data-slogan-line>未来</span>
-        <span class="hero-slogan__line" data-slogan-line>我们将如何</span>
-        <span class="hero-slogan__line hero-slogan__line--accent" data-slogan-line>
-          <span class="hero-slogan__accent" data-rotate-words="存在,生存,生活">存在</span>
-        </span>
-      </blockquote>
-    ) : (
-      <blockquote class="hero-slogan hero-slogan--en" data-overview-quote>
-        <span class="hero-slogan__line" data-slogan-line>How shall we</span>
-        <span class="hero-slogan__line hero-slogan__line--accent" data-slogan-line>
-          <span class="hero-slogan__accent" data-rotate-words="exist,survive,live">exist</span>
-        </span>
-        <span class="hero-slogan__line" data-slogan-line>in the future?</span>
-      </blockquote>
-    )}
-  </div>
 </section>
 
 <!-- Fluid reveal overlay: "close" mode.
